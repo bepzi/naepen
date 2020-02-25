@@ -1,0 +1,79 @@
+# -*- mode: yaml;-*-
+---
+# Global defaults for all C-like languages
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: true
+AlignTrailingComments: false
+
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+
+BinPackArguments: true
+BinPackParameters: true
+
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: WebKit
+BreakStringLiterals: true
+
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+
+# Same convention as in Python
+SpacesBeforeTrailingComments: 2
+
+# Don't inject spaces around my punctuation unless I say so!
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+SpaceAfterCStyleCast: false
+
+SortUsingDeclarations: true
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# I prefer to do this manually with Emacs
+ReflowComments: false
+---
+Language: Cpp
+Standard: Cpp11
+
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+
+PointerAlignment: Right
+FixNamespaceComments: true
+
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+Cpp11BracedListStyle: true
+
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+
+AlwaysBreakTemplateDeclarations: Yes
+
+AccessModifierOffset: -4
+
+SpaceBeforeCpp11BracedList: true
+SpaceAfterTemplateKeyword: false
+
+AlignEscapedNewlines: Right

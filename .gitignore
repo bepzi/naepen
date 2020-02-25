@@ -1,0 +1,4 @@
+**/*build*
+**/.idea
+# */Builds/LinuxMakefile/build
+# */Builds/CLion/cmake-build-*
