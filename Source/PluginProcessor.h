@@ -1,25 +1,17 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
+
+#include "Wavetable.h"
 
 #include <JuceHeader.h>
 
-//==============================================================================
 /**
-*/
+ * Handles audio, MIDI I/O, and processing logic.
+ */
 class NaepenAudioProcessor : public AudioProcessor {
 public:
     //==============================================================================
     NaepenAudioProcessor();
-    ~NaepenAudioProcessor();
+    ~NaepenAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
@@ -54,7 +46,11 @@ public:
     void getStateInformation(MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
+    SineWavetable<1024, 44100> table;
+
 private:
+
     //==============================================================================
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessor)
 };

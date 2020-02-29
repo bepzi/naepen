@@ -49,6 +49,8 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
+    "../../Source/Wavetable.h"
+    "../../Source/Oscillator.h"
     "../../Source/PluginProcessor.cpp"
     "../../Source/PluginProcessor.h"
     "../../Source/PluginEditor.cpp"
@@ -1184,6 +1186,8 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JuceHeader.h"
 )
 
+set_source_files_properties ("../../Source/Wavetable.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/Oscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h" PROPERTIES HEADER_FILE_ONLY TRUE)

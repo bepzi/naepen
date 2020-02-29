@@ -9,6 +9,8 @@
               pluginDesc="A WIP polyphonic synthesizer">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
+      <FILE id="tJd19S" name="Wavetable.h" compile="0" resource="0" file="Source/Wavetable.h"/>
+      <FILE id="kahB3j" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="HRNWTR" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="jNXuei" name="PluginProcessor.h" compile="0" resource="0"

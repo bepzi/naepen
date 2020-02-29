@@ -1,40 +1,43 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
-*/
-
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
-//==============================================================================
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &p) :
-    AudioProcessorEditor(&p), processor(p)
+    AudioProcessorEditor(&p), processor(p), visualizer(2), freq_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize(400, 300);
+    visualizer.setBufferSize(512); // TODO: No, don't do this here
+    visualizer.setSamplesPerBlock(8);
+
+    freq_slider.setRange(0.0, 5000.0);
+    freq_slider.setSkewFactorFromMidPoint(500.0);
+
+    addAndMakeVisible(visualizer);
+    addAndMakeVisible(freq_slider);
+
+    freq_slider.addListener(this);
+
+    setSize(640, 480);
+    setVisible(true);
 }
 
-NaepenAudioProcessorEditor::~NaepenAudioProcessorEditor() {}
+NaepenAudioProcessorEditor::~NaepenAudioProcessorEditor() = default;
 
 //==============================================================================
 void NaepenAudioProcessorEditor::paint(Graphics &g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
-
-    g.setColour(Colours::white);
-    g.setFont(15.0f);
-    g.drawFittedText("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void NaepenAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    auto area = getLocalBounds();
+    area.reduce(8, 8);
+
+    freq_slider.setBounds(area.removeFromTop(128));
+    visualizer.setBounds(area);
+}
+
+void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider) {
+    if (slider == &freq_slider) {
+        processor.table.set_freq((float)freq_slider.getValue());
+    }
 }
