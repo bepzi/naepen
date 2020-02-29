@@ -2,79 +2,57 @@
 
 #include "Oscillator.h"
 
+#include <functional>
+
 template<unsigned int T = 1024, unsigned int R = 44100>
 class Wavetable {
 public:
     Wavetable<T, R>() noexcept = default;
     virtual ~Wavetable<T, R>() noexcept = default;
 
-    [[nodiscard]] float get_next_sample() noexcept
+    [[nodiscard]] forcedinline float get_next_sample() noexcept
     {
-        if (use_secondary_osc) {
-            float primary_sample = weight * primary->get_next_sample();
-            float secondary_sample = (1 - weight) * secondary->get_next_sample();
-            return primary_sample + secondary_sample;
-        } else {
-            float sample = primary->get_next_sample();
-            return sample;
-        }
+        return oscillators.at(osc_idx)->get_next_sample();
     }
 
     void set_freq(float freq) noexcept
     {
-        jassert(!oscillators.empty());
-        if (oscillators.size() == 1) {
-            // Don't do any interpolation, just set the frequency
-            oscillators[0].second->set_freq(freq);
-            primary = oscillators[0].second;
-            secondary = nullptr;
-            use_secondary_osc = false;
-            return;
+        // Find the best-fitting oscillator for this
+        // frequency, and prepare that oscillator for playback.
+        osc_idx = std::floor(R / (2.0f * (freq < 1.0f ? 1.0f : freq)));
+        jassert(osc_idx >= 1);
+
+        if (osc_idx >= oscillators.size()) {
+            // We don't have an oscillator with enough harmonics, choose the next-best one
+            osc_idx = oscillators.size() - 1;
         }
 
-        unsigned int lower_idx = 0;
-        for (auto i = 0; i < oscillators.size(); ++i) {
-            if (oscillators[i].first > freq) {
-                break;
-            } else {
-                lower_idx = i;
-            }
+        oscillators.at(osc_idx)->set_freq(freq);
+    }
+
+    /**
+     * Computes the amount of space (in bytes) this wavetable takes up in memory.
+     */
+    [[nodiscard]] size_t get_space_occupied() const noexcept
+    {
+        return (T + 1) * oscillators.size() * sizeof(float);
+    }
+
+    /**
+     * Computes the lowest frequency that can be accurately represented.
+     */
+    [[nodiscard]] float get_lowest_accurate_freq() const noexcept
+    {
+        if (oscillators.empty()) {
+            return 0.0f;
         }
 
-        unsigned int upper_idx = (lower_idx + 1 < oscillators.size()) ? lower_idx + 1 : lower_idx;
-        if (lower_idx != upper_idx) {
-            auto lower = oscillators[lower_idx];
-            auto upper = oscillators[upper_idx];
-
-            if (lower.first < freq && upper.first > freq) {
-                primary = oscillators[lower_idx].second;
-                secondary = oscillators[upper_idx].second;
-                primary->set_freq(freq);
-                secondary->set_freq(freq);
-                use_secondary_osc = true;
-                weight = (upper.first - freq) / (upper.first - lower.first);
-
-            } else {
-                primary = oscillators[lower_idx].second;
-                primary->set_freq(freq);
-                secondary = nullptr;
-                use_secondary_osc = false;
-            }
-        } else {
-            primary = oscillators[lower_idx].second;
-            primary->set_freq(freq);
-            secondary = nullptr;
-            use_secondary_osc = false;
-        }
+        return R / (2.0f * (oscillators.size() - 1));
     }
 
 protected:
-    bool use_secondary_osc = false;
-    Oscillator<T, R> *primary = nullptr;
-    Oscillator<T, R> *secondary = nullptr;
-    float weight = 0.0;
-
-    std::vector<std::pair<float, Oscillator<T, R> *>> oscillators;
+    unsigned int osc_idx = 0;
+    std::vector<Oscillator<T, R> *> oscillators;
 };
 
 template<unsigned int T = 1024, unsigned int R = 44100>
@@ -82,26 +60,29 @@ class SawtoothWavetable : public Wavetable<T, R> {
 public:
     SawtoothWavetable<T, R>() noexcept
     {
-        this->oscillators.push_back(std::make_pair(50.0f, &sawtooth_oscs[0]));
-        this->oscillators.push_back(std::make_pair(100.0f, &sawtooth_oscs[1]));
-        this->oscillators.push_back(std::make_pair(200.0f, &sawtooth_oscs[2]));
-        this->oscillators.push_back(std::make_pair(400.0f, &sawtooth_oscs[3]));
-        this->oscillators.push_back(std::make_pair(800.0f, &sawtooth_oscs[4]));
-        this->oscillators.push_back(std::make_pair(1000.0f, &sawtooth_oscs[5]));
-        this->oscillators.push_back(std::make_pair(2000.0f, &sawtooth_oscs[6]));
-        this->oscillators.push_back(std::make_pair(4000.0f, &sawtooth_oscs[7]));
+        this->oscillators.resize(num_harmonics + 1, nullptr);
+
+        for (unsigned int i = 1; i <= num_harmonics; ++i) {
+            auto *osc = new SawtoothOscillator<T, R>(i);
+            this->oscillators[i] = osc;
+        }
+
+        auto usage = this->get_space_occupied();
+        auto freq = this->get_lowest_accurate_freq();
+
+        jassert(!this->oscillators.empty());
+    }
+
+    ~SawtoothWavetable<T, R>() noexcept
+    {
+        for (auto &osc : this->oscillators) {
+            delete osc;
+        }
+        this->oscillators.clear();
     }
 
 private:
-    SawtoothOscillator<T, R> sawtooth_oscs[8] = {
-        SawtoothOscillator<T, R>(50.0f),
-        SawtoothOscillator<T, R>(100.0f),
-        SawtoothOscillator<T, R>(200.0f),
-        SawtoothOscillator<T, R>(400.0f),
-        SawtoothOscillator<T, R>(800.0f),
-        SawtoothOscillator<T, R>(1000.0f),
-        SawtoothOscillator<T, R>(2000.0f),
-        SawtoothOscillator<T, R>(4000.0f)};
+    static const unsigned int num_harmonics = 70;
 };
 
 template<unsigned int T = 1024, unsigned int R = 44100>
@@ -109,9 +90,13 @@ class SineWavetable : public Wavetable<T, R> {
 public:
     SineWavetable<T, R>() noexcept
     {
-        this->oscillators.push_back(std::make_pair(440.0f, &sine_oscs[0]));
+        this->oscillators.resize(num_harmonics + 1, nullptr);
+        this->oscillators[1] = (&sine_osc);
+        jassert(!this->oscillators.empty());
     }
 
 private:
-    SineOscillator<T, R> sine_oscs[1] = {SineOscillator<T, R>()};
+    static const unsigned int num_harmonics = 1;
+
+    SineOscillator<T, R> sine_osc = {};
 };

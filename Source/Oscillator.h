@@ -37,8 +37,20 @@ public:
         return T;
     }
 
+    [[nodiscard]] unsigned int get_num_harmonics() const noexcept
+    {
+        return num_harmonics;
+    }
+
 protected:
     float buf[T + 1] = {};
+
+    /// How many harmonics were used to synthesize the values in the buffer.
+    ///
+    /// If this number is too high and you try to play a high-frequency tone,
+    /// you may get aliasing. Make sure the frequencies you want to play are
+    /// compatible with this table.
+    unsigned int num_harmonics = 1;
 
     float idx = 0.0f;
     float idx_delta = 0.0f;
@@ -66,15 +78,14 @@ public:
 template<unsigned int T = 1024, unsigned int R = 44100>
 class SquareOscillator : public Oscillator<T, R> {
 public:
-    explicit SquareOscillator<T, R>(float freq) noexcept
+    explicit SquareOscillator<T, R>(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
-        jassert(freq > 0.0f);
+        jassert(num_harmonics >= 1);
+        this->num_harmonics = num_harmonics;
 
         float phase = 0.0f;
         float phase_delta = MathConstants<float>::twoPi / (float)(T - 1);
-
-        auto num_harmonics = (unsigned int)(R / (2 * freq));
 
         for (auto i = 0; i < T; ++i) {
             for (auto h = 1; h <= num_harmonics; h += 2) {
@@ -92,15 +103,16 @@ public:
 template<unsigned int T = 1024, unsigned int R = 44100>
 class SawtoothOscillator : public Oscillator<T, R> {
 public:
-    explicit SawtoothOscillator<T, R>(float freq) noexcept
+    explicit SawtoothOscillator<T, R>(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
-        jassert(freq > 0.0f);
+        jassert(num_harmonics >= 1);
+        this->num_harmonics = num_harmonics;
 
         float phase = 0.0f;
         float phase_delta = MathConstants<float>::twoPi / (float)(T - 1);
 
-        auto num_harmonics = (unsigned int)(R / (2 * freq));
+        // TODO: Account for the Gibbs phenomenon
 
         for (auto i = 0; i < T; ++i) {
             for (auto h = 1; h <= num_harmonics; ++h) {
@@ -118,15 +130,14 @@ public:
 template<unsigned int T = 1024, unsigned int R = 44100>
 class TriangleOscillator : public Oscillator<T, R> {
 public:
-    explicit TriangleOscillator<T, R>(float freq) noexcept
+    explicit TriangleOscillator<T, R>(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
-        jassert(freq > 0.0f);
+        jassert(num_harmonics >= 1);
+        this->num_harmonics = num_harmonics;
 
         float phase = 0.0f;
         float phase_delta = MathConstants<float>::twoPi / (float)(T - 1);
-
-        auto num_harmonics = (unsigned int)(R / (2 * freq));
 
         for (auto i = 0; i < T; ++i) {
             for (auto h = 1; h <= num_harmonics; h += 2) {

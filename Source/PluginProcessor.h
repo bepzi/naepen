@@ -48,7 +48,7 @@ public:
 
     void set_freq(float freq)
     {
-        table.set_freq(freq);
+        this->freq = freq;
     }
 
     void set_gain(float gain)
@@ -57,9 +57,10 @@ public:
     }
 
 private:
+    float freq = 0.0f;
     float gain = 0.0f;
-    SineWavetable<1024, 44100> table;
 
+    SawtoothWavetable<1024, 44100> table = {};
     AudioVisualiserComponent visualizer;
 
     //==============================================================================

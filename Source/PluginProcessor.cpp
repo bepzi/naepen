@@ -119,6 +119,7 @@ bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) co
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
 {
     ScopedNoDenormals noDenormals;
+
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -131,6 +132,8 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     if (totalNumOutputChannels < 1) {
         return;
     }
+
+    table.set_freq(freq);
 
     // Do the computations for channel 0
     {
