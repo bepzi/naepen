@@ -46,9 +46,21 @@ public:
     void getStateInformation(MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
-    SineWavetable<1024, 44100> table;
+    void set_freq(float freq)
+    {
+        table.set_freq(freq);
+    }
+
+    void set_gain(float gain)
+    {
+        this->gain = gain;
+    }
 
 private:
+    float gain = 0.0f;
+    SineWavetable<1024, 44100> table;
+
+    AudioVisualiserComponent visualizer;
 
     //==============================================================================
 

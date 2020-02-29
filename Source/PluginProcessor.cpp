@@ -12,8 +12,9 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
                        .withOutput("Output", AudioChannelSet::stereo(), true)
 #endif
-    )
+                       ),
 #endif
+    visualizer(2)
 {
     table.set_freq(0.0f);
 }
@@ -81,6 +82,8 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &newName) {
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
+    visualizer.setBufferSize(samplesPerBlock);
+    visualizer.setSamplesPerBlock(samplesPerBlock / 64);
 }
 
 void NaepenAudioProcessor::releaseResources()
@@ -133,7 +136,7 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     {
         float *c0_buf = buffer.getWritePointer(0);
         for (int i = 0; i < buffer.getNumSamples(); ++i) {
-            c0_buf[i] = table.get_next_sample() * 0.03f;
+            c0_buf[i] = table.get_next_sample() * gain;
         }
     }
 
@@ -143,6 +146,8 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
         float *buf = buffer.getWritePointer(channel);
         std::memcpy(buf, c0_buf, sizeof(float) * buffer.getNumSamples());
     }
+
+    visualizer.pushBuffer(buffer);
 }
 
 //==============================================================================
@@ -153,7 +158,7 @@ bool NaepenAudioProcessor::hasEditor() const
 
 AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 {
-    return new NaepenAudioProcessorEditor(*this);
+    return new NaepenAudioProcessorEditor(*this, visualizer);
 }
 
 //==============================================================================

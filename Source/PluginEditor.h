@@ -9,7 +9,7 @@
  */
 class NaepenAudioProcessorEditor : public AudioProcessorEditor, public Slider::Listener {
 public:
-    explicit NaepenAudioProcessorEditor(NaepenAudioProcessor &);
+    NaepenAudioProcessorEditor(NaepenAudioProcessor &, AudioVisualiserComponent &);
     ~NaepenAudioProcessorEditor() override;
 
     //==============================================================================
@@ -23,8 +23,13 @@ private:
     // access the processor object that created it.
     NaepenAudioProcessor &processor;
 
+    Label freq_label;
+    Label gain_label;
+
     Slider freq_slider;
-    AudioVisualiserComponent visualizer;
+    Slider gain_slider;
+
+    AudioVisualiserComponent &visualizer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessorEditor)
 };
