@@ -39,7 +39,8 @@ public:
     {
         // Find the best-fitting oscillator for this
         // frequency, and prepare that oscillator for playback.
-        osc_idx = std::floor((float)sample_rate / (2.0f * (freq < 1.0f ? 1.0f : freq)));
+        osc_idx =
+            (unsigned int)std::floor((float)sample_rate / (2.0f * (freq < 1.0f ? 1.0f : freq)));
 
         if (osc_idx < 1) {
             // We don't have an oscillator with too few harmonics, choose the next-best one
@@ -61,7 +62,7 @@ public:
     }
 
 protected:
-    unsigned int osc_idx;
+    size_t osc_idx;
     std::vector<Oscillator<T> *> oscillators;
 };
 

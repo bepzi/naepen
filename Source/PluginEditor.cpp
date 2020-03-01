@@ -7,9 +7,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     NaepenAudioProcessor &p, AudioVisualiserComponent &vis, MidiKeyboardState &key_state) :
     AudioProcessorEditor(&p),
     processor(p),
-    visualizer(vis),
     gain_label("", "Master Gain"),
     gain_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    visualizer(vis),
     keyboard_state(key_state),
     keyboard_component(keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {

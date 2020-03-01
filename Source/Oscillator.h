@@ -129,8 +129,8 @@ public:
 
         // TODO: Account for the Gibbs phenomenon
 
-        for (auto i = 0; i < T; ++i) {
-            for (auto h = 1; h <= num_harmonics; ++h) {
+        for (unsigned i = 0; i < T; ++i) {
+            for (unsigned int h = 1; h <= num_harmonics; ++h) {
                 float amp = 1.0f / h;
                 this->buf[i] += std::sin(phase * h) * amp;
             }

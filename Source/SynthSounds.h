@@ -42,7 +42,7 @@ public:
         tail_on = 1.0f;
 
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-        table->set_freq(freq_hz, (int)getSampleRate());
+        table->set_freq((float)freq_hz, (int)getSampleRate());
     }
 
     void stopNote(float /*velocity*/, bool allow_tail_off) override
@@ -72,7 +72,7 @@ public:
                 }
 
                 ++start_sample;
-                tail_off *= 0.99;
+                tail_off *= 0.99f;
 
                 if (tail_off <= 0.005) {
                     clearCurrentNote();
