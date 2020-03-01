@@ -17,16 +17,12 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
     visualizer(2)
 {
-//    table.set_freq(0.0f);
-
-    for (int i = 0; i < 14; ++i) {
-        synth.addVoice(new SawtoothWaveVoice());
+    for (int i = 0; i < 12; ++i) {
+        synth.addVoice(
+            new WavetableVoice<1024, 48000>(std::make_unique<SineWavetable<1024, 48000>>()));
     }
 
-//    synth.addVoice(new SawtoothWaveVoice());
-
-    synth.addSound(new SawtoothWaveSound());
-//    synth.addSound(new SawtoothWaveSound());
+    synth.addSound(new WavetableSound());
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -146,27 +142,6 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     if (totalNumOutputChannels < 1) {
         return;
     }
-
-    /*
-    table.set_freq(freq);
-
-    // Do the computations for channel 0
-    {
-        float *c0_buf = buffer.getWritePointer(0);
-        for (int i = 0; i < buffer.getNumSamples(); ++i) {
-            c0_buf[i] = table.get_next_sample() * gain;
-        }
-    }
-
-    // Copy-paste the computations from channel 0 to the others
-    const float *c0_buf = buffer.getReadPointer(0);
-    for (int channel = 1; channel < totalNumOutputChannels; ++channel) {
-        float *buf = buffer.getWritePointer(channel);
-        std::memcpy(buf, c0_buf, sizeof(float) * buffer.getNumSamples());
-    }
-
-    visualizer.pushBuffer(buffer);
-    */
 
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);

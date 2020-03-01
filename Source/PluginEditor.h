@@ -7,7 +7,10 @@
 /**
  * Handles on-screen GUI controls and visualizations.
  */
-class NaepenAudioProcessorEditor : public AudioProcessorEditor, public Slider::Listener, public ComboBox::Listener {
+class NaepenAudioProcessorEditor :
+    public AudioProcessorEditor,
+    public Slider::Listener,
+    public ComboBox::Listener {
 public:
     NaepenAudioProcessorEditor(
         NaepenAudioProcessor &, AudioVisualiserComponent &, MidiKeyboardState &);
@@ -25,10 +28,7 @@ private:
     // access the processor object that created it.
     NaepenAudioProcessor &processor;
 
-    //    Label freq_label;
     Label gain_label;
-
-    //    Slider freq_slider;
     Slider gain_slider;
 
     AudioVisualiserComponent &visualizer;

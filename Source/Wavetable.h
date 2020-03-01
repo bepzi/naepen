@@ -2,7 +2,8 @@
 
 #include "Oscillator.h"
 
-#include <functional>
+// TODO: Ditch template argument for sample-rate
+// TODO: Add copy-constructors for faster construction of the same wavetable multiple times
 
 template<unsigned int T = 1024, unsigned int R = 44100>
 class Wavetable {
@@ -66,9 +67,6 @@ public:
             auto *osc = new SawtoothOscillator<T, R>(i);
             this->oscillators[i] = osc;
         }
-
-        auto usage = this->get_space_occupied();
-        auto freq = this->get_lowest_accurate_freq();
 
         jassert(!this->oscillators.empty());
     }
