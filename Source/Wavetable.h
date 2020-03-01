@@ -82,7 +82,7 @@ public:
     }
 
 private:
-    static const unsigned int num_harmonics = 70;
+    static const unsigned int num_harmonics = 100;
 };
 
 template<unsigned int T = 1024, unsigned int R = 44100>

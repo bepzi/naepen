@@ -46,24 +46,20 @@ public:
     void getStateInformation(MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
-    void set_freq(float freq)
-    {
-        this->freq = freq;
-    }
-
     void set_gain(float gain)
     {
         this->gain = gain;
     }
 
 private:
-    float freq = 0.0f;
-    float gain = 0.0f;
+    float gain = 1.0f;
 
-    SawtoothWavetable<1024, 44100> table = {};
     AudioVisualiserComponent visualizer;
 
-    //==============================================================================
+    Synthesiser synth;
+
+    MidiMessageCollector midi_collector;
+    MidiKeyboardState keyboard_state;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessor)
 };

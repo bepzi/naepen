@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "SynthSounds.h"
 
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor()
@@ -16,7 +17,16 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
     visualizer(2)
 {
-    table.set_freq(0.0f);
+//    table.set_freq(0.0f);
+
+    for (int i = 0; i < 14; ++i) {
+        synth.addVoice(new SawtoothWaveVoice());
+    }
+
+//    synth.addVoice(new SawtoothWaveVoice());
+
+    synth.addSound(new SawtoothWaveSound());
+//    synth.addSound(new SawtoothWaveSound());
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -84,6 +94,10 @@ void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     visualizer.setBufferSize(samplesPerBlock);
     visualizer.setSamplesPerBlock(samplesPerBlock / 64);
+
+    synth.setCurrentPlaybackSampleRate(sampleRate);
+
+    midi_collector.reset(sampleRate);
 }
 
 void NaepenAudioProcessor::releaseResources()
@@ -133,6 +147,7 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
         return;
     }
 
+    /*
     table.set_freq(freq);
 
     // Do the computations for channel 0
@@ -151,6 +166,20 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     }
 
     visualizer.pushBuffer(buffer);
+    */
+
+    midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
+    keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    visualizer.pushBuffer(buffer);
+
+    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
+        float *buf = buffer.getWritePointer(channel);
+        for (int i = 0; i < buffer.getNumSamples(); ++i) {
+            buf[i] *= gain;
+        }
+    }
 }
 
 //==============================================================================
@@ -161,7 +190,7 @@ bool NaepenAudioProcessor::hasEditor() const
 
 AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 {
-    return new NaepenAudioProcessorEditor(*this, visualizer);
+    return new NaepenAudioProcessorEditor(*this, visualizer, keyboard_state);
 }
 
 //==============================================================================

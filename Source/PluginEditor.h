@@ -7,9 +7,10 @@
 /**
  * Handles on-screen GUI controls and visualizations.
  */
-class NaepenAudioProcessorEditor : public AudioProcessorEditor, public Slider::Listener {
+class NaepenAudioProcessorEditor : public AudioProcessorEditor, public Slider::Listener, public ComboBox::Listener {
 public:
-    NaepenAudioProcessorEditor(NaepenAudioProcessor &, AudioVisualiserComponent &);
+    NaepenAudioProcessorEditor(
+        NaepenAudioProcessor &, AudioVisualiserComponent &, MidiKeyboardState &);
     ~NaepenAudioProcessorEditor() override;
 
     //==============================================================================
@@ -17,19 +18,26 @@ public:
     void resized() override;
 
     void sliderValueChanged(Slider *slider) override;
+    void comboBoxChanged(ComboBox *menu) override;
 
 private:
     // This reference is provided as a quick way for the editor to
     // access the processor object that created it.
     NaepenAudioProcessor &processor;
 
-    Label freq_label;
+    //    Label freq_label;
     Label gain_label;
 
-    Slider freq_slider;
+    //    Slider freq_slider;
     Slider gain_slider;
 
     AudioVisualiserComponent &visualizer;
+
+    MidiKeyboardState &keyboard_state;
+    MidiKeyboardComponent keyboard_component;
+
+    ComboBox waveform_selector;
+    enum class WaveformId { Empty = 0, Sine, Sawtooth };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessorEditor)
 };
