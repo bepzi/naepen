@@ -2,6 +2,9 @@
 #include "PluginEditor.h"
 #include "SynthSounds.h"
 
+static const SineWavetable<1024> sine_wavetable;
+static const SawtoothWavetable<1024> sawtooth_wavetable;
+
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -18,7 +21,8 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     visualizer(2)
 {
     for (int i = 0; i < 12; ++i) {
-        synth.addVoice(new WavetableVoice<1024>(std::make_unique<SineWavetable<1024>>()));
+        auto wavetable_copy = std::make_unique<Wavetable<1024>>(sawtooth_wavetable);
+        synth.addVoice(new WavetableVoice<1024>(std::move(wavetable_copy)));
     }
 
     synth.addSound(new WavetableSound());

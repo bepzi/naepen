@@ -2,13 +2,33 @@
 
 #include "Oscillator.h"
 
-// TODO: Add copy-constructors for faster construction of the same wavetable multiple times
+// TODO: I'm not happy with the fact that you HAVE to heap-allocate the oscillators, and that the Wavetable itself will call delete on those oscillators
 
 template<unsigned int T = 1024>
 class Wavetable {
 public:
-    Wavetable() noexcept = default;
-    virtual ~Wavetable() noexcept = default;
+    Wavetable() noexcept : osc_idx(0), oscillators() {}
+
+    /**
+     * Copy constructor, useful for making copies of a wavetable
+     * without re-computing it from scratch.
+     */
+    Wavetable(const Wavetable &other) noexcept : osc_idx(other.osc_idx)
+    {
+        oscillators.resize(other.oscillators.size(), nullptr);
+        for (size_t i = 1; i < oscillators.size(); ++i) {
+            auto osc_copy = new Oscillator<T>(*other.oscillators[i]);
+            oscillators[i] = osc_copy;
+        }
+    }
+
+    virtual ~Wavetable() noexcept
+    {
+        for (auto &osc : this->oscillators) {
+            delete osc;
+        }
+        this->oscillators.clear();
+    }
 
     [[nodiscard]] forcedinline float get_next_sample() noexcept
     {
@@ -41,14 +61,14 @@ public:
     }
 
 protected:
-    unsigned int osc_idx = 0;
+    unsigned int osc_idx;
     std::vector<Oscillator<T> *> oscillators;
 };
 
 template<unsigned int T = 1024>
 class SawtoothWavetable : public Wavetable<T> {
 public:
-    SawtoothWavetable() noexcept
+    SawtoothWavetable() noexcept : Wavetable<T>()
     {
         this->oscillators.resize(num_harmonics + 1, nullptr);
 
@@ -60,14 +80,6 @@ public:
         jassert(!this->oscillators.empty());
     }
 
-    ~SawtoothWavetable() noexcept
-    {
-        for (auto &osc : this->oscillators) {
-            delete osc;
-        }
-        this->oscillators.clear();
-    }
-
 private:
     static const unsigned int num_harmonics = 100;
 };
@@ -75,15 +87,14 @@ private:
 template<unsigned int T = 1024>
 class SineWavetable : public Wavetable<T> {
 public:
-    SineWavetable() noexcept
+    SineWavetable() noexcept : Wavetable<T>()
     {
         this->oscillators.resize(num_harmonics + 1, nullptr);
-        this->oscillators[1] = (&sine_osc);
+        auto *osc = new SineOscillator<T>();
+        this->oscillators[1] = (osc);
         jassert(!this->oscillators.empty());
     }
 
 private:
     static const unsigned int num_harmonics = 1;
-
-    SineOscillator<T> sine_osc = {};
 };

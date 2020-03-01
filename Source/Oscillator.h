@@ -7,6 +7,17 @@ class Oscillator {
 public:
     Oscillator() noexcept = default;
 
+    /**
+     * Copy constructor for creating a new oscillator with the same values as the other.
+     */
+    Oscillator(const Oscillator &other) noexcept :
+        num_harmonics(other.num_harmonics), idx(other.idx), idx_delta(other.idx_delta)
+    {
+        std::memcpy(this->buf, other.buf, sizeof(float) * (T + 1));
+    }
+
+    virtual ~Oscillator() noexcept = default;
+
     void set_freq(float freq, int sample_rate) noexcept
     {
         if (sample_rate <= 0) {
