@@ -5,6 +5,8 @@
 static const SineWavetable<1024> sine_wavetable;
 static const SawtoothWavetable<1024> sawtooth_wavetable;
 
+static constexpr size_t MAX_POLYPHONY = 12;
+
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -20,8 +22,8 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
     visualizer(2)
 {
-    for (int i = 0; i < 12; ++i) {
-        auto wavetable_copy = std::make_unique<Wavetable<1024>>(sawtooth_wavetable);
+    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
+        auto wavetable_copy = std::make_unique<Wavetable<1024>>(sine_wavetable);
         synth.addVoice(new WavetableVoice<1024>(std::move(wavetable_copy)));
     }
 

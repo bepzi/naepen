@@ -4,6 +4,8 @@
 
 #include <JuceHeader.h>
 
+// TODO: Fix glitches/popping and duplicate noises when rapidly playing notes
+
 class WavetableSound : public SynthesiserSound {
 public:
     WavetableSound() noexcept = default;
@@ -38,22 +40,24 @@ public:
         int /*currentPitchWheelPosition*/) override
     {
         level = velocity * 0.15f;
-        tail_off = 0.0f;
-        tail_on = 1.0f;
+
+        atk_curr_samples = 0;
+        release_curr_samples = release_total_samples;
 
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
         table->set_freq((float)freq_hz, (int)getSampleRate());
     }
 
-    void stopNote(float /*velocity*/, bool allow_tail_off) override
+    void stopNote(float /* velocity */, bool allow_tail_off) override
     {
+        atk_curr_samples = atk_total_samples;
+
         if (allow_tail_off) {
-            if (tail_off <= 0.0) {
-                tail_off = 1.0;
-            }
+            release_curr_samples = 0;
         } else {
+            release_curr_samples = release_total_samples;
             clearCurrentNote();
-            table->set_freq(0.0f, (int)getSampleRate());
+            table->set_freq(0.0f, 1);
         }
     }
 
@@ -61,59 +65,63 @@ public:
     void controllerMoved(int, int) override {}
 
     void
-    renderNextBlock(AudioSampleBuffer &output_buffer, int start_sample, int num_samples) override
+    renderNextBlock(AudioBuffer<float> &output_buffer, int start_sample, int num_samples) override
     {
-        if (tail_off > 0.0) {
-            while (--num_samples >= 0) {
-                auto current_sample = table->get_next_sample() * level * tail_off;
+        while (--num_samples >= 0) {
+            auto current_sample = table->get_next_sample() * level;
 
-                for (auto i = output_buffer.getNumChannels(); --i >= 0;) {
-                    output_buffer.addSample(i, start_sample, current_sample);
-                }
+            if (atk_curr_samples < atk_total_samples) {
+                // Apply attack
+                current_sample *= attack_function();
+                ++atk_curr_samples;
 
-                ++start_sample;
-                tail_off *= 0.99f;
+            } else if (release_curr_samples < release_total_samples) {
+                // Apply release
+                current_sample *= release_function();
+                ++release_curr_samples;
 
-                if (tail_off <= 0.005) {
+                if (release_curr_samples >= release_total_samples) {
+                    // Finished playing the note, shut it down
                     clearCurrentNote();
-                    table->set_freq(0.0f, (int)getSampleRate());
+                    table->set_freq(0.0f, 1);
                     break;
                 }
             }
 
-        } else if (tail_on > 0) {
-            while (--num_samples >= 0) {
-                auto current_sample = table->get_next_sample() * level * (1 - tail_on);
-
-                for (auto i = output_buffer.getNumChannels(); --i >= 0;) {
-                    output_buffer.addSample(i, start_sample, current_sample);
-                }
-
-                ++start_sample;
-                tail_on *= 0.999f;
-
-                if (tail_on <= 0.0001f) {
-                    tail_on = 0.0f;
-                }
+            for (auto i = 0; i < output_buffer.getNumChannels(); ++i) {
+                output_buffer.addSample(i, start_sample, current_sample);
             }
-
-        } else {
-            while (--num_samples >= 0) {
-                auto current_sample = table->get_next_sample() * level;
-
-                for (auto i = output_buffer.getNumChannels(); --i >= 0;) {
-                    output_buffer.addSample(i, start_sample, current_sample);
-                }
-
-                ++start_sample;
-            }
+            ++start_sample;
         }
     }
 
 private:
+    size_t atk_total_samples = ms_to_samples(40.0f, getSampleRate());
+    size_t atk_curr_samples = 0;
+
+    size_t release_total_samples = ms_to_samples(200.0f, getSampleRate());
+    size_t release_curr_samples = release_total_samples;
+
     float level = 0.0f;
-    float tail_on = 0.0f;
-    float tail_off = 0.0f;
 
     std::unique_ptr<Wavetable<T>> table = nullptr;
+
+    static forcedinline size_t ms_to_samples(float time_ms, double sample_rate)
+    {
+        return (size_t)std::ceil(time_ms * 0.001f * sample_rate);
+    }
+
+    // Exponential gain: a^x - 1, where a > 1. The closer a is to 1, the slower the attack.
+    // Exponential decay: a^x, where a < 1. The closer a is to 1, the slower the decay.
+    forcedinline float attack_function()
+    {
+        // TODO: Make this exponential, not linear
+        return (float)atk_curr_samples / (float)atk_total_samples;
+    }
+
+    forcedinline float release_function()
+    {
+        // TODO: Make this exponential, not linear
+        return (1.0f - ((float)release_curr_samples / (float)release_total_samples));
+    }
 };
