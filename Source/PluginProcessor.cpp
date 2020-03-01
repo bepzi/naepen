@@ -18,8 +18,7 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     visualizer(2)
 {
     for (int i = 0; i < 12; ++i) {
-        synth.addVoice(
-            new WavetableVoice<1024, 48000>(std::make_unique<SineWavetable<1024, 48000>>()));
+        synth.addVoice(new WavetableVoice<1024>(std::make_unique<SineWavetable<1024>>()));
     }
 
     synth.addSound(new WavetableSound());

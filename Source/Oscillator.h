@@ -2,15 +2,19 @@
 
 #include <JuceHeader.h>
 
-template<unsigned int T = 1024, unsigned int R = 44100>
+template<unsigned int T = 1024>
 class Oscillator {
 public:
-    Oscillator<T, R>() noexcept = default;
+    Oscillator() noexcept = default;
 
-    void set_freq(float freq) noexcept
+    void set_freq(float freq, int sample_rate) noexcept
     {
-        static_assert(R > 0);
-        idx_delta = freq * ((float)T / R);
+        if (sample_rate <= 0) {
+            idx_delta = 0.0f;
+            return;
+        }
+
+        idx_delta = freq * ((float)T / (float)sample_rate);
     }
 
     [[nodiscard]] forcedinline float get_next_sample() noexcept
@@ -56,10 +60,10 @@ protected:
     float idx_delta = 0.0f;
 };
 
-template<unsigned int T = 1024, unsigned int R = 44100>
-class SineOscillator : public Oscillator<T, R> {
+template<unsigned int T = 1024>
+class SineOscillator : public Oscillator<T> {
 public:
-    SineOscillator<T, R>() noexcept
+    SineOscillator() noexcept
     {
         static_assert(T > 1);
 
@@ -75,10 +79,10 @@ public:
     }
 };
 
-template<unsigned int T = 1024, unsigned int R = 44100>
-class SquareOscillator : public Oscillator<T, R> {
+template<unsigned int T = 1024>
+class SquareOscillator : public Oscillator<T> {
 public:
-    explicit SquareOscillator<T, R>(unsigned int num_harmonics) noexcept
+    explicit SquareOscillator(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
         jassert(num_harmonics >= 1);
@@ -100,10 +104,10 @@ public:
     }
 };
 
-template<unsigned int T = 1024, unsigned int R = 44100>
-class SawtoothOscillator : public Oscillator<T, R> {
+template<unsigned int T = 1024>
+class SawtoothOscillator : public Oscillator<T> {
 public:
-    explicit SawtoothOscillator<T, R>(unsigned int num_harmonics) noexcept
+    explicit SawtoothOscillator(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
         jassert(num_harmonics >= 1);
@@ -127,10 +131,10 @@ public:
     }
 };
 
-template<unsigned int T = 1024, unsigned int R = 44100>
-class TriangleOscillator : public Oscillator<T, R> {
+template<unsigned int T = 1024>
+class TriangleOscillator : public Oscillator<T> {
 public:
-    explicit TriangleOscillator<T, R>(unsigned int num_harmonics) noexcept
+    explicit TriangleOscillator(unsigned int num_harmonics) noexcept
     {
         static_assert(T > 1);
         jassert(num_harmonics >= 1);

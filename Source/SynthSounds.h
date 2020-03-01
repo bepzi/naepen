@@ -20,10 +20,10 @@ public:
 private:
 };
 
-template<unsigned int T = 1024, unsigned int R = 44100>
+template<unsigned int T = 1024>
 class WavetableVoice : public SynthesiserVoice {
 public:
-    explicit WavetableVoice(std::unique_ptr<Wavetable<T, R>> table) noexcept
+    explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
         this->table = std::move(table);
     }
@@ -42,7 +42,7 @@ public:
         tail_on = 1.0f;
 
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-        table->set_freq(freq_hz);
+        table->set_freq(freq_hz, (int)getSampleRate());
     }
 
     void stopNote(float /*velocity*/, bool allow_tail_off) override
@@ -53,7 +53,7 @@ public:
             }
         } else {
             clearCurrentNote();
-            table->set_freq(0.0f);
+            table->set_freq(0.0f, (int)getSampleRate());
         }
     }
 
@@ -76,7 +76,7 @@ public:
 
                 if (tail_off <= 0.005) {
                     clearCurrentNote();
-                    table->set_freq(0.0f);
+                    table->set_freq(0.0f, (int)getSampleRate());
                     break;
                 }
             }
@@ -115,5 +115,5 @@ private:
     float tail_on = 0.0f;
     float tail_off = 0.0f;
 
-    std::unique_ptr<Wavetable<1024, 48000>> table = nullptr;
+    std::unique_ptr<Wavetable<T>> table = nullptr;
 };
