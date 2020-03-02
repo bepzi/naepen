@@ -4,7 +4,7 @@
 
 #include <JuceHeader.h>
 
-//https://www.earlevel.com/main/2012/05/25/a-wavetable-oscillator%e2%80%94the-code/
+// https://www.earlevel.com/main/2012/05/25/a-wavetable-oscillator%e2%80%94the-code/
 
 // TODO: Fix glitches/popping and duplicate noises when rapidly playing notes
 
@@ -52,6 +52,7 @@ public:
 
     void stopNote(float /* velocity */, bool allow_tail_off) override
     {
+        /*
         atk_curr_samples = atk_total_samples;
 
         if (allow_tail_off) {
@@ -61,6 +62,10 @@ public:
             clearCurrentNote();
             table->set_freq(0.0f, 1);
         }
+        */
+
+        clearCurrentNote();
+        table->set_freq(0.0f, 1);
     }
 
     void pitchWheelMoved(int) override {}
@@ -72,6 +77,7 @@ public:
         while (--num_samples >= 0) {
             auto current_sample = table->get_next_sample() * level;
 
+            /*
             if (atk_curr_samples < atk_total_samples) {
                 // Apply attack
                 current_sample *= attack_function();
@@ -89,6 +95,7 @@ public:
                     break;
                 }
             }
+            */
 
             for (auto i = 0; i < output_buffer.getNumChannels(); ++i) {
                 output_buffer.addSample(i, start_sample, current_sample);

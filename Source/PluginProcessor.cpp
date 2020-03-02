@@ -2,6 +2,29 @@
 #include "PluginEditor.h"
 #include "SynthSounds.h"
 
+//static std::array<double, 2048> make_sawtooth()
+//{
+//    // Lowest freq we support is 20Hz
+//    std::array<double, 2048> out = {0.0f};
+//
+//    double phase = 0.0f;
+//    double phase_delta = MathConstants<double>::twoPi / (double)(2048);
+//    auto num_harmonics = (size_t)(48000.0 / (2.0 * 20.0));
+//
+//    for (auto &f : out) {
+//        for (size_t i = 1; i <= num_harmonics; ++i) {
+//            float amp = 1.0f / i;
+//            f += std::sin(phase * i) * amp;
+//        }
+//
+//        phase += phase_delta;
+//    }
+//
+//    return out;
+//}
+//static auto sawtooth = make_sawtooth();
+//static const GoodWavetable<> wt(sawtooth);
+
 static const SineWavetable<1024> sine_wavetable;
 static const SawtoothWavetable<1024> sawtooth_wavetable;
 

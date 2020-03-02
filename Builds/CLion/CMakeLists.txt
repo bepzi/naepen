@@ -16,6 +16,7 @@ if (UNIX AND NOT APPLE)
 project ("naepen" C CXX)
 
 find_package (PkgConfig REQUIRED)
+pkg_search_module (FFTW3 REQUIRED fftw3)
 pkg_search_module (ALSA REQUIRED alsa)
 pkg_search_module (X11 REQUIRED x11)
 pkg_search_module (XINERAMA REQUIRED xinerama)
@@ -2329,6 +2330,7 @@ include_directories (
     "/usr/share/juce/modules/juce_audio_processors/format_types/VST3_SDK"
     "../../JuceLibraryCode"
     "/usr/share/juce/modules"
+    ${FFTW3_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
     ${XINERAMA_INCLUDE_DIRS}
@@ -2397,6 +2399,7 @@ target_link_libraries (VST PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
@@ -2448,6 +2451,7 @@ target_link_libraries (STANDALONE_PLUGIN PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
@@ -2499,6 +2503,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
@@ -2535,6 +2540,7 @@ include_directories (
     "/usr/share/juce/modules/juce_audio_processors/format_types/VST3_SDK"
     "../../JuceLibraryCode"
     "/usr/share/juce/modules"
+    ${FFTW3_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
     ${XINERAMA_INCLUDE_DIRS}
@@ -2603,6 +2609,7 @@ target_link_libraries (VST PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
@@ -2654,6 +2661,7 @@ target_link_libraries (STANDALONE_PLUGIN PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
@@ -2705,6 +2713,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${DL}
     ${PTHREAD}
     ${GL}
+    ${FFTW3_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${X11_LIBRARIES}
     ${XINERAMA_LIBRARIES}
