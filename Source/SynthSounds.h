@@ -4,6 +4,8 @@
 
 #include <JuceHeader.h>
 
+//https://www.earlevel.com/main/2012/05/25/a-wavetable-oscillator%e2%80%94the-code/
+
 // TODO: Fix glitches/popping and duplicate noises when rapidly playing notes
 
 class WavetableSound : public SynthesiserSound {

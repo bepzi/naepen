@@ -18,6 +18,8 @@
       <FILE id="SgtN1L" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="JhZl2w" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="SYYBKw" name="WaveformVisualizer.h" compile="0" resource="0"
+            file="Source/WaveformVisualizer.h"/>
       <FILE id="LhpU18" name="SynthSounds.h" compile="0" resource="0" file="Source/SynthSounds.h"/>
     </GROUP>
   </MAINGROUP>

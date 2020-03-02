@@ -20,7 +20,8 @@ public:
 
     void set_freq(float freq, int sample_rate) noexcept
     {
-        if (sample_rate <= 0) {
+        if (sample_rate <= 0 || freq < 1.0f) {
+            // Treat this as a "reset", we don't want to generate any more samples
             idx_delta = 0.0f;
             return;
         }
@@ -47,6 +48,7 @@ public:
         return sample;
     }
 
+    /*
     [[nodiscard]] constexpr unsigned int get_table_size() const noexcept
     {
         return T;
@@ -56,6 +58,7 @@ public:
     {
         return num_harmonics;
     }
+    */
 
 protected:
     float buf[T + 1] = {};

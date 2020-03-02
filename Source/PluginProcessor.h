@@ -1,5 +1,6 @@
 #pragma once
 
+#include "WaveformVisualizer.h"
 #include "Wavetable.h"
 
 #include <JuceHeader.h>
@@ -54,7 +55,7 @@ public:
 private:
     float gain = 1.0f;
 
-    AudioVisualiserComponent visualizer;
+    WaveformVisualiser visualizer;
 
     Synthesiser synth;
 

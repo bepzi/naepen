@@ -55,6 +55,7 @@ add_library (SHARED_CODE STATIC
     "../../Source/PluginProcessor.h"
     "../../Source/PluginEditor.cpp"
     "../../Source/PluginEditor.h"
+    "../../Source/WaveformVisualizer.h"
     "../../Source/SynthSounds.h"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.cpp"
@@ -1191,6 +1192,7 @@ set_source_files_properties ("../../Source/Wavetable.h" PROPERTIES HEADER_FILE_O
 set_source_files_properties ("../../Source/Oscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/WaveformVisualizer.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/SynthSounds.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
