@@ -10,12 +10,13 @@
 
 class WavetableSound : public SynthesiserSound {
 public:
-    WavetableSound() noexcept = default;
+    WavetableSound() noexcept {}
 
     bool appliesToNote(int /* midi_note_number */) override
     {
         return true;
     }
+
     bool appliesToChannel(int /* midi_channel */) override
     {
         return true;
