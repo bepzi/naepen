@@ -5,6 +5,7 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+
 rcParams['font.family'] = 'monospace'
 rcParams['font.monospace'] = ['Roboto Mono', 'Ubuntu Mono', 'Source Code Pro', 'monospace']
 
@@ -29,7 +30,7 @@ def make_sawtooth(freq: float):
         phase += phase_incr
         out.append(sample)
 
-    return np.array(out)
+    return np.array(out) / 1.5741594205752307
 
 
 freqs = [1.0, 20.0, 220.0, 440.0, 5000.0, 10000.0]
@@ -46,8 +47,29 @@ sawtooth_tables = [pickle.load(open(f'{T}pt_{f}Hz.pickle', 'rb')) for f in freqs
 #     ax.set_title(f'{T}-pt Wavetable ({f} Hz)')
 # plt.show()
 
-base_wave = np.array(sawtooth_tables[1])
-ft = sp.fft.rfft(base_wave)
+base_wave = sawtooth_tables[1]
+wavetable = [(base_wave.copy(), 20.0)]
 
-max_harmonics = ft.shape[0]
-print(0)
+ft = sp.fft.rfft(base_wave)
+ft[0] = ft[T // 2] = 0  # Zero-out DC offset and Nyquist
+
+max_harmonics = T // 2
+min_val = 0.000001  # -120 dB
+
+while abs(ft[max_harmonics]) < min_val:
+    max_harmonics -= 1
+
+for _ in range(1, 32):
+    if max_harmonics <= 0:
+        break
+
+    ft[max_harmonics // 2:max_harmonics] = 0
+    wavetable.append((sp.fft.irfft(ft), R // (2 * max_harmonics)))
+    max_harmonics = max_harmonics // 2
+
+fig, axes = plt.subplots(nrows=len(wavetable))
+for table, ax in zip(wavetable, axes):
+    ax.plot(np.arange(T), table[0])
+    ax.set_title(f'Safe For <= {table[1]} Hz')
+    ax.set_ylim(-1.1, 1.1)
+plt.show()
