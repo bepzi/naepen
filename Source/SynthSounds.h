@@ -4,8 +4,6 @@
 
 #include <JuceHeader.h>
 
-// https://www.earlevel.com/main/2012/05/25/a-wavetable-oscillator%e2%80%94the-code/
-
 // TODO: Fix glitches/popping and duplicate noises when rapidly playing notes
 
 class WavetableSound : public SynthesiserSound {
@@ -25,10 +23,10 @@ public:
 private:
 };
 
-template<unsigned int T = 1024>
-class WavetableVoice : public SynthesiserVoice {
+template<size_t T = 2048>
+class GoodWavetableVoice : public SynthesiserVoice {
 public:
-    explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
+    explicit GoodWavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
         this->table = std::move(table);
     }

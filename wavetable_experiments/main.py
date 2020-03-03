@@ -33,17 +33,17 @@ def make_sawtooth(freq: float):
     return np.array(out) / 1.5741594205752307
 
 
-freqs = [1.0, 20.0, 220.0, 440.0, 5000.0, 10000.0]
+freqs = [1.0, 20.0, 220.0, 440.0, 800.0, 5000.0, 10000.0]
 # for f in freqs:
 #     pickle.dump(make_sawtooth(f), open(f'{T}pt_{f}Hz.pickle', 'wb'))
 sawtooth_tables = [pickle.load(open(f'{T}pt_{f}Hz.pickle', 'rb')) for f in freqs]
 
-# fig, axes = plt.subplots(ncols=len(freqs))
+# fig, axes = plt.subplots(nrows=len(freqs))
 # for f, table, ax in zip(freqs, sawtooth_tables, axes):
 #     ax.plot(np.arange(T), table)
 #     ax.set_xlabel('Samples')
 #     ax.set_ylabel('Amplitude')
-#     ax.set_ylim(-2, 2)
+#     ax.set_ylim(-1.1, 1.1)
 #     ax.set_title(f'{T}-pt Wavetable ({f} Hz)')
 # plt.show()
 
@@ -56,7 +56,7 @@ ft[0] = ft[T // 2] = 0  # Zero-out DC offset and Nyquist
 max_harmonics = T // 2
 min_val = 0.000001  # -120 dB
 
-while abs(ft[max_harmonics]) < min_val:
+while abs(ft[max_harmonics]) < min_val and max_harmonics > 0:
     max_harmonics -= 1
 
 for _ in range(1, 32):
@@ -64,7 +64,7 @@ for _ in range(1, 32):
         break
 
     ft[max_harmonics // 2:max_harmonics] = 0
-    wavetable.append((sp.fft.irfft(ft), R // (2 * max_harmonics)))
+    wavetable.append((sp.fft.irfft(ft), R // max_harmonics))
     max_harmonics = max_harmonics // 2
 
 fig, axes = plt.subplots(nrows=len(wavetable))
