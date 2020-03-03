@@ -1,6 +1,7 @@
 from typing import List
 
 import pickle
+import sounddevice as sd
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
@@ -60,12 +61,12 @@ while abs(ft[max_harmonics]) < min_val and max_harmonics > 0:
     max_harmonics -= 1
 
 for _ in range(1, 32):
+    max_harmonics = max_harmonics // 2
     if max_harmonics <= 0:
         break
 
-    ft[max_harmonics // 2:max_harmonics] = 0
-    wavetable.append((sp.fft.irfft(ft), R // max_harmonics))
-    max_harmonics = max_harmonics // 2
+    ft[max_harmonics:(max_harmonics * 2) + 1] = 0
+    wavetable.append((sp.fft.irfft(ft), R // (2 * max_harmonics)))
 
 fig, axes = plt.subplots(nrows=len(wavetable))
 for table, ax in zip(wavetable, axes):
@@ -73,3 +74,23 @@ for table, ax in zip(wavetable, axes):
     ax.set_title(f'Safe For <= {table[1]} Hz')
     ax.set_ylim(-1.1, 1.1)
 plt.show()
+
+
+samples = np.zeros((10 * R,))
+freqs = np.linspace(20.0, 20000.0, samples.shape[0])
+
+phase = 0.0
+
+for i in range(0, samples.shape[0]):
+    # TODO: Choose the correct wavetable and interpolate between samples and wavetables
+    samples[i] = wavetable[1][0][int(phase)]
+
+    f = freqs[i]
+    phase_incr = f * (T / R)
+
+    phase += phase_incr
+    if phase > T:
+        phase -= T
+
+samples *= 0.1
+sd.play(samples, R, blocking=True)
