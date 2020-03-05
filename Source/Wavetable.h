@@ -19,9 +19,6 @@ public:
     {
         tables.reserve(max_tables);
 
-        Table first(waveform, T / 2);
-        tables.push_back(first);
-
         auto fft = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * ((T / 2) + 1));
         fftw_plan p = fftw_plan_dft_r2c_1d(T, waveform.data(), (fftw_complex *)fft, FFTW_ESTIMATE);
         fftw_execute(p);
@@ -31,55 +28,61 @@ public:
         fft[0][0] = fft[1][0] = 0.0;
         fft[0][T / 2] = fft[1][T / 2] = 0.0;
 
-        // Calculate top harmonic for initial wavetable
+        // Calculate top harmonic and freq for initial wavetable
         size_t max_harmonic = T / 2;
-
         const double min_val = 0.000001;  // -120 dB
+
         while ((std::abs(fft[0][max_harmonic]) + std::abs(fft[1][max_harmonic]) < min_val) &&
                max_harmonic > 0) {
             --max_harmonic;
         }
 
-        for (size_t i = 1; i < max_tables; ++i) {
-            for (size_t h = max_harmonic / 2; h < max_harmonic + 1; ++h) {
+        double top_freq = 2.0 / (3.0 * max_harmonic);
+
+        for (size_t i = 0; i < max_tables && max_harmonic != 0; ++i) {
+            // TODO: Do this with std::memset?
+            for (size_t h = (max_harmonic / 2) + 1; h < (T / 2) + 1; ++h) {
                 fft[0][h] = fft[1][h] = 0.0;
             }
 
-            max_harmonic /= 2;
-            if (max_harmonic == 0) {
-                // Minor optimization to ensure we can always look at "the next table"
-                // when interpolating between two tables.
-                tables.push_back(tables.at(tables.size() - 1));
-                break;
-            }
-
-            Table t(to_waveform(fft), max_harmonic);
+            Table t(to_waveform(fft), top_freq);
             tables.push_back(t);
+
+            top_freq *= 2.0;
+            max_harmonic /= 2;
+        }
+
+        auto global_max = tables[0].get_max();
+        for (Table &t : tables) {
+            t.scale_by(global_max);
         }
 
         fftw_free(fft);
     }
 
-    virtual ~Wavetable() noexcept = default;
-
-    void set_freq(double freq, double sample_rate) noexcept
+    void set_freq(double freq_hz, double sample_rate) noexcept
     {
-        phase_incr = (float)(freq * (T / sample_rate));
-
-        size_t highest_harmonic = std::floor(sample_rate / (2 * freq));
+        phase_incr = (float)(freq_hz * (T / sample_rate));
 
         for (idx = 0; idx < tables.size(); ++idx) {
-            if (tables[idx].get_highest_safe_harmonic() > highest_harmonic) {
+            if (idx == tables.size() - 1) {
+                // No more tables left, use the last one
+                break;
+            }
+
+            double top_freq = sample_rate / tables[idx].get_top_freq();
+            if (top_freq >= freq_hz) {
+                // We've found our table
                 break;
             }
         }
+
         jassert(idx <= tables.size() - 1);
     }
 
     [[nodiscard]] forcedinline float get_next_sample() noexcept
     {
         auto sample = tables[idx].get_sample(phase);
-        // TODO: inter-wavetable interpolation?
 
         if ((phase += phase_incr) > (float)T) {
             phase -= (float)T;
@@ -97,12 +100,12 @@ private:
     public:
         /**
          * @param waveform A single cycle of a waveform
-         * @param highest_freq_hz The highest harmonic that can be safely played (not enforced)
+         * @param top_freq The highest frequency that can be safely played (not enforced)
          */
-        explicit Table(const std::array<double, T> &waveform, size_t highest_harmonic) noexcept
+        explicit Table(const std::array<double, T> &waveform, double top_freq) noexcept
         {
             std::copy(waveform.begin(), waveform.end(), table.begin());
-            this->highest_harmonic = highest_harmonic;
+            this->top_freq = top_freq;
 
             // Minor optimization that ensures we can always
             // look at "the next element" when interpolating
@@ -125,17 +128,26 @@ private:
             return sample;
         }
 
-        /**
-         * @return The highest frequency that this table can be safely played at before aliasing begins to occur.
-         */
-        [[nodiscard]] size_t get_highest_safe_harmonic() const
+        [[nodiscard]] size_t get_top_freq() const
         {
-            return highest_harmonic;
+            return top_freq;
+        }
+
+        [[nodiscard]] float get_max() const noexcept
+        {
+            return *std::max_element(table.begin(), table.end());
+        }
+
+        void scale_by(float scale) noexcept
+        {
+            for (float &f : table) {
+                f /= scale;
+            }
         }
 
     private:
         std::array<float, T + 1> table;
-        size_t highest_harmonic;
+        double top_freq;
     };
 
     static const size_t max_tables = 32;
