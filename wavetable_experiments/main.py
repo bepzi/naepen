@@ -4,6 +4,8 @@ import pickle
 import sounddevice as sd
 import numpy as np
 import scipy as sp
+from scipy.io import wavfile
+from scipy import signal
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 
@@ -14,13 +16,105 @@ R = 48000  # sample rate, samples per second
 T = 2048
 
 
-def make_sawtooth(freq: float):
-    out: List[float] = []
+def pad_waveform(w: np.ndarray) -> np.ndarray:
+    if w.shape[0] == T:
+        cpy = np.empty((w.shape[0] + 1,))
+        cpy[:-1] = w
+        cpy[-1] = cpy[0]
+        w = cpy
+    assert (w.shape[0] == T + 1)
+    return w
 
-    num_harmonics: int = int(R / (2 * freq))
+
+def play_waveform_sweep(waveform: np.ndarray, duration_sec: float = 5.0, do_play: bool = True) -> np.ndarray:
+    waveform = pad_waveform(waveform)
+
+    samples = np.zeros((duration_sec * R,))
+    freqs = np.geomspace(16.0, R / 2, samples.shape[0])
 
     phase = 0.0
-    phase_incr: float = np.pi * 2 / (T - 1)
+    for i in range(0, samples.shape[0]):
+        idx0 = int(phase)
+        idx1: int = idx0 + 1
+        frac: float = phase - idx0
+
+        s0 = waveform[idx0]
+        s1 = waveform[idx1]
+
+        # Interpolate between samples
+        samples[i] = s0 + frac * (s1 - s0)
+
+        f = freqs[i]
+        phase_incr = f * (T / R)
+
+        phase += phase_incr
+        if phase > T:
+            phase -= T
+
+    samples *= 0.1
+    if do_play:
+        sd.play(samples, R, blocking=True)
+    return samples
+
+
+def play_wavetable_sweep(wavetable: np.ndarray, duration_sec: float = 5.0, do_play: bool = True) -> np.ndarray:
+    padded_table = [(pad_waveform(wave), top_freq) for wave, top_freq in wavetable]
+
+    samples = np.zeros((duration_sec * R,))
+    freqs = np.geomspace(16.0, R / 2, samples.shape[0])
+
+    best_table = padded_table[0][0]
+
+    phase = 0.0
+    for i in range(0, samples.shape[0]):
+        f = freqs[i]
+
+        for j, (table, top_freq) in enumerate(padded_table):
+            if j == len(padded_table) - 1:
+                best_table = padded_table[-1][0]
+
+            if top_freq >= f:
+                best_table = table
+                break
+
+        idx0 = int(phase)
+        idx1: int = idx0 + 1
+        frac: float = phase - idx0
+
+        s0 = best_table[idx0]
+        s1 = best_table[idx1]
+
+        # Interpolate between samples
+        samples[i] = s0 + frac * (s1 - s0)
+
+        phase_incr = f * (T / R)
+        phase += phase_incr
+        if phase > T:
+            phase -= T
+
+    samples *= 0.1
+    if do_play:
+        sd.play(samples, R, blocking=True)
+    return samples
+
+
+def show_spectrogram(waveform: np.ndarray):
+    f, t, Zxx = sp.signal.stft(waveform, R, nperseg=512)
+
+    fig, ax = plt.subplots()
+    ax.pcolormesh(t, f, np.abs(Zxx), cmap='Greens')
+    ax.set_ylabel("Frequency (Hz)")
+    ax.set_xlabel("Time (seconds)")
+    plt.show()
+
+
+def make_sawtooth(top_freq: float) -> np.ndarray:
+    out = []
+
+    num_harmonics = int(R / (2 * top_freq))
+
+    phase = 0.0
+    phase_incr: float = 2 * np.pi / T
 
     for _ in range(T):
         sample = 0.0
@@ -30,67 +124,48 @@ def make_sawtooth(freq: float):
 
         phase += phase_incr
         out.append(sample)
+    out = np.array(out)
 
-    return np.array(out) / 1.5741594205752307
+    return out / np.max(out)
 
 
-freqs = [1.0, 20.0, 220.0, 440.0, 800.0, 5000.0, 10000.0]
+freqs = [20.0, 40.0, 80.0, 160.0, 320.0, 640.0, 1280.0, 2560.0, 5120.0, 10240.0, 20480.0]
 # for f in freqs:
 #     pickle.dump(make_sawtooth(f), open(f'{T}pt_{f}Hz.pickle', 'wb'))
 sawtooth_tables = [pickle.load(open(f'{T}pt_{f}Hz.pickle', 'rb')) for f in freqs]
 
-# fig, axes = plt.subplots(nrows=len(freqs))
-# for f, table, ax in zip(freqs, sawtooth_tables, axes):
-#     ax.plot(np.arange(T), table)
-#     ax.set_xlabel('Samples')
-#     ax.set_ylabel('Amplitude')
-#     ax.set_ylim(-1.1, 1.1)
-#     ax.set_title(f'{T}-pt Wavetable ({f} Hz)')
-# plt.show()
-
-base_wave = sawtooth_tables[1]
-wavetable = [(base_wave.copy(), 20.0)]
-
-ft = sp.fft.rfft(base_wave)
-ft[0] = ft[T // 2] = 0  # Zero-out DC offset and Nyquist
-
-max_harmonics = T // 2
-min_val = 0.000001  # -120 dB
-
-while abs(ft[max_harmonics]) < min_val and max_harmonics > 0:
-    max_harmonics -= 1
-
-for _ in range(1, 32):
-    max_harmonics = max_harmonics // 2
-    if max_harmonics <= 0:
-        break
-
-    ft[max_harmonics:(max_harmonics * 2) + 1] = 0
-    wavetable.append((sp.fft.irfft(ft), R // (2 * max_harmonics)))
-
-fig, axes = plt.subplots(nrows=len(wavetable))
-for table, ax in zip(wavetable, axes):
-    ax.plot(np.arange(T), table[0])
-    ax.set_title(f'Safe For <= {table[1]} Hz')
-    ax.set_ylim(-1.1, 1.1)
-plt.show()
+show_spectrogram(play_waveform_sweep(sawtooth_tables[0], 10, do_play=False))
 
 
-samples = np.zeros((10 * R,))
-freqs = np.linspace(20.0, 20000.0, samples.shape[0])
+def generate_wavetable(initial_waveform: np.ndarray) -> np.ndarray:
+    fft = sp.fft.rfft(initial_waveform)
+    fft[0] = fft[T // 2] = 0
 
-phase = 0.0
+    max_harmonic = T // 2
+    min_val = 0.000001  # -120 dB
+    while np.abs(fft[max_harmonic]) < min_val and max_harmonic != 0:
+        max_harmonic -= 1
 
-for i in range(0, samples.shape[0]):
-    # TODO: Choose the correct wavetable and interpolate between samples and wavetables
-    samples[i] = wavetable[1][0][int(phase)]
+    top_freq = (2 * R) / (3 * max_harmonic)
 
-    f = freqs[i]
-    phase_incr = f * (T / R)
+    out = []
+    while max_harmonic != 0:
+        table_fft = np.zeros(fft.shape, dtype=np.complex128)
+        table_fft[1:max_harmonic + 1] = fft[1:max_harmonic + 1]
 
-    phase += phase_incr
-    if phase > T:
-        phase -= T
+        table_wav = sp.fft.irfft(table_fft)
 
-samples *= 0.1
-sd.play(samples, R, blocking=True)
+        out.append((table_wav, top_freq))
+        top_freq *= 2
+        max_harmonic //= 2
+
+    # Scale all tables by global max
+    global_max = np.max(out[0][0])
+    out = [(t / global_max, f) for t, f in out]
+    return np.array(out)
+
+
+sawtooth_wavetable = generate_wavetable(sawtooth_tables[0])
+sweep = play_wavetable_sweep(sawtooth_wavetable, 10, do_play=False)
+# sp.io.wavfile.write('20Hz_20kHz_sweep_sawtooth.wav', R, sweep)
+show_spectrogram(sweep)
