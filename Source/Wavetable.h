@@ -40,9 +40,9 @@ public:
 
         double top_freq = 2.0 / 3.0 / max_harmonic;
 
-        for (size_t i = 0; i < max_tables && max_harmonic != 0; ++i) {
+        while (max_harmonic != 0) {
             // TODO: Do this with std::memset?
-            for (size_t h = (max_harmonic / 2) + 1; h < (T / 2) + 1; ++h) {
+            for (size_t h = max_harmonic + 1; h < (T / 2) + 1; ++h) {
                 fft[0][h] = fft[1][h] = 0.0;
             }
 

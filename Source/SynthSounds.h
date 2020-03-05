@@ -28,10 +28,10 @@ class WavetableVoice : public SynthesiserVoice {
 public:
     explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
-        sample_rate = getSampleRate();
-        adsr_envelope.setSampleRate(sample_rate);
-        adsr_envelope.setParameters({0.01f, 0.0f, 1.0f, 0.2f});
         this->table = std::move(table);
+
+        adsr_envelope.setSampleRate(getSampleRate());
+        adsr_envelope.setParameters(adsr_params);
     }
 
     bool canPlaySound(SynthesiserSound *sound) override
@@ -43,12 +43,13 @@ public:
         int midi_note_number, float velocity, SynthesiserSound *,
         int /*currentPitchWheelPosition*/) override
     {
+        level = velocity * 0.5;
+        auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number) / 2;
+        table->set_freq(freq_hz, getSampleRate());
+
+        adsr_envelope.setSampleRate(getSampleRate());
+        adsr_envelope.setParameters(adsr_params);
         adsr_envelope.noteOn();
-
-        level = velocity * 0.15f;
-
-        auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-        table->set_freq(freq_hz, sample_rate);
     }
 
     void stopNote(float /* velocity */, bool allow_tail_off) override
@@ -66,25 +67,24 @@ public:
     void
     renderNextBlock(AudioBuffer<float> &output_buffer, int start_sample, int num_samples) override
     {
-        if (!adsr_envelope.isActive()) {
-            clearCurrentNote();
-            return;
-        }
-
         for (int i = start_sample; i < start_sample + num_samples; ++i) {
-            auto sample = table->get_next_sample() * level;
-            for (int chan = 0; chan < output_buffer.getNumChannels(); ++chan) {
-                output_buffer.addSample(chan, i, sample);
+            if (!adsr_envelope.isActive()) {
+                clearCurrentNote();
+                break;
+            }
+
+            auto sample = table->get_next_sample() * level * adsr_envelope.getNextSample();
+            for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
+                output_buffer.addSample(channel, i, sample);
             }
         }
-
-        adsr_envelope.applyEnvelopeToBuffer(output_buffer, start_sample, num_samples);
     }
 
 private:
-    double sample_rate;
     float level = 0.0f;
 
     ADSR adsr_envelope;
+    ADSR::Parameters adsr_params = {0.01f, 0.0f, 1.0f, 0.2f};
+
     std::unique_ptr<Wavetable<T>> table = nullptr;
 };
