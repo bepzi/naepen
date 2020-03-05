@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SynthSounds.h"
 #include "WaveformVisualizer.h"
 #include "Wavetable.h"
 
@@ -50,6 +51,18 @@ public:
     void set_gain(float gain)
     {
         this->gain = gain;
+    }
+
+    void set_adsr(double attack, double decay, double sustain, double release)
+    {
+        for (int i = 0; i < synth.getNumVoices(); ++i) {
+            // TODO: Not a fan of needing to do this dynamic cast. Is there a better way to update the global ADSR? Maybe I need to subclass JUCE::Synthesiser...
+            auto wavetable_voice = dynamic_cast<WavetableVoice<2048> *>(synth.getVoice(i));
+            if (wavetable_voice != nullptr) {
+                wavetable_voice->set_adsr(
+                    {(float)attack, (float)decay, (float)sustain, (float)release});
+            }
+        }
     }
 
 private:

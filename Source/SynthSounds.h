@@ -80,11 +80,16 @@ public:
         }
     }
 
+    void set_adsr(const ADSR::Parameters &params) noexcept
+    {
+        adsr_params = params;
+    }
+
 private:
     float level = 0.0f;
 
     ADSR adsr_envelope;
-    ADSR::Parameters adsr_params = {0.01f, 0.0f, 1.0f, 0.2f};
+    ADSR::Parameters adsr_params = {0.005f, 0.25f, 1.0f, 0.1f};
 
     std::unique_ptr<Wavetable<T>> table = nullptr;
 };

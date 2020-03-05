@@ -31,6 +31,15 @@ private:
     Label gain_label;
     Slider gain_slider;
 
+    Label attack_label;
+    Slider attack_slider;
+    Label decay_label;
+    Slider decay_slider;
+    Label sustain_label;
+    Slider sustain_slider;
+    Label release_label;
+    Slider release_slider;
+
     AudioVisualiserComponent &visualizer;
 
     MidiKeyboardState &keyboard_state;
