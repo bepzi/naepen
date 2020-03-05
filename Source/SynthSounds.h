@@ -28,6 +28,9 @@ class WavetableVoice : public SynthesiserVoice {
 public:
     explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
+        sample_rate = getSampleRate();
+        adsr_envelope.setSampleRate(sample_rate);
+        adsr_envelope.setParameters({0.01f, 0.0f, 1.0f, 0.2f});
         this->table = std::move(table);
     }
 
@@ -40,25 +43,20 @@ public:
         int midi_note_number, float velocity, SynthesiserSound *,
         int /*currentPitchWheelPosition*/) override
     {
+        adsr_envelope.noteOn();
+
         level = velocity * 0.15f;
 
-        atk_curr_samples = 0;
-        release_curr_samples = release_total_samples;
-
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-        table->set_freq(freq_hz, getSampleRate());
+        table->set_freq(freq_hz, sample_rate);
     }
 
     void stopNote(float /* velocity */, bool allow_tail_off) override
     {
-        atk_curr_samples = atk_total_samples;
-
         if (allow_tail_off) {
-            release_curr_samples = 0;
+            adsr_envelope.noteOff();
         } else {
-            release_curr_samples = release_total_samples;
             clearCurrentNote();
-            table->set_freq(0.0, getSampleRate());
         }
     }
 
@@ -68,61 +66,25 @@ public:
     void
     renderNextBlock(AudioBuffer<float> &output_buffer, int start_sample, int num_samples) override
     {
-        while (--num_samples >= 0) {
-            auto current_sample = table->get_next_sample() * level;
-
-            if (atk_curr_samples < atk_total_samples) {
-                // Apply attack
-                current_sample *= attack_function();
-                ++atk_curr_samples;
-
-            } else if (release_curr_samples < release_total_samples) {
-                // Apply release
-                current_sample *= release_function();
-                ++release_curr_samples;
-
-                if (release_curr_samples >= release_total_samples) {
-                    // Finished playing the note, shut it down
-                    clearCurrentNote();
-                    table->set_freq(0.0, getSampleRate());
-                    break;
-                }
-            }
-
-            for (auto i = 0; i < output_buffer.getNumChannels(); ++i) {
-                output_buffer.addSample(i, start_sample, current_sample);
-            }
-            ++start_sample;
+        if (!adsr_envelope.isActive()) {
+            clearCurrentNote();
+            return;
         }
+
+        for (int i = start_sample; i < start_sample + num_samples; ++i) {
+            auto sample = table->get_next_sample() * level;
+            for (int chan = 0; chan < output_buffer.getNumChannels(); ++chan) {
+                output_buffer.addSample(chan, i, sample);
+            }
+        }
+
+        adsr_envelope.applyEnvelopeToBuffer(output_buffer, start_sample, num_samples);
     }
 
 private:
-    size_t atk_total_samples = ms_to_samples(80.0, getSampleRate());
-    size_t atk_curr_samples = 0;
-
-    size_t release_total_samples = ms_to_samples(160.0, getSampleRate());
-    size_t release_curr_samples = release_total_samples;
-
+    double sample_rate;
     float level = 0.0f;
 
+    ADSR adsr_envelope;
     std::unique_ptr<Wavetable<T>> table = nullptr;
-
-    static forcedinline size_t ms_to_samples(double time_ms, double sample_rate)
-    {
-        return (size_t)std::ceil(time_ms * 0.001 * sample_rate);
-    }
-
-    // Exponential gain: a^x - 1, where a > 1. The closer a is to 1, the slower the attack.
-    // Exponential decay: a^x, where a < 1. The closer a is to 1, the slower the decay.
-    forcedinline float attack_function()
-    {
-        // TODO: Make this exponential, not linear
-        return (float)atk_curr_samples / (float)atk_total_samples;
-    }
-
-    forcedinline float release_function()
-    {
-        // TODO: Make this exponential, not linear
-        return (1.0f - ((float)release_curr_samples / (float)release_total_samples));
-    }
 };
