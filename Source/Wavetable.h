@@ -43,7 +43,7 @@ public:
         while (max_harmonic != 0) {
             // TODO: Do this with std::memset?
             for (size_t h = max_harmonic + 1; h < (T / 2) + 1; ++h) {
-                fft[0][h] = fft[1][h] = 0.0;
+                fft[0][h] = /* fft[1][h] = */ 0.0;
             }
 
             Table t(to_waveform(fft), top_freq);

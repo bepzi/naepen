@@ -3,6 +3,9 @@
 
 #define DRAW_COMPONENT_BOUNDS false
 
+constexpr auto PADDING = 8;
+constexpr auto COMPONENT_HEIGHT = 24;
+
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     NaepenAudioProcessor &p, AudioVisualiserComponent &vis, MidiKeyboardState &key_state) :
     AudioProcessorEditor(&p),
@@ -65,7 +68,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     sustain_slider.addListener(this);
     release_slider.addListener(this);
 
-    setSize(640, 480);
+    setSize(1280, 720);
     setVisible(true);
 }
 
@@ -87,39 +90,39 @@ void NaepenAudioProcessorEditor::paint(Graphics &g)
 void NaepenAudioProcessorEditor::resized()
 {
     auto area = getLocalBounds();
-    area.reduce(8, 8);
+    area.reduce(PADDING, PADDING);
 
     auto top_row = area.removeFromTop(128);
-    area.removeFromTop(8);
+    area.removeFromTop(PADDING);
 
     auto top_left = top_row.removeFromLeft((top_row.getWidth() / 2));
-    gain_label.setBounds(top_left.removeFromBottom(24));
+    gain_label.setBounds(top_left.removeFromBottom(COMPONENT_HEIGHT));
     gain_slider.setBounds(top_left);
 
     auto top_right = top_row;
-    auto quarter_top_right = (top_right.getWidth() / 4) - 8;
+    auto quarter_top_right = (top_right.getWidth() / 4) - PADDING;
 
     auto attack_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(8);
-    attack_label.setBounds(attack_area.removeFromBottom(24));
+    top_right.removeFromLeft(PADDING);
+    attack_label.setBounds(attack_area.removeFromBottom(COMPONENT_HEIGHT));
     attack_slider.setBounds(attack_area);
 
     auto decay_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(8);
-    decay_label.setBounds(decay_area.removeFromBottom(24));
+    top_right.removeFromLeft(PADDING);
+    decay_label.setBounds(decay_area.removeFromBottom(COMPONENT_HEIGHT));
     decay_slider.setBounds(decay_area);
 
     auto sustain_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(8);
-    sustain_label.setBounds(sustain_area.removeFromBottom(24));
+    top_right.removeFromLeft(PADDING);
+    sustain_label.setBounds(sustain_area.removeFromBottom(COMPONENT_HEIGHT));
     sustain_slider.setBounds(sustain_area);
 
     auto release_area = top_right.removeFromLeft(quarter_top_right);
-    release_label.setBounds(release_area.removeFromBottom(24));
+    release_label.setBounds(release_area.removeFromBottom(COMPONENT_HEIGHT));
     release_slider.setBounds(release_area);
 
-    keyboard_component.setBounds(area.removeFromBottom(72));
-    area.removeFromBottom(8);
+    keyboard_component.setBounds(area.removeFromBottom(COMPONENT_HEIGHT * 3));
+    area.removeFromBottom(PADDING);
 
     visualizer.setBounds(area);
 }
