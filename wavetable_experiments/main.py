@@ -73,7 +73,7 @@ def play_wavetable_sweep(wavetable: np.ndarray, duration_sec: float = 5.0, do_pl
             if j == len(padded_table) - 1:
                 best_table = padded_table[-1][0]
 
-            if top_freq >= f:
+            if (R * top_freq) >= f:
                 best_table = table
                 break
 
@@ -146,7 +146,7 @@ def generate_wavetable(initial_waveform: np.ndarray) -> np.ndarray:
     while np.abs(fft[max_harmonic]) < min_val and max_harmonic != 0:
         max_harmonic -= 1
 
-    top_freq = (2 * R) / (3 * max_harmonic)
+    top_freq = 2 / 3 / max_harmonic
 
     out = []
     while max_harmonic != 0:
@@ -166,6 +166,6 @@ def generate_wavetable(initial_waveform: np.ndarray) -> np.ndarray:
 
 
 sawtooth_wavetable = generate_wavetable(sawtooth_tables[0])
-sweep = play_wavetable_sweep(sawtooth_wavetable, 10, do_play=False)
+sweep = play_wavetable_sweep(sawtooth_wavetable, 10, do_play=True)
 # sp.io.wavfile.write('20Hz_20kHz_sweep_sawtooth.wav', R, sweep)
 show_spectrogram(sweep)

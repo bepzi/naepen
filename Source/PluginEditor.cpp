@@ -73,7 +73,7 @@ void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
 void NaepenAudioProcessorEditor::comboBoxChanged(ComboBox *menu)
 {
     if (menu == &waveform_selector) {
-        auto id = static_cast<WaveformId>(waveform_selector.getSelectedId());
+        //        auto id = static_cast<WaveformId>(waveform_selector.getSelectedId());
         // TODO: Trigger switching waveforms for current synth
     }
 }

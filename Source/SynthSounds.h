@@ -24,9 +24,9 @@ private:
 };
 
 template<size_t T = 2048>
-class GoodWavetableVoice : public SynthesiserVoice {
+class WavetableVoice : public SynthesiserVoice {
 public:
-    explicit GoodWavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
+    explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
         this->table = std::move(table);
     }
@@ -46,7 +46,7 @@ public:
         release_curr_samples = release_total_samples;
 
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-        table->set_freq((float)freq_hz, (int)getSampleRate());
+        table->set_freq(freq_hz, getSampleRate());
     }
 
     void stopNote(float /* velocity */, bool allow_tail_off) override
@@ -64,7 +64,7 @@ public:
         */
 
         clearCurrentNote();
-        table->set_freq(0.0f, 1);
+        table->set_freq(0.0, getSampleRate());
     }
 
     void pitchWheelMoved(int) override {}

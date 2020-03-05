@@ -36,8 +36,9 @@ public:
                max_harmonic > 0) {
             --max_harmonic;
         }
+        jassert(max_harmonic > 0);
 
-        double top_freq = 2.0 / (3.0 * max_harmonic);
+        double top_freq = 2.0 / 3.0 / max_harmonic;
 
         for (size_t i = 0; i < max_tables && max_harmonic != 0; ++i) {
             // TODO: Do this with std::memset?
@@ -52,7 +53,7 @@ public:
             max_harmonic /= 2;
         }
 
-        auto global_max = tables[0].get_max();
+        auto global_max = tables.at(0).get_max();
         for (Table &t : tables) {
             t.scale_by(global_max);
         }
@@ -60,9 +61,23 @@ public:
         fftw_free(fft);
     }
 
+    Wavetable(const Wavetable<T> &other) noexcept
+    {
+        this->phase = other.phase;
+        this->phase_incr = other.phase_incr;
+        this->idx = other.idx;
+        this->tables = other.tables;
+    }
+
     void set_freq(double freq_hz, double sample_rate) noexcept
     {
-        phase_incr = (float)(freq_hz * (T / sample_rate));
+        if (freq_hz <= 0.0 || sample_rate < 1.0) {
+            // Turn the wavetable off
+            phase_incr = 0.0;
+            return;
+        }
+
+        phase_incr = freq_hz * (T / sample_rate);
 
         for (idx = 0; idx < tables.size(); ++idx) {
             if (idx == tables.size() - 1) {
@@ -70,7 +85,8 @@ public:
                 break;
             }
 
-            double top_freq = sample_rate / tables[idx].get_top_freq();
+            double top_freq = tables[idx].get_top_freq_hz(sample_rate);
+
             if (top_freq >= freq_hz) {
                 // We've found our table
                 break;
@@ -92,8 +108,8 @@ public:
     }
 
 private:
-    float phase = 0.0;
-    float phase_incr = 0.0;
+    double phase = 0.0;
+    double phase_incr = 0.0;
     size_t idx = 0;
 
     class Table {
@@ -113,24 +129,30 @@ private:
             table[T] = table[0];
         }
 
-        [[nodiscard]] forcedinline float get_sample(float index) const noexcept
+        Table(const Table &other) noexcept
+        {
+            this->top_freq = other.top_freq;
+            this->table = other.table;
+        }
+
+        [[nodiscard]] forcedinline float get_sample(double index) const noexcept
         {
             // Linearly interpolate between two sample values
-            auto idx0 = (int)std::floor(index);
+            auto idx0 = (size_t)std::floor(index);
             auto idx1 = idx0 + 1;
 
             float lower = table[idx0];
             float upper = table[idx1];
 
-            float frac = index - (float)idx0;
+            float frac = (float)index - idx0;
             float sample = lower + frac * (upper - lower);
 
             return sample;
         }
 
-        [[nodiscard]] size_t get_top_freq() const
+        [[nodiscard]] size_t get_top_freq_hz(double sr) const
         {
-            return top_freq;
+            return top_freq * sr;
         }
 
         [[nodiscard]] float get_max() const noexcept

@@ -22,7 +22,7 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 {
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
         auto wavetable_copy = std::make_unique<Wavetable<2048>>(sawtooth);
-        synth.addVoice(new GoodWavetableVoice<2048>(std::move(wavetable_copy)));
+        synth.addVoice(new WavetableVoice<2048>(std::move(wavetable_copy)));
     }
 
     synth.addSound(new WavetableSound());
