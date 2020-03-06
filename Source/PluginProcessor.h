@@ -2,7 +2,7 @@
 
 #include "SynthSounds.h"
 #include "WaveformVisualizer.h"
-#include "Wavetable.h"
+#include "WavetableOsc.h"
 
 #include <JuceHeader.h>
 

@@ -1,7 +1,7 @@
 #include "PluginProcessor.h"
-#include "Oscillator.h"
 #include "PluginEditor.h"
 #include "SynthSounds.h"
+#include "WavetableOsc.h"
 
 static constexpr size_t MAX_POLYPHONY = 12;
 
@@ -21,7 +21,7 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     visualizer(2)
 {
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new WavetableVoice<2048>(std::make_unique<Wavetable<2048>>(square_wave)));
+        synth.addVoice(new WavetableVoice<2048>(std::make_unique<WavetableOsc<2048>>(square_wave)));
     }
 
     synth.addSound(new WavetableSound());
@@ -78,14 +78,21 @@ int NaepenAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void NaepenAudioProcessor::setCurrentProgram(int index) {}
+void NaepenAudioProcessor::setCurrentProgram(int index)
+{
+    ignoreUnused(index);
+}
 
 const String NaepenAudioProcessor::getProgramName(int index)
 {
+    ignoreUnused(index);
     return {};
 }
 
-void NaepenAudioProcessor::changeProgramName(int index, const String &newName) {}
+void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
+{
+    ignoreUnused(index, new_name);
+}
 
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
@@ -132,37 +139,30 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
 {
     ScopedNoDenormals noDenormals;
 
-    auto totalNumInputChannels = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    if (totalNumOutputChannels < 1) {
+    if (getTotalNumOutputChannels() < 1) {
         return;
     }
 
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    visualizer.pushBuffer(buffer);
-
+    // Apply master gain
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
         float *buf = buffer.getWritePointer(channel);
         for (int i = 0; i < buffer.getNumSamples(); ++i) {
             buf[i] *= gain;
         }
     }
+
+    visualizer.pushBuffer(buffer);
 }
 
 //==============================================================================
 bool NaepenAudioProcessor::hasEditor() const
 {
-    return true;  // (change this to false if you choose to not supply an editor)
+    return true;
 }
 
 AudioProcessorEditor *NaepenAudioProcessor::createEditor()
@@ -171,17 +171,19 @@ AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 }
 
 //==============================================================================
-void NaepenAudioProcessor::getStateInformation(MemoryBlock &destData)
+void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    ignoreUnused(dest_data);
 }
 
-void NaepenAudioProcessor::setStateInformation(const void *data, int sizeInBytes)
+void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    ignoreUnused(data, size_in_bytes);
 }
 
 //==============================================================================

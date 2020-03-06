@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Wavetable.h"
+#include "WavetableOsc.h"
 
 #include <JuceHeader.h>
-
-// TODO: Fix glitches/popping and duplicate noises when rapidly playing notes
 
 class WavetableSound : public SynthesiserSound {
 public:
@@ -26,7 +24,7 @@ private:
 template<size_t T = 2048>
 class WavetableVoice : public SynthesiserVoice {
 public:
-    explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
+    explicit WavetableVoice(std::unique_ptr<WavetableOsc<T>> table) noexcept
     {
         this->table = std::move(table);
 
@@ -91,5 +89,5 @@ private:
     ADSR adsr_envelope;
     ADSR::Parameters adsr_params = {0.005f, 0.25f, 1.0f, 0.1f};
 
-    std::unique_ptr<Wavetable<T>> table = nullptr;
+    std::unique_ptr<WavetableOsc<T>> table = nullptr;
 };

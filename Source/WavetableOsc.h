@@ -5,7 +5,7 @@
 #include <JuceHeader.h>
 
 template<size_t T = 2048>
-class Wavetable {
+class WavetableOsc {
 public:
     /**
      * Given a full-bandwidth, single-cycle waveform, creates a set of
@@ -15,7 +15,7 @@ public:
      *  - https://www.earlevel.com/main/2013/03/03/replicating-wavetables/ and
      *  - https://www.vast-dynamics.com/?q=node/181
      */
-    explicit Wavetable(std::array<double, T> waveform) noexcept
+    explicit WavetableOsc(std::array<double, T> waveform) noexcept
     {
         tables.reserve(max_tables);
 
@@ -40,7 +40,7 @@ public:
 
         double top_freq = 2.0 / 3.0 / max_harmonic;
 
-        while (max_harmonic != 0) {
+        while (max_harmonic != 0 && tables.size() <= max_tables) {
             // TODO: Do this with std::memset?
             for (size_t h = max_harmonic + 1; h < (T / 2) + 1; ++h) {
                 fft[0][h] = /* fft[1][h] = */ 0.0;
@@ -61,7 +61,7 @@ public:
         fftw_free(fft);
     }
 
-    Wavetable(const Wavetable<T> &other) noexcept
+    WavetableOsc(const WavetableOsc<T> &other) noexcept
     {
         this->phase = other.phase;
         this->phase_incr = other.phase_incr;
@@ -108,9 +108,14 @@ public:
     }
 
 private:
+    class Table;
+
     double phase = 0.0;
     double phase_incr = 0.0;
     size_t idx = 0;
+
+    static const size_t max_tables = 20;
+    std::vector<Table> tables;
 
     class Table {
     public:
@@ -150,7 +155,7 @@ private:
             return sample;
         }
 
-        [[nodiscard]] size_t get_top_freq_hz(double sr) const
+        [[nodiscard]] double get_top_freq_hz(double sr) const
         {
             return top_freq * sr;
         }
@@ -172,9 +177,6 @@ private:
         double top_freq;
     };
 
-    static const size_t max_tables = 32;
-    std::vector<Table> tables;
-
     static std::array<double, T> to_waveform(fftw_complex *in)
     {
         std::array<double, T> out = {};
@@ -186,3 +188,90 @@ private:
         return out;
     }
 };
+
+template<size_t T = 2048>
+std::array<double, T> make_sine() noexcept
+{
+    std::array<double, T> out = {};
+
+    double phase = 0.0f;
+    double phase_delta = MathConstants<double>::twoPi / (double)(T);
+
+    for (auto &f : out) {
+        f += std::sin(phase);
+        phase += phase_delta;
+    }
+
+    return out;
+}
+
+template<size_t T = 2048>
+std::array<double, T> make_triangle(double top_freq) noexcept
+{
+    std::array<double, T> out = {};
+
+    double phase = 0.0f;
+    double phase_delta = MathConstants<double>::twoPi / (double)(T);
+    auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
+
+    for (auto &f : out) {
+        for (size_t i = 1; i <= num_harmonics; i += 2) {
+            float amp = 1.0f / (float)(i * i);
+            f += std::sin(phase * i) * amp;
+        }
+
+        phase += phase_delta;
+    }
+
+    return out;
+}
+
+template<size_t T = 2048>
+std::array<double, T> make_square(double top_freq) noexcept
+{
+    std::array<double, T> out = {};
+
+    double phase = 0.0f;
+    double phase_delta = MathConstants<double>::twoPi / (double)(T);
+    auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
+
+    for (auto &f : out) {
+        for (size_t i = 1; i <= num_harmonics; i += 2) {
+            float amp = 1.0f / i;
+            f += std::sin(phase * i) * amp;
+        }
+
+        phase += phase_delta;
+    }
+
+    return out;
+}
+
+template<size_t T = 2048>
+std::array<double, T> make_sawtooth(double top_freq) noexcept
+{
+    std::array<double, T> out = {};
+
+    double phase = 0.0f;
+    double phase_delta = MathConstants<double>::twoPi / (double)(T);
+    auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
+
+    for (auto &f : out) {
+        for (size_t i = 1; i <= num_harmonics; ++i) {
+            float amp = 1.0f / i;
+            f += std::sin(phase * i) * amp;
+        }
+
+        // Sine wave summation makes an "inverted" sawtooth, so flip it back over
+        f = -f;
+
+        phase += phase_delta;
+    }
+
+    return out;
+}
+
+static auto sine_wave = WavetableOsc<2048>(make_sine<2048>());
+static auto triangle_wave = WavetableOsc<2048>(make_triangle<2048>(20.0));
+static auto square_wave = WavetableOsc<2048>(make_square<2048>(20.0));
+static auto sawtooth_wave = WavetableOsc<2048>(make_sawtooth<2048>(20.0));

@@ -1,7 +1,7 @@
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
-#define DRAW_COMPONENT_BOUNDS false
+#define DRAW_COMPONENT_BOUNDS true
 
 constexpr auto PADDING = 8;
 constexpr auto COMPONENT_HEIGHT = 24;
@@ -80,10 +80,15 @@ void NaepenAudioProcessorEditor::paint(Graphics &g)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
 #if DRAW_COMPONENT_BOUNDS == true
+    std::vector<Component *> drawable_components = {
+        &gain_label,   &gain_slider,    &visualizer,     &attack_slider,
+        &decay_slider, &sustain_slider, &release_slider, &attack_label,
+        &decay_label,  &sustain_label,  &release_label,  &keyboard_component};
+
     g.setColour(Colours::red);
-    g.drawRect(gain_label.getBoundsInParent());
-    g.drawRect(gain_slider.getBoundsInParent());
-    g.drawRect(visualizer.getBoundsInParent());
+    for (const auto *c : drawable_components) {
+        g.drawRect(c->getBoundsInParent(), 2);
+    }
 #endif
 }
 
@@ -92,7 +97,7 @@ void NaepenAudioProcessorEditor::resized()
     auto area = getLocalBounds();
     area.reduce(PADDING, PADDING);
 
-    auto top_row = area.removeFromTop(128);
+    auto top_row = area.removeFromTop(COMPONENT_HEIGHT * 5);
     area.removeFromTop(PADDING);
 
     auto top_left = top_row.removeFromLeft((top_row.getWidth() / 2));
