@@ -1,7 +1,7 @@
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
-#define DRAW_COMPONENT_BOUNDS false
+#define DRAW_COMPONENT_BOUNDS true
 
 constexpr auto PADDING = 8;
 constexpr auto COMPONENT_HEIGHT = 24;
@@ -10,41 +10,41 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     NaepenAudioProcessor &p, AudioVisualiserComponent &vis, MidiKeyboardState &key_state) :
     AudioProcessorEditor(&p),
     processor(p),
-    gain_label("", "Master Gain"),
-    gain_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    gain_label("", "Master"),
+    gain_slider(Slider::LinearVertical, Slider::TextBoxBelow),
     visualizer(vis),
     keyboard_state(key_state),
     keyboard_component(keyboard_state, MidiKeyboardComponent::horizontalKeyboard),
-    attack_label("", "Attack"),
-    attack_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
-    decay_label("", "Decay"),
-    decay_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
-    sustain_label("", "Sustain"),
-    sustain_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
-    release_label("", "Release"),
-    release_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
-    table_idx_label("", "Table Position"),
+    attack_label("", "A"),
+    attack_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    decay_label("", "D"),
+    decay_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    sustain_label("", "S"),
+    sustain_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    release_label("", "R"),
+    release_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    table_idx_label("", "Offset"),
     table_idx_slider(Slider::LinearVertical, Slider::TextBoxBelow)
 {
     gain_label.setJustificationType(Justification::horizontallyCentred);
 
-    gain_slider.setRange(0.0, 1.0);
+    gain_slider.setRange(0.0, 1.25, 0.001);
     gain_slider.setSkewFactorFromMidPoint(0.1);
     gain_slider.setValue(1.0, dontSendNotification);
 
-    attack_slider.setValue(0.005);
+    attack_slider.setValue(0.005, dontSendNotification);
     attack_slider.setRange(0.0, 5.0, 0.001);
     attack_slider.setSkewFactorFromMidPoint(1.0);
     attack_label.setJustificationType(Justification::horizontallyCentred);
-    decay_slider.setValue(0.25);
+    decay_slider.setValue(0.25, dontSendNotification);
     decay_slider.setRange(0.0, 5.0, 0.001);
     decay_slider.setSkewFactorFromMidPoint(1.0);
     decay_label.setJustificationType(Justification::horizontallyCentred);
-    sustain_slider.setValue(1.0);
+    sustain_slider.setValue(1.0, dontSendNotification);
     sustain_slider.setRange(0.0, 1.0, 0.001);
     sustain_slider.setSkewFactorFromMidPoint(0.2);
     sustain_label.setJustificationType(Justification::horizontallyCentred);
-    release_slider.setValue(0.1);
+    release_slider.setValue(0.1, dontSendNotification);
     release_slider.setRange(0.0, 5.0, 0.001);
     release_slider.setSkewFactorFromMidPoint(1.0);
     release_label.setJustificationType(Justification::horizontallyCentred);
@@ -107,46 +107,67 @@ void NaepenAudioProcessorEditor::resized()
     auto area = getLocalBounds();
     area.reduce(PADDING, PADDING);
 
-    auto top_row = area.removeFromTop(COMPONENT_HEIGHT * 5);
-    area.removeFromTop(PADDING);
+    // Keyboard component and waveform visualizer
+    {
+        auto bottom_row = area.removeFromBottom(COMPONENT_HEIGHT * 3);
+        area.removeFromBottom(PADDING);
+        keyboard_component.setBounds(
+            bottom_row.removeFromLeft(((4 * bottom_row.getWidth()) / 5) - PADDING));
+        bottom_row.removeFromLeft(PADDING);
+        visualizer.setBounds(bottom_row);
+    }
 
-    auto top_left = top_row.removeFromLeft((top_row.getWidth() / 2) - PADDING);
-    top_row.removeFromLeft(PADDING);
+    // ADSR and filter parameters
+    {
+        auto left_pane = area.removeFromLeft((area.getWidth() / 3) - PADDING);
+        area.removeFromLeft(PADDING);
 
-    auto idx_box = top_left.removeFromRight((top_left.getWidth() / 2) - PADDING);
-    top_left.removeFromRight(PADDING);
-    table_idx_label.setBounds(idx_box.removeFromBottom(COMPONENT_HEIGHT));
-    table_idx_slider.setBounds(idx_box);
+        auto box_height = (left_pane.getHeight() / 5) - (2 * PADDING);
 
-    gain_label.setBounds(top_left.removeFromBottom(COMPONENT_HEIGHT));
-    gain_slider.setBounds(top_left);
+        {
+            auto ampl_adsr = left_pane.removeFromTop(box_height);
+            left_pane.removeFromTop(PADDING);
 
-    auto top_right = top_row;
-    auto quarter_top_right = (top_right.getWidth() / 4) - PADDING;
+            auto gain_box = ampl_adsr.removeFromRight(COMPONENT_HEIGHT * 2);
+            gain_label.setBounds(gain_box.removeFromBottom(COMPONENT_HEIGHT));
+            gain_slider.setBounds(gain_box);
 
-    auto attack_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(PADDING);
-    attack_label.setBounds(attack_area.removeFromBottom(COMPONENT_HEIGHT));
-    attack_slider.setBounds(attack_area);
+            auto adsr_slider_width = ampl_adsr.getWidth() / 4;
 
-    auto decay_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(PADDING);
-    decay_label.setBounds(decay_area.removeFromBottom(COMPONENT_HEIGHT));
-    decay_slider.setBounds(decay_area);
+            auto ampl_attack_box = ampl_adsr.removeFromLeft(adsr_slider_width);
+            attack_label.setBounds(ampl_attack_box.removeFromBottom(COMPONENT_HEIGHT));
+            attack_slider.setBounds(ampl_attack_box);
 
-    auto sustain_area = top_right.removeFromLeft(quarter_top_right);
-    top_right.removeFromLeft(PADDING);
-    sustain_label.setBounds(sustain_area.removeFromBottom(COMPONENT_HEIGHT));
-    sustain_slider.setBounds(sustain_area);
+            auto ampl_decay_box = ampl_adsr.removeFromLeft(adsr_slider_width);
+            decay_label.setBounds(ampl_decay_box.removeFromBottom(COMPONENT_HEIGHT));
+            decay_slider.setBounds(ampl_decay_box);
 
-    auto release_area = top_right.removeFromLeft(quarter_top_right);
-    release_label.setBounds(release_area.removeFromBottom(COMPONENT_HEIGHT));
-    release_slider.setBounds(release_area);
+            auto ampl_sustain_box = ampl_adsr.removeFromLeft(adsr_slider_width);
+            sustain_label.setBounds(ampl_sustain_box.removeFromBottom(COMPONENT_HEIGHT));
+            sustain_slider.setBounds(ampl_sustain_box);
 
-    keyboard_component.setBounds(area.removeFromBottom(COMPONENT_HEIGHT * 3));
-    area.removeFromBottom(PADDING);
+            auto ampl_release_box = ampl_adsr.removeFromLeft(adsr_slider_width);
+            release_label.setBounds(ampl_release_box.removeFromBottom(COMPONENT_HEIGHT));
+            release_slider.setBounds(ampl_release_box);
+        }
 
-    visualizer.setBounds(area);
+        // WAVETABLE ADSR / TABLE INDEX
+        {
+            auto wavetable_adsr = left_pane.removeFromTop(box_height);
+            left_pane.removeFromTop(PADDING);
+
+            auto table_idx_box = wavetable_adsr.removeFromRight(COMPONENT_HEIGHT * 2);
+            table_idx_label.setBounds(table_idx_box.removeFromBottom(COMPONENT_HEIGHT));
+            table_idx_slider.setBounds(table_idx_box);
+        }
+
+        {
+            auto filter_settings = left_pane;
+        }
+    }
+
+    // Misc. visualizations
+    auto right_pane = area;
 }
 
 void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)

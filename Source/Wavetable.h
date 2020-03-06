@@ -45,6 +45,7 @@ public:
     {
         auto idx0 = (size_t)std::floor(idx);
         auto idx1 = (size_t)std::ceil(idx);
+
         if (idx0 == idx1) {
             return oscillators[idx0].get_next_sample();
         }

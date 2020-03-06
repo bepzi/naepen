@@ -5,8 +5,6 @@
 
 static constexpr size_t MAX_POLYPHONY = 12;
 
-static auto wt = Wavetable<2048>({sine_wave, triangle_wave, square_wave, sawtooth_wave});
-
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -22,6 +20,15 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
     visualizer(2)
 {
+    // HACK: I shouldn't have to do this, esp. not here
+    auto sine_wave = WavetableOsc<2048>(make_sine<2048>());
+    auto triangle_wave = WavetableOsc<2048>(make_triangle<2048>(20.0));
+    auto square_wave = WavetableOsc<2048>(make_square<2048>(20.0));
+    auto sawtooth_wave = WavetableOsc<2048>(make_sawtooth<2048>(20.0));
+
+    sine_wave.replace_table(make_sine<2048>());
+    auto wt = Wavetable<2048>({sine_wave, triangle_wave, square_wave, sawtooth_wave});
+
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
         synth.addVoice(new WavetableVoice<2048>(std::make_unique<Wavetable<2048>>(wt)));
     }
@@ -141,14 +148,17 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
 {
     ScopedNoDenormals noDenormals;
 
+    buffer.clear();
+
     if (getTotalNumOutputChannels() < 1) {
         return;
     }
 
-    midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
-
+    midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    visualizer.pushBuffer(buffer);
 
     // Apply master gain
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
@@ -157,8 +167,6 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
             buf[i] *= gain;
         }
     }
-
-    visualizer.pushBuffer(buffer);
 }
 
 //==============================================================================

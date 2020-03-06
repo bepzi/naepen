@@ -13,7 +13,7 @@ public:
         return true;
     }
 
-    bool appliesToChannel(int /* midi_channel */) override
+    bool appliesToChannel(int midi_channel) override
     {
         return true;
     }
@@ -41,7 +41,7 @@ public:
         int midi_note_number, float velocity, SynthesiserSound *,
         int /*currentPitchWheelPosition*/) override
     {
-        level = velocity * 0.5;
+        level = velocity * 0.3f;
         auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number) / 2;
         table->set_freq(freq_hz, getSampleRate());
 

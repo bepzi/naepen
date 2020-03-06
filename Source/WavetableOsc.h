@@ -53,10 +53,7 @@ public:
             max_harmonic /= 2;
         }
 
-        auto global_max = tables.at(0).get_max();
-        for (Table &t : tables) {
-            t.scale_by(global_max);
-        }
+        normalize();
 
         fftw_free(fft);
     }
@@ -67,6 +64,17 @@ public:
         this->phase_incr = other.phase_incr;
         this->idx = other.idx;
         this->tables = other.tables;
+    }
+
+    // HACK to allow for having a single sinewave as a wavetable
+    void replace_table(std::array<double, T> waveform) noexcept
+    {
+        tables.clear();
+
+        Table t(waveform, 1.0);
+        tables.push_back(t);
+
+        normalize();
     }
 
     void set_freq(double freq_hz, double sample_rate) noexcept
@@ -187,6 +195,15 @@ private:
 
         return out;
     }
+
+    void normalize() noexcept
+    {
+        jassert(!tables.empty());
+        auto global_max = tables.at(0).get_max();
+        for (Table &t : tables) {
+            t.scale_by(global_max);
+        }
+    }
 };
 
 template<size_t T = 2048>
@@ -194,11 +211,11 @@ std::array<double, T> make_sine() noexcept
 {
     std::array<double, T> out = {};
 
-    double phase = 0.0f;
+    double phase = 0.0;
     double phase_delta = MathConstants<double>::twoPi / (double)(T);
 
     for (auto &f : out) {
-        f += std::sin(phase);
+        f = std::sin(phase);
         phase += phase_delta;
     }
 
@@ -210,7 +227,7 @@ std::array<double, T> make_triangle(double top_freq) noexcept
 {
     std::array<double, T> out = {};
 
-    double phase = 0.0f;
+    double phase = 0.0;
     double phase_delta = MathConstants<double>::twoPi / (double)(T);
     auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
 
@@ -231,7 +248,7 @@ std::array<double, T> make_square(double top_freq) noexcept
 {
     std::array<double, T> out = {};
 
-    double phase = 0.0f;
+    double phase = 0.0;
     double phase_delta = MathConstants<double>::twoPi / (double)(T);
     auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
 
@@ -252,7 +269,7 @@ std::array<double, T> make_sawtooth(double top_freq) noexcept
 {
     std::array<double, T> out = {};
 
-    double phase = 0.0f;
+    double phase = 0.0;
     double phase_delta = MathConstants<double>::twoPi / (double)(T);
     auto num_harmonics = (size_t)(48000.0 / (2.0 * top_freq));
 
@@ -270,8 +287,3 @@ std::array<double, T> make_sawtooth(double top_freq) noexcept
 
     return out;
 }
-
-static auto sine_wave = WavetableOsc<2048>(make_sine<2048>());
-static auto triangle_wave = WavetableOsc<2048>(make_triangle<2048>(20.0));
-static auto square_wave = WavetableOsc<2048>(make_square<2048>(20.0));
-static auto sawtooth_wave = WavetableOsc<2048>(make_sawtooth<2048>(20.0));
