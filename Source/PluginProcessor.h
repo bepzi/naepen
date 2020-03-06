@@ -65,6 +65,17 @@ public:
         }
     }
 
+    void set_table_index(double idx)
+    {
+        for (int i = 0; i < synth.getNumVoices(); ++i) {
+            // TODO: Not a fan of needing to do this dynamic cast. Is there a better way to update the global ADSR? Maybe I need to subclass JUCE::Synthesiser...
+            auto wavetable_voice = dynamic_cast<WavetableVoice<2048> *>(synth.getVoice(i));
+            if (wavetable_voice != nullptr) {
+                wavetable_voice->set_table_idx(idx);
+            }
+        }
+    }
+
 private:
     float gain = 1.0f;
 

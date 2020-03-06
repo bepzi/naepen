@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WavetableOsc.h"
+#include "Wavetable.h"
 
 #include <JuceHeader.h>
 
@@ -24,7 +24,7 @@ private:
 template<size_t T = 2048>
 class WavetableVoice : public SynthesiserVoice {
 public:
-    explicit WavetableVoice(std::unique_ptr<WavetableOsc<T>> table) noexcept
+    explicit WavetableVoice(std::unique_ptr<Wavetable<T>> table) noexcept
     {
         this->table = std::move(table);
 
@@ -83,11 +83,16 @@ public:
         adsr_params = params;
     }
 
+    void set_table_idx(double idx) noexcept
+    {
+        table->set_index(idx * table->get_max_index());
+    }
+
 private:
     float level = 0.0f;
 
     ADSR adsr_envelope;
     ADSR::Parameters adsr_params = {0.005f, 0.25f, 1.0f, 0.1f};
 
-    std::unique_ptr<WavetableOsc<T>> table = nullptr;
+    std::unique_ptr<Wavetable<T>> table = nullptr;
 };

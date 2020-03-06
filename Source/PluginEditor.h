@@ -40,6 +40,9 @@ private:
     Label release_label;
     Slider release_slider;
 
+    Label table_idx_label;
+    Slider table_idx_slider;
+
     AudioVisualiserComponent &visualizer;
 
     MidiKeyboardState &keyboard_state;

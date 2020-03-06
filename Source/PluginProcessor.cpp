@@ -5,6 +5,8 @@
 
 static constexpr size_t MAX_POLYPHONY = 12;
 
+static auto wt = Wavetable<2048>({sine_wave, triangle_wave, square_wave, sawtooth_wave});
+
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -21,7 +23,7 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     visualizer(2)
 {
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new WavetableVoice<2048>(std::make_unique<WavetableOsc<2048>>(square_wave)));
+        synth.addVoice(new WavetableVoice<2048>(std::make_unique<Wavetable<2048>>(wt)));
     }
 
     synth.addSound(new WavetableSound());

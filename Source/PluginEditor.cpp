@@ -1,7 +1,7 @@
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
-#define DRAW_COMPONENT_BOUNDS true
+#define DRAW_COMPONENT_BOUNDS false
 
 constexpr auto PADDING = 8;
 constexpr auto COMPONENT_HEIGHT = 24;
@@ -22,7 +22,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     sustain_label("", "Sustain"),
     sustain_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
     release_label("", "Release"),
-    release_slider(Slider::LinearBarVertical, Slider::TextBoxBelow)
+    release_slider(Slider::LinearBarVertical, Slider::TextBoxBelow),
+    table_idx_label("", "Table Position"),
+    table_idx_slider(Slider::LinearVertical, Slider::TextBoxBelow)
 {
     gain_label.setJustificationType(Justification::horizontallyCentred);
 
@@ -47,6 +49,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     release_slider.setSkewFactorFromMidPoint(1.0);
     release_label.setJustificationType(Justification::horizontallyCentred);
 
+    table_idx_slider.setRange(0.0, 1.0, 0.001);
+    table_idx_label.setJustificationType(Justification::horizontallyCentred);
+
     addAndMakeVisible(gain_label);
     addAndMakeVisible(gain_slider);
     addAndMakeVisible(visualizer);
@@ -61,12 +66,17 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     addAndMakeVisible(release_label);
     addAndMakeVisible(release_slider);
 
+    addAndMakeVisible(table_idx_label);
+    addAndMakeVisible(table_idx_slider);
+
     gain_slider.addListener(this);
 
     attack_slider.addListener(this);
     decay_slider.addListener(this);
     sustain_slider.addListener(this);
     release_slider.addListener(this);
+
+    table_idx_slider.addListener(this);
 
     setSize(1280, 720);
     setVisible(true);
@@ -81,9 +91,9 @@ void NaepenAudioProcessorEditor::paint(Graphics &g)
 
 #if DRAW_COMPONENT_BOUNDS == true
     std::vector<Component *> drawable_components = {
-        &gain_label,   &gain_slider,    &visualizer,     &attack_slider,
-        &decay_slider, &sustain_slider, &release_slider, &attack_label,
-        &decay_label,  &sustain_label,  &release_label,  &keyboard_component};
+        &gain_label,     &gain_slider,        &visualizer,       &attack_slider,  &decay_slider,
+        &sustain_slider, &release_slider,     &attack_label,     &decay_label,    &sustain_label,
+        &release_label,  &keyboard_component, &table_idx_slider, &table_idx_label};
 
     g.setColour(Colours::red);
     for (const auto *c : drawable_components) {
@@ -100,7 +110,14 @@ void NaepenAudioProcessorEditor::resized()
     auto top_row = area.removeFromTop(COMPONENT_HEIGHT * 5);
     area.removeFromTop(PADDING);
 
-    auto top_left = top_row.removeFromLeft((top_row.getWidth() / 2));
+    auto top_left = top_row.removeFromLeft((top_row.getWidth() / 2) - PADDING);
+    top_row.removeFromLeft(PADDING);
+
+    auto idx_box = top_left.removeFromRight((top_left.getWidth() / 2) - PADDING);
+    top_left.removeFromRight(PADDING);
+    table_idx_label.setBounds(idx_box.removeFromBottom(COMPONENT_HEIGHT));
+    table_idx_slider.setBounds(idx_box);
+
     gain_label.setBounds(top_left.removeFromBottom(COMPONENT_HEIGHT));
     gain_slider.setBounds(top_left);
 
@@ -136,12 +153,16 @@ void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
 {
     if (slider == &gain_slider) {
         processor.set_gain((float)gain_slider.getValue());
+
     } else if (
         slider == &attack_slider || slider == &decay_slider || slider == &sustain_slider ||
         slider == &release_slider) {
         processor.set_adsr(
             attack_slider.getValue(), decay_slider.getValue(), sustain_slider.getValue(),
             release_slider.getValue());
+
+    } else if (slider == &table_idx_slider) {
+        processor.set_table_index(table_idx_slider.getValue());
     }
 }
 
