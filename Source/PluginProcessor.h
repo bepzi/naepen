@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Filter.h"
 #include "SynthSounds.h"
 #include "WaveformVisualizer.h"
 #include "WavetableOsc.h"
@@ -76,12 +77,20 @@ public:
         }
     }
 
+    void set_filter_params(const Filter::Params &params)
+    {
+        filter_params = params;
+    }
+
 private:
     float gain = 1.0f;
 
     WaveformVisualiser visualizer;
 
     Synthesiser synth;
+
+    LowPassFilter lpf;
+    Filter::Params filter_params = {20000.0, 0.5};
 
     MidiMessageCollector midi_collector;
     MidiKeyboardState keyboard_state;

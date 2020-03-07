@@ -43,6 +43,11 @@ private:
     Label table_idx_label;
     Slider table_idx_slider;
 
+    Label filter_cutoff_label;
+    Slider filter_cutoff_slider;
+    Label filter_q_label;
+    Slider filter_q_slider;
+
     AudioVisualiserComponent &visualizer;
 
     MidiKeyboardState &keyboard_state;

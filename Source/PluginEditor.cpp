@@ -24,7 +24,11 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     release_label("", "R"),
     release_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
     table_idx_label("", "Offset"),
-    table_idx_slider(Slider::LinearVertical, Slider::TextBoxBelow)
+    table_idx_slider(Slider::LinearVertical, Slider::TextBoxBelow),
+    filter_cutoff_label("", "Cutoff"),
+    filter_cutoff_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    filter_q_label("", "Q"),
+    filter_q_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow)
 {
     gain_label.setJustificationType(Justification::horizontallyCentred);
 
@@ -52,6 +56,15 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     table_idx_slider.setRange(0.0, 1.0, 0.001);
     table_idx_label.setJustificationType(Justification::horizontallyCentred);
 
+    filter_cutoff_label.setJustificationType(Justification::horizontallyCentred);
+    filter_cutoff_slider.setRange(0.0, 20000.0, 1);
+    filter_cutoff_slider.setValue(20000.0, dontSendNotification);
+    filter_cutoff_slider.setSkewFactorFromMidPoint(750.0);
+    filter_q_label.setJustificationType(Justification::horizontallyCentred);
+    filter_q_slider.setRange(0.5, 20.0, 0.01);
+    filter_q_slider.setValue(0.5, dontSendNotification);
+    filter_q_slider.setSkewFactorFromMidPoint(5.0);
+
     addAndMakeVisible(gain_label);
     addAndMakeVisible(gain_slider);
     addAndMakeVisible(visualizer);
@@ -69,6 +82,11 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     addAndMakeVisible(table_idx_label);
     addAndMakeVisible(table_idx_slider);
 
+    addAndMakeVisible(filter_cutoff_label);
+    addAndMakeVisible(filter_cutoff_slider);
+    addAndMakeVisible(filter_q_label);
+    addAndMakeVisible(filter_q_slider);
+
     gain_slider.addListener(this);
 
     attack_slider.addListener(this);
@@ -77,6 +95,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     release_slider.addListener(this);
 
     table_idx_slider.addListener(this);
+
+    filter_cutoff_slider.addListener(this);
+    filter_q_slider.addListener(this);
 
     setSize(1280, 720);
     setVisible(true);
@@ -91,9 +112,11 @@ void NaepenAudioProcessorEditor::paint(Graphics &g)
 
 #if DRAW_COMPONENT_BOUNDS == true
     std::vector<Component *> drawable_components = {
-        &gain_label,     &gain_slider,        &visualizer,       &attack_slider,  &decay_slider,
-        &sustain_slider, &release_slider,     &attack_label,     &decay_label,    &sustain_label,
-        &release_label,  &keyboard_component, &table_idx_slider, &table_idx_label};
+        &gain_label,       &gain_slider,     &visualizer,           &attack_slider,
+        &decay_slider,     &sustain_slider,  &release_slider,       &attack_label,
+        &decay_label,      &sustain_label,   &release_label,        &keyboard_component,
+        &table_idx_slider, &table_idx_label, &filter_cutoff_slider, &filter_cutoff_label,
+        &filter_q_slider,  &filter_q_label};
 
     g.setColour(Colours::red);
     for (const auto *c : drawable_components) {
@@ -163,6 +186,14 @@ void NaepenAudioProcessorEditor::resized()
 
         {
             auto filter_settings = left_pane;
+
+            auto control_box = filter_settings.removeFromLeft(COMPONENT_HEIGHT * 3);
+            filter_cutoff_label.setBounds(control_box.removeFromBottom(COMPONENT_HEIGHT));
+            filter_cutoff_slider.setBounds(control_box);
+
+            control_box = filter_settings.removeFromLeft(COMPONENT_HEIGHT * 3);
+            filter_q_label.setBounds(control_box.removeFromBottom(COMPONENT_HEIGHT));
+            filter_q_slider.setBounds(control_box);
         }
     }
 
@@ -184,6 +215,9 @@ void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
 
     } else if (slider == &table_idx_slider) {
         processor.set_table_index(table_idx_slider.getValue());
+
+    } else if (slider == &filter_cutoff_slider || slider == &filter_q_slider) {
+        processor.set_filter_params({filter_cutoff_slider.getValue(), filter_q_slider.getValue()});
     }
 }
 

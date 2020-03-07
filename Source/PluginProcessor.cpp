@@ -3,13 +3,6 @@
 #include "SynthSounds.h"
 #include "WavetableOsc.h"
 
-// TODO: These should not be here!
-static double ic1eq = 0;
-static double ic2eq = 0;
-
-static double cutoff = 3000.0;
-static double Q = 2;
-
 static constexpr size_t MAX_POLYPHONY = 12;
 
 //==============================================================================
@@ -151,6 +144,22 @@ bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) co
 }
 #endif
 
+static forcedinline void apply_master_gain(AudioBuffer<float> &buffer, float gain)
+{
+    {
+        float *c0_buf = buffer.getWritePointer(0);
+        for (int i = 0; i < buffer.getNumSamples(); ++i) {
+            c0_buf[i] *= gain;
+        }
+    }
+
+    const float *c0_buf = buffer.getReadPointer(0);
+    for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
+        float *buf = buffer.getWritePointer(channel);
+        std::memcpy(buf, c0_buf, sizeof(float) * buffer.getNumSamples());
+    }
+}
+
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
 {
     ScopedNoDenormals noDenormals;
@@ -165,38 +174,12 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    // Apply master gain and hardcoded lowpass filter
-    // TODO: Don't hardcode this here!
-    double g = std::tan(MathConstants<double>::pi * cutoff / getSampleRate());
-    double k = 1 / Q;
-    double a1 = 1 / (1 + g * (g + k));
-    double a2 = g * a1;
-    double a3 = g * a2;
-    double m0 = 0;
-    double m1 = 0;
-    double m2 = 1;
-
-    {
-        float *c0_buf = buffer.getWritePointer(0);
-        for (int i = 0; i < buffer.getNumSamples(); ++i) {
-            double v0 = c0_buf[i];
-            double v3 = v0 - ic2eq;
-            double v1 = (a1 * ic1eq) + (a3 * v3);
-            double v2 = ic2eq + (a2 * ic1eq) + (a3 * v3);
-            ic1eq = (2 * v1) - ic1eq;
-            ic2eq = (2 * v2) - ic2eq;
-
-            c0_buf[i] = (m0 * v0) + (m1 * v1) + (m2 * v2);
-        }
-    }
-
-    const float *c0_buf = buffer.getReadPointer(0);
-    for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
-        float *buf = buffer.getWritePointer(channel);
-        std::memcpy(buf, c0_buf, sizeof(float) * buffer.getNumSamples());
-    }
+    lpf.set_params(filter_params, getSampleRate());
+    lpf.apply_to_buffer(buffer);
 
     visualizer.pushBuffer(buffer);
+
+    apply_master_gain(buffer, gain);
 }
 
 //==============================================================================
