@@ -134,7 +134,8 @@ freqs = [20.0, 40.0, 80.0, 160.0, 320.0, 640.0, 1280.0, 2560.0, 5120.0, 10240.0,
 #     pickle.dump(make_sawtooth(f), open(f'{T}pt_{f}Hz.pickle', 'wb'))
 sawtooth_tables = [pickle.load(open(f'{T}pt_{f}Hz.pickle', 'rb')) for f in freqs]
 
-show_spectrogram(play_waveform_sweep(sawtooth_tables[0], 10, do_play=False))
+
+# show_spectrogram(play_waveform_sweep(sawtooth_tables[0], 10, do_play=False))
 
 
 def generate_wavetable(initial_waveform: np.ndarray) -> np.ndarray:
@@ -165,7 +166,49 @@ def generate_wavetable(initial_waveform: np.ndarray) -> np.ndarray:
     return np.array(out)
 
 
+# https://cytomic.com/files/dsp/SvfLinearTrapOptimised2.pdf
+
+# Variables
+cutoff = 500.0
+Q = 10
+
+# Case lowpass
+g = np.tan(np.pi * cutoff / R)
+k = 1 / Q
+a1 = 1 / (1 + g * (g + k))
+a2 = g * a1
+a3 = g * a2
+m0 = 0
+m1 = 0
+m2 = 1
+
+# Clear
+ic1eq = 0
+ic2eq = 0
+
 sawtooth_wavetable = generate_wavetable(sawtooth_tables[0])
-sweep = play_wavetable_sweep(sawtooth_wavetable, 10, do_play=True)
+sweep = play_wavetable_sweep(sawtooth_wavetable, 5, do_play=False)
 # sp.io.wavfile.write('20Hz_20kHz_sweep_sawtooth.wav', R, sweep)
-show_spectrogram(sweep)
+# show_spectrogram(sweep)
+
+for i in range(sweep.shape[0]):
+    v0 = sweep[i]
+
+    # Tick
+    v3 = v0 - ic2eq
+    v1 = (a1 * ic1eq) + (a3 * v3)
+    v2 = ic2eq + (a2 * ic1eq) + (a3 * v3)
+    ic1eq = (2 * v1) - ic1eq
+    ic2eq = (2 * v2) - ic2eq
+
+    sweep[i] = (m0 * v0) + (m1 * v1) + (m2 * v2)
+
+# sd.play(sweep, R, blocking=True)
+
+fig, axes = plt.subplots()
+w, h = sp.signal.freqz([a1, a2, a3])
+axes.set_xlabel('Frequency (Hz)')
+axes.set_ylabel('Amplitude (dB)')
+# axes.set_ylim(-40, 5)
+axes.semilogx(w * (R / (2 * np.pi)), 20 * np.log10(np.maximum(abs(h), 1e-5)))
+plt.show()
