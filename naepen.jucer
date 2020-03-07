@@ -28,7 +28,7 @@
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" enableGNUExtensions="0" linuxExtraPkgConfig="fftw3"
                 extraCompilerFlags="-Wall -Wextra -Wswitch">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" optimisation="4"/>
+        <CONFIGURATION isDebug="1" name="Debug" optimisation="4" defines="DRAW_COMPONENT_BOUNDS=true"/>
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

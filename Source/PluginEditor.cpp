@@ -1,7 +1,9 @@
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
 
-#define DRAW_COMPONENT_BOUNDS true
+#ifndef DRAW_COMPONENT_BOUNDS
+#define DRAW_COMPONENT_BOUNDS false
+#endif
 
 constexpr auto PADDING = 8;
 constexpr auto COMPONENT_HEIGHT = 24;
