@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Filter.h"
+#include "SvfFilter.h"
 #include "SynthSounds.h"
 #include "WaveformVisualizer.h"
 #include "WavetableOsc.h"
@@ -77,7 +77,12 @@ public:
         }
     }
 
-    void set_filter_params(const Filter::Params &params)
+    void set_filter_type(SvfFilter::Type type)
+    {
+        filter.set_type(type);
+    }
+
+    void set_filter_params(const SvfFilter::Params &params)
     {
         filter_params = params;
     }
@@ -89,8 +94,8 @@ private:
 
     Synthesiser synth;
 
-    LowPassFilter lpf;
-    Filter::Params filter_params = {20000.0, 0.5};
+    SvfFilter filter;
+    SvfFilter::Params filter_params = {20000.0, 0.5};
 
     MidiMessageCollector midi_collector;
     MidiKeyboardState keyboard_state;

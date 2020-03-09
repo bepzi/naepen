@@ -43,6 +43,7 @@ private:
     Label table_idx_label;
     Slider table_idx_slider;
 
+    ComboBox filter_type_selector;
     Label filter_cutoff_label;
     Slider filter_cutoff_slider;
     Label filter_q_label;
@@ -53,8 +54,8 @@ private:
     MidiKeyboardState &keyboard_state;
     MidiKeyboardComponent keyboard_component;
 
-    ComboBox waveform_selector;
-    enum class WaveformId { Empty = 0, Sine, Sawtooth };
+//    ComboBox waveform_selector;
+//    enum class WaveformId { Empty = 0, Sine, Sawtooth };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessorEditor)
 };

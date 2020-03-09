@@ -30,7 +30,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     filter_cutoff_label("", "Cutoff"),
     filter_cutoff_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
     filter_q_label("", "Q"),
-    filter_q_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow)
+    filter_q_slider(Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow),
+    filter_type_selector()
 {
     gain_label.setJustificationType(Justification::horizontallyCentred);
 
@@ -56,6 +57,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     release_label.setJustificationType(Justification::horizontallyCentred);
 
     table_idx_slider.setRange(0.0, 1.0, 0.001);
+    table_idx_slider.setValue(0.5, dontSendNotification);
     table_idx_label.setJustificationType(Justification::horizontallyCentred);
 
     filter_cutoff_label.setJustificationType(Justification::horizontallyCentred);
@@ -63,9 +65,12 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     filter_cutoff_slider.setValue(20000.0, dontSendNotification);
     filter_cutoff_slider.setSkewFactorFromMidPoint(750.0);
     filter_q_label.setJustificationType(Justification::horizontallyCentred);
-    filter_q_slider.setRange(0.5, 20.0, 0.01);
+    filter_q_slider.setRange(0.5, 20, 0.01);
     filter_q_slider.setValue(0.5, dontSendNotification);
     filter_q_slider.setSkewFactorFromMidPoint(5.0);
+
+    filter_type_selector.addItemList({"Lowpass", "Highpass", "Bandpass"}, 1);
+    filter_type_selector.setSelectedItemIndex(0, dontSendNotification);
 
     addAndMakeVisible(gain_label);
     addAndMakeVisible(gain_slider);
@@ -89,6 +94,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     addAndMakeVisible(filter_q_label);
     addAndMakeVisible(filter_q_slider);
 
+    addAndMakeVisible(filter_type_selector);
+
     gain_slider.addListener(this);
 
     attack_slider.addListener(this);
@@ -100,6 +107,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
 
     filter_cutoff_slider.addListener(this);
     filter_q_slider.addListener(this);
+
+    filter_type_selector.addListener(this);
 
     setSize(1280, 720);
     setVisible(true);
@@ -187,9 +196,13 @@ void NaepenAudioProcessorEditor::resized()
         }
 
         {
-            auto filter_settings = left_pane;
+            auto filter_settings = left_pane.removeFromTop(box_height);
+            left_pane.removeFromTop(PADDING);
 
-            auto control_box = filter_settings.removeFromLeft(COMPONENT_HEIGHT * 3);
+            auto control_box = filter_settings.removeFromRight(COMPONENT_HEIGHT * 4);
+            filter_type_selector.setBounds(control_box.removeFromTop(control_box.getHeight() / 3));
+
+            control_box = filter_settings.removeFromLeft(COMPONENT_HEIGHT * 3);
             filter_cutoff_label.setBounds(control_box.removeFromBottom(COMPONENT_HEIGHT));
             filter_cutoff_slider.setBounds(control_box);
 
@@ -225,8 +238,9 @@ void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
 
 void NaepenAudioProcessorEditor::comboBoxChanged(ComboBox *menu)
 {
-    if (menu == &waveform_selector) {
-        //        auto id = static_cast<WaveformId>(waveform_selector.getSelectedId());
-        // TODO: Trigger switching waveforms for current synth
+    if (menu == &filter_type_selector) {
+        // Should never be 0
+        auto id = static_cast<SvfFilter::Type>(filter_type_selector.getSelectedId());
+        processor.set_filter_type(id);
     }
 }

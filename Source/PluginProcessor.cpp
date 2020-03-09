@@ -34,6 +34,8 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     }
 
     synth.addSound(new WavetableSound());
+
+    set_table_index(0.5);
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -174,8 +176,8 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    lpf.set_params(filter_params, getSampleRate());
-    lpf.apply_to_buffer(buffer);
+    filter.set_params(filter_params, getSampleRate());
+    filter.apply_to_buffer(buffer);
 
     visualizer.pushBuffer(buffer);
 
