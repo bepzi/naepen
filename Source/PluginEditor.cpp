@@ -239,7 +239,7 @@ void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
 void NaepenAudioProcessorEditor::comboBoxChanged(ComboBox *menu)
 {
     if (menu == &filter_type_selector) {
-        // Should never be 0
+        jassert(filter_type_selector.getSelectedId() > 0);
         auto id = static_cast<SvfFilter::Type>(filter_type_selector.getSelectedId());
         processor.set_filter_type(id);
     }
