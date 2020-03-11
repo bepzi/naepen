@@ -87,6 +87,12 @@ public:
         filter_params = params;
     }
 
+    std::vector<std::array<float, 2048>> get_wavetable_mesh() const noexcept
+    {
+        auto wavetable_voice = dynamic_cast<WavetableVoice<2048> *>(synth.getVoice(0));
+        return wavetable_voice->get_wavetable_mesh();
+    }
+
 private:
     float gain = 1.0f;
 

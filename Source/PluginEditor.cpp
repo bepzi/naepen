@@ -112,6 +112,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
 
     filter_type_selector.addListener(this);
 
+    wavetable_visualizer.update_wavetable_model(processor.get_wavetable_mesh());
+
     setSize(1280, 720);
     setVisible(true);
 }

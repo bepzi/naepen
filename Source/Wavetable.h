@@ -57,6 +57,18 @@ public:
         return ((1.0f - weight) * sample0) + (weight * sample1);
     }
 
+    std::vector<std::array<float, T>> get_tables() const noexcept
+    {
+        std::vector<std::array<float, T>> out;
+        out.reserve(oscillators.size());
+
+        for (const auto &osc : oscillators) {
+            out.push_back(osc.get_table());
+        }
+
+        return out;
+    }
+
 private:
     std::vector<WavetableOsc<T>> oscillators;
     double idx = 0.0;

@@ -88,6 +88,11 @@ public:
         table->set_index(idx * table->get_max_index());
     }
 
+    std::vector<std::array<float, T>> get_wavetable_mesh() const noexcept
+    {
+        return table->get_tables();
+    }
+
 private:
     float level = 0.0f;
 

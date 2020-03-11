@@ -115,6 +115,11 @@ public:
         return sample;
     }
 
+    std::array<float, T> get_table() const noexcept
+    {
+        return tables[0].get_table();
+    }
+
 private:
     class Table;
 
@@ -178,6 +183,15 @@ private:
             for (float &f : table) {
                 f /= scale;
             }
+        }
+
+        std::array<float, T> get_table() const noexcept
+        {
+            std::array<float, T> out;
+            for (size_t i = 0; i < out.size(); ++i) {
+                out[i] = table[i];
+            }
+            return out;
         }
 
     private:
