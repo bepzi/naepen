@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "WaveformVisualizerComponent.h"
+#include "WavetableVisualizerComponent.h"
 
 #include <JuceHeader.h>
 
@@ -49,13 +51,12 @@ private:
     Label filter_q_label;
     Slider filter_q_slider;
 
-    AudioVisualiserComponent &visualizer;
+    WavetableVisualizerComponent wavetable_visualizer;
+
+    AudioVisualiserComponent &audio_visualizer;
 
     MidiKeyboardState &keyboard_state;
     MidiKeyboardComponent keyboard_component;
-
-//    ComboBox waveform_selector;
-//    enum class WaveformId { Empty = 0, Sine, Sawtooth };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessorEditor)
 };

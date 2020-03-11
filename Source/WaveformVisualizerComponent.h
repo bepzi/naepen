@@ -2,9 +2,9 @@
 
 #include <JuceHeader.h>
 
-class WaveformVisualiser : public AudioVisualiserComponent {
+class WaveformVisualizerComponent : public AudioVisualiserComponent {
 public:
-    explicit WaveformVisualiser(int initialNumChannels) :
+    explicit WaveformVisualizerComponent(int initialNumChannels) :
         AudioVisualiserComponent(initialNumChannels)
     {
         // Do nothing
@@ -22,5 +22,5 @@ public:
     }
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformVisualiser)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformVisualizerComponent)
 };

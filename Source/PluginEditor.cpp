@@ -14,7 +14,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     processor(p),
     gain_label("", "Master"),
     gain_slider(Slider::LinearVertical, Slider::TextBoxBelow),
-    visualizer(vis),
+    audio_visualizer(vis),
     keyboard_state(key_state),
     keyboard_component(keyboard_state, MidiKeyboardComponent::horizontalKeyboard),
     attack_label("", "A"),
@@ -74,7 +74,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
 
     addAndMakeVisible(gain_label);
     addAndMakeVisible(gain_slider);
-    addAndMakeVisible(visualizer);
+    addAndMakeVisible(audio_visualizer);
     addAndMakeVisible(keyboard_component);
 
     addAndMakeVisible(attack_label);
@@ -95,6 +95,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     addAndMakeVisible(filter_q_slider);
 
     addAndMakeVisible(filter_type_selector);
+
+    addAndMakeVisible(wavetable_visualizer);
 
     gain_slider.addListener(this);
 
@@ -123,7 +125,7 @@ void NaepenAudioProcessorEditor::paint(Graphics &g)
 
 #if DRAW_COMPONENT_BOUNDS == true
     std::vector<Component *> drawable_components = {
-        &gain_label,       &gain_slider,     &visualizer,           &attack_slider,
+        &gain_label,       &gain_slider,     &audio_visualizer,     &attack_slider,
         &decay_slider,     &sustain_slider,  &release_slider,       &attack_label,
         &decay_label,      &sustain_label,   &release_label,        &keyboard_component,
         &table_idx_slider, &table_idx_label, &filter_cutoff_slider, &filter_cutoff_label,
@@ -148,7 +150,7 @@ void NaepenAudioProcessorEditor::resized()
         keyboard_component.setBounds(
             bottom_row.removeFromLeft(((4 * bottom_row.getWidth()) / 5) - PADDING));
         bottom_row.removeFromLeft(PADDING);
-        visualizer.setBounds(bottom_row);
+        audio_visualizer.setBounds(bottom_row);
     }
 
     // ADSR and filter parameters
@@ -214,6 +216,7 @@ void NaepenAudioProcessorEditor::resized()
 
     // Misc. visualizations
     auto right_pane = area;
+    wavetable_visualizer.setBounds(area);
 }
 
 void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)

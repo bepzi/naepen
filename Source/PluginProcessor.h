@@ -2,7 +2,7 @@
 
 #include "SvfFilter.h"
 #include "SynthSounds.h"
-#include "WaveformVisualizer.h"
+#include "WaveformVisualizerComponent.h"
 #include "WavetableOsc.h"
 
 #include <JuceHeader.h>
@@ -90,7 +90,7 @@ public:
 private:
     float gain = 1.0f;
 
-    WaveformVisualiser visualizer;
+    WaveformVisualizerComponent visualizer;
 
     Synthesiser synth;
 
