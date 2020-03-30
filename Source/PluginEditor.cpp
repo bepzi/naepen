@@ -96,8 +96,6 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
 
     addAndMakeVisible(filter_type_selector);
 
-    addAndMakeVisible(wavetable_visualizer);
-
     gain_slider.addListener(this);
 
     attack_slider.addListener(this);
@@ -111,8 +109,6 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(
     filter_q_slider.addListener(this);
 
     filter_type_selector.addListener(this);
-
-    wavetable_visualizer.update_wavetable_model(processor.get_wavetable_mesh());
 
     setSize(1280, 720);
     setVisible(true);
@@ -218,7 +214,6 @@ void NaepenAudioProcessorEditor::resized()
 
     // Misc. visualizations
     auto right_pane = area;
-    wavetable_visualizer.setBounds(area);
 }
 
 void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)

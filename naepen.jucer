@@ -9,10 +9,6 @@
               pluginDesc="A WIP polyphonic synthesizer">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
-      <FILE id="n5HD63" name="WavetableVisualizerComponent.cpp" compile="1"
-            resource="0" file="Source/WavetableVisualizerComponent.cpp"/>
-      <FILE id="NzIfeb" name="WavetableVisualizerComponent.h" compile="0"
-            resource="0" file="Source/WavetableVisualizerComponent.h"/>
       <FILE id="egUPcV" name="SvfFilter.h" compile="0" resource="0" file="Source/SvfFilter.h"/>
       <FILE id="iwJF5K" name="Wavetable.h" compile="0" resource="0" file="Source/Wavetable.h"/>
       <FILE id="tJd19S" name="WavetableOsc.h" compile="0" resource="0" file="Source/WavetableOsc.h"/>

@@ -2,7 +2,6 @@
 
 #include "PluginProcessor.h"
 #include "WaveformVisualizerComponent.h"
-#include "WavetableVisualizerComponent.h"
 
 #include <JuceHeader.h>
 
@@ -50,8 +49,6 @@ private:
     Slider filter_cutoff_slider;
     Label filter_q_label;
     Slider filter_q_slider;
-
-    WavetableVisualizerComponent wavetable_visualizer;
 
     AudioVisualiserComponent &audio_visualizer;
 
