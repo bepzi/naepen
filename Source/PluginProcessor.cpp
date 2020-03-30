@@ -1,7 +1,7 @@
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
 #include "SynthSounds.h"
-#include "WavetableOsc.h"
+#include "dsp/WavetableOsc.h"
+#include "gui/PluginEditor.h"
 
 static constexpr size_t MAX_POLYPHONY = 12;
 

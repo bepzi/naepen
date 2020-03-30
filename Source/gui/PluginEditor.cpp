@@ -1,5 +1,5 @@
 #include "PluginEditor.h"
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 
 #ifndef DRAW_COMPONENT_BOUNDS
 #define DRAW_COMPONENT_BOUNDS false

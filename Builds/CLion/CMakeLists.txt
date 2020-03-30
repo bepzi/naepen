@@ -50,14 +50,14 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
-    "../../Source/SvfFilter.h"
-    "../../Source/Wavetable.h"
-    "../../Source/WavetableOsc.h"
+    "../../Source/dsp/SvfFilter.h"
+    "../../Source/dsp/Wavetable.h"
+    "../../Source/dsp/WavetableOsc.h"
+    "../../Source/gui/PluginEditor.cpp"
+    "../../Source/gui/PluginEditor.h"
+    "../../Source/gui/WaveformVisualizerComponent.h"
     "../../Source/PluginProcessor.cpp"
     "../../Source/PluginProcessor.h"
-    "../../Source/PluginEditor.cpp"
-    "../../Source/PluginEditor.h"
-    "../../Source/WaveformVisualizerComponent.h"
     "../../Source/SynthSounds.h"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.cpp"
@@ -1190,12 +1190,12 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JuceHeader.h"
 )
 
-set_source_files_properties ("../../Source/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/Wavetable.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/WavetableOsc.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/dsp/Wavetable.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/dsp/WavetableOsc.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/SynthSounds.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)

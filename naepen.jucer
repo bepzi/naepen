@@ -9,18 +9,22 @@
               pluginDesc="A WIP polyphonic synthesizer">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
-      <FILE id="egUPcV" name="SvfFilter.h" compile="0" resource="0" file="Source/SvfFilter.h"/>
-      <FILE id="iwJF5K" name="Wavetable.h" compile="0" resource="0" file="Source/Wavetable.h"/>
-      <FILE id="tJd19S" name="WavetableOsc.h" compile="0" resource="0" file="Source/WavetableOsc.h"/>
+      <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
+        <FILE id="BAX5Ft" name="SvfFilter.h" compile="0" resource="0" file="Source/dsp/SvfFilter.h"/>
+        <FILE id="hu500o" name="Wavetable.h" compile="0" resource="0" file="Source/dsp/Wavetable.h"/>
+        <FILE id="AslMP6" name="WavetableOsc.h" compile="0" resource="0" file="Source/dsp/WavetableOsc.h"/>
+      </GROUP>
+      <GROUP id="{B2BE71AD-D467-E1B9-66C3-742F3C86202F}" name="gui">
+        <FILE id="y6emzS" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/gui/PluginEditor.cpp"/>
+        <FILE id="eyGWBy" name="PluginEditor.h" compile="0" resource="0" file="Source/gui/PluginEditor.h"/>
+        <FILE id="keSoR7" name="WaveformVisualizerComponent.h" compile="0"
+              resource="0" file="Source/gui/WaveformVisualizerComponent.h"/>
+      </GROUP>
       <FILE id="HRNWTR" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="jNXuei" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="SgtN1L" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="JhZl2w" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="SYYBKw" name="WaveformVisualizerComponent.h" compile="0"
-            resource="0" file="Source/WaveformVisualizerComponent.h"/>
       <FILE id="LhpU18" name="SynthSounds.h" compile="0" resource="0" file="Source/SynthSounds.h"/>
     </GROUP>
   </MAINGROUP>

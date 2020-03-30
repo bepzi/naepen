@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SvfFilter.h"
 #include "SynthSounds.h"
-#include "WaveformVisualizerComponent.h"
-#include "WavetableOsc.h"
+#include "dsp/SvfFilter.h"
+#include "dsp/WavetableOsc.h"
+#include "gui/WaveformVisualizerComponent.h"
 
 #include <JuceHeader.h>
 

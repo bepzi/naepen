@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 #include "WaveformVisualizerComponent.h"
 
 #include <JuceHeader.h>

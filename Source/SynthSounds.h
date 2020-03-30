@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Wavetable.h"
+#include "dsp/Wavetable.h"
 
 #include <JuceHeader.h>
 
