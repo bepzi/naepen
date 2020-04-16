@@ -17,7 +17,8 @@ public:
      */
     explicit WavetableOsc(std::array<double, T> waveform) noexcept
     {
-        tables.reserve(max_tables);
+        tables = std::make_shared<std::vector<Table>>();
+        tables->reserve(max_tables);
 
         auto fft = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * ((T / 2) + 1));
         fftw_plan p = fftw_plan_dft_r2c_1d(T, waveform.data(), (fftw_complex *)fft, FFTW_ESTIMATE);
@@ -40,14 +41,14 @@ public:
 
         double top_freq = 2.0 / 3.0 / max_harmonic;
 
-        while (max_harmonic != 0 && tables.size() <= max_tables) {
+        while (max_harmonic != 0 && tables->size() <= max_tables) {
             // TODO: Do this with std::memset?
             for (size_t h = max_harmonic + 1; h < (T / 2) + 1; ++h) {
                 fft[0][h] = /* fft[1][h] = */ 0.0;
             }
 
             Table t(to_waveform(fft), top_freq);
-            tables.push_back(t);
+            tables->push_back(t);
 
             top_freq *= 2.0;
             max_harmonic /= 2;
@@ -69,10 +70,10 @@ public:
     // HACK to allow for having a single sinewave as a wavetable
     void replace_table(std::array<double, T> waveform) noexcept
     {
-        tables.clear();
+        tables = std::make_shared<std::vector<Table>>();
 
         Table t(waveform, 1.0);
-        tables.push_back(t);
+        tables->push_back(t);
 
         normalize();
     }
@@ -87,13 +88,13 @@ public:
 
         phase_incr = freq_hz * (T / sample_rate);
 
-        for (idx = 0; idx < tables.size(); ++idx) {
-            if (idx == tables.size() - 1) {
+        for (idx = 0; idx < tables->size(); ++idx) {
+            if (idx == tables->size() - 1) {
                 // No more tables left, use the last one
                 break;
             }
 
-            double top_freq = tables[idx].get_top_freq_hz(sample_rate);
+            double top_freq = (*tables)[idx].get_top_freq_hz(sample_rate);
 
             if (top_freq >= freq_hz) {
                 // We've found our table
@@ -101,12 +102,12 @@ public:
             }
         }
 
-        jassert(idx <= tables.size() - 1);
+        jassert(idx <= tables->size() - 1);
     }
 
     [[nodiscard]] forcedinline float get_next_sample() noexcept
     {
-        auto sample = tables[idx].get_sample(phase);
+        auto sample = (*tables)[idx].get_sample(phase);
 
         if ((phase += phase_incr) > (float)T) {
             phase -= (float)T;
@@ -115,26 +116,23 @@ public:
         return sample;
     }
 
-    std::array<float, T> get_table() const noexcept
-    {
-        return tables[0].get_table();
-    }
-
 private:
-    class Table;
+    class Table;  // Forward-declaration
 
     double phase = 0.0;
     double phase_incr = 0.0;
+
+    // Which table we're currently pulling samples from
     size_t idx = 0;
 
-    static const size_t max_tables = 20;
-    std::vector<Table> tables;
+    static const size_t max_tables = 16;
+    std::shared_ptr<std::vector<Table>> tables;
 
     class Table {
     public:
         /**
          * @param waveform A single cycle of a waveform
-         * @param top_freq The highest frequency that can be safely played (not enforced)
+         * @param top_freq The highest frequency that can be safely played (not enforced!)
          */
         explicit Table(const std::array<double, T> &waveform, double top_freq) noexcept
         {
@@ -178,27 +176,26 @@ private:
             return *std::max_element(table.begin(), table.end());
         }
 
-        void scale_by(float scale) noexcept
+        void normalize_by(float scale) noexcept
         {
+            jassert(scale != 0.0);
+
             for (float &f : table) {
                 f /= scale;
             }
         }
 
-        std::array<float, T> get_table() const noexcept
-        {
-            std::array<float, T> out;
-            for (size_t i = 0; i < out.size(); ++i) {
-                out[i] = table[i];
-            }
-            return out;
-        }
-
     private:
         std::array<float, T + 1> table;
+
+        // The highest frequency that this oscillator
+        // can be safely used at before aliasing
         double top_freq;
     };
 
+    /**
+     * Converts from the frequency domain to the time domain.
+     */
     static std::array<double, T> to_waveform(fftw_complex *in)
     {
         std::array<double, T> out = {};
@@ -210,12 +207,15 @@ private:
         return out;
     }
 
+    /**
+     * Normalizes the values within the oscillator so that all the samples are between [-1, 1].
+     */
     void normalize() noexcept
     {
-        jassert(!tables.empty());
-        auto global_max = tables.at(0).get_max();
-        for (Table &t : tables) {
-            t.scale_by(global_max);
+        jassert(!tables->empty());
+        auto global_max = tables->at(0).get_max();
+        for (Table &t : *tables) {
+            t.normalize_by(global_max);
         }
     }
 };

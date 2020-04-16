@@ -13,7 +13,7 @@ public:
         return true;
     }
 
-    bool appliesToChannel(int midi_channel) override
+    bool appliesToChannel(int /* midi_channel */) override
     {
         return true;
     }
@@ -86,11 +86,6 @@ public:
     void set_table_idx(double idx) noexcept
     {
         table->set_index(idx * table->get_max_index());
-    }
-
-    std::vector<std::array<float, T>> get_wavetable_mesh() const noexcept
-    {
-        return table->get_tables();
     }
 
 private:

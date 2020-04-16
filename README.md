@@ -1,6 +1,6 @@
 <h1 align="center">Naepen</h1>
 
-A toy cross-platform polyphonic synthesizer.
+A cross-platform polyphonic synthesizer.
 
 ### Building
 

@@ -51,7 +51,7 @@ SortIncludes: true
 IncludeBlocks: Preserve
 
 # I prefer to do this manually with Emacs
-ReflowComments: false
+ReflowComments: true
 ---
 Language: Cpp
 Standard: Cpp11
