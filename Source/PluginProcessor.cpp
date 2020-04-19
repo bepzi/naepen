@@ -109,10 +109,11 @@ void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_sawtooth(20.0, sampleRate));
 
     synth.clearVoices();
-    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table)));
-    }
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
+        synth.addVoice(
+            new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table), state));
+    }
 
     midi_collector.reset(sampleRate);
 }
@@ -185,6 +186,18 @@ AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 }
 
 //==============================================================================
+#ifdef DEBUG
+// Don't save/load patch state when compiling in debug mode, for development purposes
+void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
+{
+    ignoreUnused(dest_data);
+}
+
+void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
+{
+    ignoreUnused(data, size_in_bytes);
+}
+#else
 void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 {
     auto xml = state.state.toXmlString();
@@ -196,15 +209,42 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
     auto xml = String::fromUTF8((const char *)data, size_in_bytes);
     state.replaceState(ValueTree::fromXml(xml));
 }
+#endif
 
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
-    std::vector<std::unique_ptr<RangedAudioParameter>> params;
+    auto master_gain_param = std::make_unique<AudioParameterFloat>(
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain",
+        (NormalisableRange<float>) {0.0f, 1.0f}, 1.0f);
 
-    params.push_back(std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", 0.0, 1.0, 1.0));
+    auto osc_one_group = std::make_unique<AudioProcessorParameterGroup>(
+        DatabaseIdentifiers::OSC_ONE_GROUP.toString(), "Oscillator 1", "|");
+    {
+        NormalisableRange<float> adr_range = {0.0f, 5.0f};
+        adr_range.setSkewForCentre(0.75f);
 
-    return {params.begin(), params.end()};
+        auto osc_one_gain_attack = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(), "Osc 1 Gain Attack", adr_range,
+            0.05f, "s");
+
+        auto osc_one_gain_decay = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(), "Osc 1 Gain Decay", adr_range,
+            0.25f, "s");
+
+        auto osc_one_gain_sustain = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(), "Osc 1 Gain Sustain",
+            (NormalisableRange<float>) {0.0f, 1.0f}, 1.0f);
+
+        auto osc_one_gain_release = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(), "Osc 1 Gain Release", adr_range,
+            0.15f, "s");
+
+        osc_one_group->addChild(
+            std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
+            std::move(osc_one_gain_sustain), std::move(osc_one_gain_release));
+    }
+
+    return {std::move(master_gain_param), std::move(osc_one_group)};
 }
 
 //==============================================================================

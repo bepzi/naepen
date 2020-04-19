@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../PluginProcessor.h"
+#include "OscOneComponent.h"
 
 #include <JuceHeader.h>
 
@@ -17,8 +18,10 @@ public:
 private:
     NaepenAudioProcessor &processor;
 
-    Slider master_gain_slider;
+    Slider master_gain_slider {Slider::LinearVertical, Slider::TextBoxBelow};
     APVTS::SliderAttachment master_gain_slider_attachment;
+
+    OscOneComponent osc_one;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessorEditor)
 };

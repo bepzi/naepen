@@ -24,7 +24,7 @@ public:
     explicit BandlimitedOscillator(std::shared_ptr<const LookupTable> t);
     ~BandlimitedOscillator() override = default;
 
-    [[nodiscard]] inline float get_next_sample() override;
+    [[nodiscard]] float get_next_sample() override;
 
     void set_freq(double freq_hz) override;
 

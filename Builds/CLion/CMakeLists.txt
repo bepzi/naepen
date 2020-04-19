@@ -59,12 +59,15 @@ add_library (SHARED_CODE STATIC
     "../../Source/dsp/OscillatorVoice.h"
     "../../Source/dsp/Oscillator.h"
     "../../Source/dsp/InterpolatingOscillator.h"
+    "../../Source/gui/OscOneComponent.cpp"
+    "../../Source/gui/OscOneComponent.h"
     "../../Source/gui/PluginEditor.cpp"
     "../../Source/gui/PluginEditor.h"
     "../../Source/gui/WaveformVisualizerComponent.h"
     "../../Source/PluginProcessor.cpp"
     "../../Source/PluginProcessor.h"
     "../../Source/DatabaseIdentifiers.h"
+    "../../Source/DatabaseIdentifiers.cpp"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/audio_play_head/juce_AudioPlayHead.h"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.cpp"
     "../../../../../../../usr/share/juce/modules/juce_audio_basics/buffers/juce_AudioChannelSet.h"
@@ -1201,6 +1204,7 @@ set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FI
 set_source_files_properties ("../../Source/dsp/OscillatorVoice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/Oscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/InterpolatingOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/OscOneComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -2382,7 +2386,6 @@ target_compile_definitions (VST PRIVATE
     LINUX=1
     DEBUG=1
     _DEBUG=1
-    DRAW_COMPONENT_BOUNDS=true
     JUCER_LINUX_MAKE_6D53C8B4=1
     JUCE_APP_VERSION=0.1.0
     JUCE_APP_VERSION_HEX=0x100
@@ -2442,7 +2445,6 @@ target_compile_definitions (STANDALONE_PLUGIN PRIVATE
     LINUX=1
     DEBUG=1
     _DEBUG=1
-    DRAW_COMPONENT_BOUNDS=true
     JUCER_LINUX_MAKE_6D53C8B4=1
     JUCE_APP_VERSION=0.1.0
     JUCE_APP_VERSION_HEX=0x100
@@ -2495,7 +2497,6 @@ target_compile_definitions (SHARED_CODE PRIVATE
     LINUX=1
     DEBUG=1
     _DEBUG=1
-    DRAW_COMPONENT_BOUNDS=true
     JUCER_LINUX_MAKE_6D53C8B4=1
     JUCE_APP_VERSION=0.1.0
     JUCE_APP_VERSION_HEX=0x100
@@ -2536,7 +2537,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wextra -Wswitch")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -2746,7 +2747,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -Wall -Wextra -Wswitch")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Release)

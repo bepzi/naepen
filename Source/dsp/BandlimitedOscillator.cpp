@@ -9,7 +9,7 @@ BandlimitedOscillator::BandlimitedOscillator(std::shared_ptr<const LookupTable> 
 {
 }
 
-[[nodiscard]] inline float BandlimitedOscillator::get_next_sample()
+float BandlimitedOscillator::get_next_sample()
 {
     auto sample = get_table_sample(phase, (*lookup_table)[idx].second);
 
@@ -167,7 +167,7 @@ BandlimitedOscillator::LookupTable make_sine()
     double phase_delta = (2 * M_PI) / (double)(BandlimitedOscillator::T);
 
     for (auto &f : samples) {
-        f = std::sin(phase);
+        f = static_cast<float>(std::sin(phase));
         phase += phase_delta;
     }
     samples[BandlimitedOscillator::T] = samples[0];

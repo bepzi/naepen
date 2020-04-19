@@ -14,7 +14,7 @@ public:
 
 class OscillatorVoice : public SynthesiserVoice {
 public:
-    explicit OscillatorVoice(std::unique_ptr<Oscillator> oscillator);
+    OscillatorVoice(std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts);
 
     bool canPlaySound(SynthesiserSound *sound) override;
 
@@ -35,11 +35,11 @@ public:
 
 private:
     std::unique_ptr<Oscillator> osc;
+    AudioProcessorValueTreeState &state;
 
     float level = 0.0f;
 
     ADSR adsr_envelope;
-    ADSR::Parameters adsr_params = {0.005f, 0.25f, 1.0f, 0.1f};
 };
 
 //    void set_adsr(const ADSR::Parameters &params) noexcept

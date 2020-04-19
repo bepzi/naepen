@@ -1,5 +1,7 @@
 #include "OscillatorVoice.h"
 
+#include "../DatabaseIdentifiers.h"
+
 bool OscillatorSound::appliesToNote(int midi_note_number)
 {
     ignoreUnused(midi_note_number);
@@ -14,13 +16,10 @@ bool OscillatorSound::appliesToChannel(int midi_channel)
 
 //==============================================================================
 
-OscillatorVoice::OscillatorVoice(std::unique_ptr<Oscillator> oscillator) :
-    osc(std::move(oscillator))
+OscillatorVoice::OscillatorVoice(
+    std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts) :
+    osc(std::move(oscillator)), state(apvts)
 {
-    osc->set_sample_rate(getSampleRate());
-
-    adsr_envelope.setSampleRate(getSampleRate());
-    adsr_envelope.setParameters(adsr_params);
 }
 
 bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
@@ -37,6 +36,12 @@ void OscillatorVoice::startNote(
     auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
     osc->set_freq(freq_hz);
 
+    ADSR::Parameters adsr_params = {
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_DECAY).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
+    };
     adsr_envelope.setParameters(adsr_params);
     adsr_envelope.noteOn();
 }
@@ -74,4 +79,13 @@ void OscillatorVoice::renderNextBlock(
 void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
 {
     osc->set_sample_rate(new_rate);
+
+    adsr_envelope.setSampleRate(new_rate);
+    ADSR::Parameters adsr_params = {
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_DECAY).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
+    };
+    adsr_envelope.setParameters(adsr_params);
 }
