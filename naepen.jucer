@@ -2,17 +2,29 @@
 
 <JUCERPROJECT id="NTGeGU" name="naepen" projectType="audioplug" jucerVersion="5.4.7"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
-              cppLanguageStandard="17" pluginFormats="buildStandalone,buildVST"
+              cppLanguageStandard="latest" pluginFormats="buildStandalone,buildVST"
               pluginName="Naepen" pluginManufacturer="Benjamin Zinn" aaxIdentifier="com.github.bepzi.naepen"
               version="0.1.0" projectLineFeed="&#10;" displaySplashScreen="0"
               reportAppUsage="0" splashScreenColour="Dark" bundleIdentifier="com.github.bepzi.naepen"
-              pluginDesc="A WIP polyphonic synthesizer">
+              pluginDesc="A WIP polyphonic synthesizer" includeBinaryInJuceHeader="0">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
+        <FILE id="SNNGmY" name="InterpolatingOscillator.cpp" compile="1" resource="0"
+              file="Source/dsp/InterpolatingOscillator.cpp"/>
+        <FILE id="qiVSIx" name="OscillatorVoice.cpp" compile="1" resource="0"
+              file="Source/dsp/OscillatorVoice.cpp"/>
+        <FILE id="jiG6tn" name="SvfFilter.cpp" compile="1" resource="0" file="Source/dsp/SvfFilter.cpp"/>
+        <FILE id="e5sIol" name="BandlimitedOscillator.h" compile="0" resource="0"
+              file="Source/dsp/BandlimitedOscillator.h"/>
+        <FILE id="ZoMj8H" name="BandlimitedOscillator.cpp" compile="1" resource="0"
+              file="Source/dsp/BandlimitedOscillator.cpp"/>
         <FILE id="BAX5Ft" name="SvfFilter.h" compile="0" resource="0" file="Source/dsp/SvfFilter.h"/>
-        <FILE id="hu500o" name="Wavetable.h" compile="0" resource="0" file="Source/dsp/Wavetable.h"/>
-        <FILE id="AslMP6" name="WavetableOsc.h" compile="0" resource="0" file="Source/dsp/WavetableOsc.h"/>
+        <FILE id="cR0CbW" name="OscillatorVoice.h" compile="0" resource="0"
+              file="Source/dsp/OscillatorVoice.h"/>
+        <FILE id="kTrAce" name="Oscillator.h" compile="0" resource="0" file="Source/dsp/Oscillator.h"/>
+        <FILE id="Z7FcPP" name="InterpolatingOscillator.h" compile="0" resource="0"
+              file="Source/dsp/InterpolatingOscillator.h"/>
       </GROUP>
       <GROUP id="{B2BE71AD-D467-E1B9-66C3-742F3C86202F}" name="gui">
         <FILE id="y6emzS" name="PluginEditor.cpp" compile="1" resource="0"
@@ -25,7 +37,8 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="jNXuei" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="LhpU18" name="SynthSounds.h" compile="0" resource="0" file="Source/SynthSounds.h"/>
+      <FILE id="yq1Smy" name="DatabaseIdentifiers.h" compile="0" resource="0"
+            file="Source/DatabaseIdentifiers.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
