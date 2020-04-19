@@ -1,7 +1,8 @@
 #include "PluginProcessor.h"
-#include "SynthSounds.h"
-#include "dsp/WavetableOsc.h"
+#include "dsp/OscillatorVoice.h"
 #include "gui/PluginEditor.h"
+
+#include "DatabaseIdentifiers.h"
 
 static constexpr size_t MAX_POLYPHONY = 12;
 
@@ -18,24 +19,12 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 #endif
                        ),
 #endif
-    visualizer(2)
+    state(
+        *this, nullptr, Identifier(DatabaseIdentifiers::DATABASE_TYPE_ID),
+        create_parameter_layout())
 {
-    // HACK: I shouldn't have to do this, esp. not here
-    auto sine_wave = WavetableOsc<2048>(make_sine<2048>());
-    auto triangle_wave = WavetableOsc<2048>(make_triangle<2048>(20.0));
-    auto square_wave = WavetableOsc<2048>(make_square<2048>(20.0));
-    auto sawtooth_wave = WavetableOsc<2048>(make_sawtooth<2048>(20.0));
-
-    sine_wave.replace_table(make_sine<2048>());
-    auto wt = Wavetable<2048>({sine_wave, triangle_wave, square_wave, sawtooth_wave});
-
-    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new WavetableVoice<2048>(std::make_unique<Wavetable<2048>>(wt)));
-    }
-
-    synth.addSound(new WavetableSound());
-
-    set_table_index(0.5);
+    sine_table = std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine());
+    synth.addSound(new OscillatorSound());
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -108,9 +97,21 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    visualizer.setBufferSize(samplesPerBlock);
-    visualizer.setSamplesPerBlock(samplesPerBlock / 64);
+    ignoreUnused(samplesPerBlock);
+    //    visualizer.setBufferSize(samplesPerBlock);
+    //    visualizer.setSamplesPerBlock(samplesPerBlock / 64);
 
+    triangle_table =
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0, sampleRate));
+    square_table =
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sampleRate));
+    sawtooth_table =
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_sawtooth(20.0, sampleRate));
+
+    synth.clearVoices();
+    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
+        synth.addVoice(new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table)));
+    }
     synth.setCurrentPlaybackSampleRate(sampleRate);
 
     midi_collector.reset(sampleRate);
@@ -146,42 +147,30 @@ bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) co
 }
 #endif
 
-static forcedinline void apply_master_gain(AudioBuffer<float> &buffer, float gain)
-{
-    {
-        float *c0_buf = buffer.getWritePointer(0);
-        for (int i = 0; i < buffer.getNumSamples(); ++i) {
-            c0_buf[i] *= gain;
-        }
-    }
-
-    const float *c0_buf = buffer.getReadPointer(0);
-    for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
-        float *buf = buffer.getWritePointer(channel);
-        std::memcpy(buf, c0_buf, sizeof(float) * buffer.getNumSamples());
-    }
-}
-
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
 {
     ScopedNoDenormals noDenormals;
 
     buffer.clear();
 
-    if (getTotalNumOutputChannels() < 1) {
-        return;
-    }
-
-    keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
+    keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    filter.set_params(filter_params, getSampleRate());
-    filter.apply_to_buffer(buffer);
+    float master_gain = state.getParameter(DatabaseIdentifiers::MASTER_GAIN)->getValue();
+    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
+        float *buf = buffer.getWritePointer(channel);
+        for (int i = 0; i < buffer.getNumSamples(); ++i) {
+            buf[i] *= master_gain;
+        }
+    }
 
-    visualizer.pushBuffer(buffer);
-
-    apply_master_gain(buffer, gain);
+    //    filter.set_params(filter_params, getSampleRate());
+    //    filter.apply_to_buffer(buffer);
+    //
+    //    visualizer.pushBuffer(buffer);
+    //
+    //    apply_master_gain(buffer, gain);
 }
 
 //==============================================================================
@@ -192,23 +181,30 @@ bool NaepenAudioProcessor::hasEditor() const
 
 AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 {
-    return new NaepenAudioProcessorEditor(*this, visualizer, keyboard_state);
+    return new NaepenAudioProcessorEditor(*this);
 }
 
 //==============================================================================
 void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    ignoreUnused(dest_data);
+    auto xml = state.state.toXmlString();
+    dest_data.append(xml.getCharPointer(), xml.getNumBytesAsUTF8());
 }
 
 void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    ignoreUnused(data, size_in_bytes);
+    auto xml = String::fromUTF8((const char *)data, size_in_bytes);
+    state.replaceState(ValueTree::fromXml(xml));
+}
+
+APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
+{
+    std::vector<std::unique_ptr<RangedAudioParameter>> params;
+
+    params.push_back(std::make_unique<AudioParameterFloat>(
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", 0.0, 1.0, 1.0));
+
+    return {params.begin(), params.end()};
 }
 
 //==============================================================================

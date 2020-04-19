@@ -1,11 +1,13 @@
 #pragma once
 
-#include "SynthSounds.h"
+#include "dsp/BandlimitedOscillator.h"
+#include "dsp/OscillatorVoice.h"
 #include "dsp/SvfFilter.h"
-#include "dsp/WavetableOsc.h"
 #include "gui/WaveformVisualizerComponent.h"
 
 #include <JuceHeader.h>
+
+using APVTS = juce::AudioProcessorValueTreeState;
 
 /**
  * Handles audio, MIDI I/O, and processing logic.
@@ -49,58 +51,27 @@ public:
     void getStateInformation(MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
-    void set_gain(float gain)
-    {
-        this->gain = gain;
-    }
-
-    void set_adsr(double attack, double decay, double sustain, double release)
-    {
-        for (int i = 0; i < synth.getNumVoices(); ++i) {
-            // TODO: Not a fan of needing to do this dynamic cast. Is there a better way to update
-            // the global ADSR? Maybe I need to subclass JUCE::Synthesiser...
-            auto wavetable_voice = dynamic_cast<WavetableVoice<2048> *>(synth.getVoice(i));
-            if (wavetable_voice != nullptr) {
-                wavetable_voice->set_adsr(
-                    {(float)attack, (float)decay, (float)sustain, (float)release});
-            }
-        }
-    }
-
-    void set_table_index(double idx)
-    {
-        for (int i = 0; i < synth.getNumVoices(); ++i) {
-            // TODO: Not a fan of needing to do this dynamic cast. Is there a better way to update
-            // the global ADSR? Maybe I need to subclass JUCE::Synthesiser...
-            auto wavetable_voice = dynamic_cast<WavetableVoice<2048> *>(synth.getVoice(i));
-            if (wavetable_voice != nullptr) {
-                wavetable_voice->set_table_idx(idx);
-            }
-        }
-    }
-
-    void set_filter_type(SvfFilter::Type type)
-    {
-        filter.set_type(type);
-    }
-
-    void set_filter_params(const SvfFilter::Params &params)
-    {
-        filter_params = params;
-    }
+    APVTS state;
 
 private:
-    float gain = 1.0f;
-
-    WaveformVisualizerComponent visualizer;
-
     Synthesiser synth;
 
-    SvfFilter filter;
-    SvfFilter::Params filter_params = {20000.0, 0.5};
+    // Waveform lookup tables, computed once at startup
+    // and then copied around (by shared_ptr) to many oscillators/voices
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> sine_table;
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> triangle_table;
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> square_table;
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> sawtooth_table;
 
+    SvfFilter filter;
     MidiMessageCollector midi_collector;
     MidiKeyboardState keyboard_state;
+
+    /**
+     * Sets up the automatable parameters for the synth.
+     * Parameters _cannot_ be added outside of calling this method!
+     */
+    static APVTS::ParameterLayout create_parameter_layout();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessor)
 };
