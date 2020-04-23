@@ -7,7 +7,7 @@ A cross-platform polyphonic synthesizer.
 On Arch Linux:
 
 ```bash
-sudo pacman -S juce
+sudo pacman -S juce fftw
 git clone <repo_url.git> <repo> && cd <repo>
 cd Builds/LinuxMakefile  # Alternatively, build in CLion
 make -j
