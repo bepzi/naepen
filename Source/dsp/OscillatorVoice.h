@@ -19,12 +19,11 @@ public:
     bool canPlaySound(SynthesiserSound *sound) override;
 
     void startNote(
-        int midi_note_number, float velocity, SynthesiserSound *,
-        int /*currentPitchWheelPosition*/) override;
+        int midi_note_number, float velocity, SynthesiserSound *sound,
+        int pitch_wheel_pos) override;
 
     void stopNote(float /* velocity */, bool allow_tail_off) override;
 
-    // TODO: Implement pitch wheel bending
     void pitchWheelMoved(int) override;
     void controllerMoved(int, int) override;
 
@@ -32,6 +31,12 @@ public:
     renderNextBlock(AudioBuffer<float> &output_buffer, int start_sample, int num_samples) override;
 
     void setCurrentPlaybackSampleRate(double new_rate) override;
+
+    /**
+     * Calculates the note frequency (in Hz) given a MIDI note number
+     * and the position of the pitch wheel.
+     */
+    static double calc_freq(int midi_nn, int pitch_wheel_pos);
 
 private:
     std::unique_ptr<Oscillator> osc;

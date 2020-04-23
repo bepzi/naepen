@@ -28,13 +28,12 @@ bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
 }
 
 void OscillatorVoice::startNote(
-    int midi_note_number, float velocity, SynthesiserSound *sound, int currentPitchWheelPosition)
+    int midi_note_number, float velocity, SynthesiserSound *sound, int pitch_wheel_pos)
 {
-    ignoreUnused(sound, currentPitchWheelPosition);
+    ignoreUnused(sound);
 
     level = velocity * 0.3f;
-    auto freq_hz = MidiMessage::getMidiNoteInHertz(midi_note_number);
-    osc->set_freq(freq_hz);
+    osc->set_freq(calc_freq(midi_note_number, pitch_wheel_pos));
 
     ADSR::Parameters adsr_params = {
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
@@ -57,7 +56,11 @@ void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
     }
 }
 
-void OscillatorVoice::pitchWheelMoved(int) {}
+void OscillatorVoice::pitchWheelMoved(int pitch_wheel_pos)
+{
+    osc->set_freq(calc_freq(getCurrentlyPlayingNote(), pitch_wheel_pos));
+}
+
 void OscillatorVoice::controllerMoved(int, int) {}
 
 void OscillatorVoice::renderNextBlock(
@@ -88,4 +91,25 @@ void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
     };
     adsr_envelope.setParameters(adsr_params);
+}
+
+double OscillatorVoice::calc_freq(int nn, int wheel_pos)
+{
+    // TODO: BEND_RANGE can be a user-changeable parameter
+    static constexpr int BEND_RANGE = 4;  // semitones of pitch bend
+
+    jassert(wheel_pos >= 0);
+    if (nn < 0) {
+        return 0.0;
+    }
+
+    // 0 = pitch down; 8192 = neutral; 16383 = pitch up
+    double pitch_ratio = (wheel_pos - 8192) / (double)16383;
+    int sign = (pitch_ratio == 0.0) ? 0 : (pitch_ratio < 0 ? -1 : 1);
+
+    double curr_freq = MidiMessage::getMidiNoteInHertz(nn);
+    double bent_freq = MidiMessage::getMidiNoteInHertz(nn + (BEND_RANGE * sign));
+
+    // Linearly interpolate between curr/bent freq, up or down
+    return ((1.0 - (sign * pitch_ratio)) * curr_freq) + (sign * pitch_ratio * bent_freq);
 }
