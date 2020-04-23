@@ -51,7 +51,9 @@ public:
     void getStateInformation(MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
 
+    // Holds all of our state, including the automatable parameters
     APVTS state;
+    MidiKeyboardState keyboard_state;
 
 private:
     Synthesiser synth;
@@ -65,7 +67,6 @@ private:
 
     SvfFilter filter;
     MidiMessageCollector midi_collector;
-    MidiKeyboardState keyboard_state;
 
     /**
      * Sets up the automatable parameters for the synth.

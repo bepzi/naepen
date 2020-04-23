@@ -158,7 +158,7 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    float master_gain = state.getParameter(DatabaseIdentifiers::MASTER_GAIN)->getValue();
+    float master_gain = state.getParameterAsValue(DatabaseIdentifiers::MASTER_GAIN).getValue();
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
         float *buf = buffer.getWritePointer(channel);
         for (int i = 0; i < buffer.getNumSamples(); ++i) {
@@ -213,10 +213,14 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
 
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
+    // Global parameters
+    // ====================================================
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
         DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain",
         (NormalisableRange<float>) {0.0f, 1.0f}, 1.0f);
 
+    // Parameters for Oscillator 1
+    // ====================================================
     auto osc_one_group = std::make_unique<AudioProcessorParameterGroup>(
         DatabaseIdentifiers::OSC_ONE_GROUP.toString(), "Oscillator 1", "|");
     {
@@ -248,7 +252,6 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 }
 
 //==============================================================================
-// This creates new instances of the plugin..
 AudioProcessor *JUCE_CALLTYPE createPluginFilter()
 {
     return new NaepenAudioProcessor();

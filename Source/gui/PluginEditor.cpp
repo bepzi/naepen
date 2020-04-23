@@ -8,13 +8,16 @@ static constexpr auto PADDING = 8;
 
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &proc) :
     AudioProcessorEditor(proc),
-    processor(proc),
+    naepenProcessor(proc),
     master_gain_slider_attachment(
-        processor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
-    osc_one(processor.state)
+        naepenProcessor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
+    osc_one(naepenProcessor.state),
+    midi_keyboard(naepenProcessor.keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {
-    addAndMakeVisible(master_gain_slider);
+    midi_keyboard.setOctaveForMiddleC(4);
 
+    addAndMakeVisible(master_gain_slider);
+    addAndMakeVisible(midi_keyboard);
     addAndMakeVisible(osc_one);
 
     setSize(EDITOR_WIDTH, EDITOR_HEIGHT);
@@ -30,12 +33,10 @@ void NaepenAudioProcessorEditor::resized()
     auto area = getLocalBounds();
     area.reduce(PADDING, PADDING);
 
+    midi_keyboard.setBounds(area.removeFromBottom(64));
+    area.removeFromBottom(PADDING);
+
     master_gain_slider.setBounds(area.removeFromLeft(128));
     area.removeFromLeft(128);
     osc_one.setBounds(area);
-}
-
-void NaepenAudioProcessorEditor::sliderValueChanged(Slider *slider)
-{
-    ignoreUnused(slider);
 }
