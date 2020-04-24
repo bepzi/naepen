@@ -17,7 +17,7 @@ public:
 
     void set_params(const SvfFilter::Params &params, double sample_rate) noexcept;
 
-    [[nodiscard]] inline float get_next_sample(float curr_sample) noexcept;
+    [[nodiscard]] float get_next_sample(float curr_sample) noexcept;
 
     void reset() noexcept;
 

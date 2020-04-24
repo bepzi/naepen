@@ -73,4 +73,5 @@ private:
 BandlimitedOscillator::LookupTable make_sine();
 BandlimitedOscillator::LookupTable make_triangle(double top_freq, double sample_rate);
 BandlimitedOscillator::LookupTable make_square(double top_freq, double sample_rate);
-BandlimitedOscillator::LookupTable make_sawtooth(double top_freq, double sample_rate);
+BandlimitedOscillator::LookupTable make_engineers_sawtooth(double top_freq, double sample_rate);
+BandlimitedOscillator::LookupTable make_musicians_sawtooth(double top_freq, double sample_rate);

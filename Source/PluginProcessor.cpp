@@ -105,14 +105,16 @@ void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0, sampleRate));
     square_table =
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sampleRate));
-    sawtooth_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_sawtooth(20.0, sampleRate));
+    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
+        make_engineers_sawtooth(20.0, sampleRate));
+    musicians_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
+        make_musicians_sawtooth(20.0, sampleRate));
 
     synth.clearVoices();
     synth.setCurrentPlaybackSampleRate(sampleRate);
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(
-            new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table), state));
+        synth.addVoice(new OscillatorVoice(
+            std::make_unique<BandlimitedOscillator>(musicians_sawtooth_table), state));
     }
 
     midi_collector.reset(sampleRate);
@@ -158,20 +160,45 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    float master_gain = state.getParameterAsValue(DatabaseIdentifiers::MASTER_GAIN).getValue();
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-        float *buf = buffer.getWritePointer(channel);
-        for (int i = 0; i < buffer.getNumSamples(); ++i) {
-            buf[i] *= master_gain;
+    // Apply oscillator 1's filter
+    // TODO: Somehow get smoother interpolation without checking the params every sample
+    if (state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED).getValue()) {
+        SvfFilter::Params filter_params = {
+            state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF).getValue(),
+            state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q).getValue(),
+        };
+        osc_one_filter.set_params(filter_params, getSampleRate());
+
+        {
+            float *c0_buf = buffer.getWritePointer(0);
+            for (int i = 0; i < buffer.getNumSamples(); ++i) {
+                c0_buf[i] = osc_one_filter.get_next_sample(c0_buf[i]);
+            }
+        }
+
+        const float *c0_buf = buffer.getReadPointer(0);
+        for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
+            float *buf = buffer.getWritePointer(channel);
+            std::memcpy(buf, c0_buf, sizeof(float) * (size_t)buffer.getNumSamples());
         }
     }
 
-    //    filter.set_params(filter_params, getSampleRate());
-    //    filter.apply_to_buffer(buffer);
-    //
-    //    visualizer.pushBuffer(buffer);
-    //
-    //    apply_master_gain(buffer, gain);
+    // Apply master gain
+    {
+        float master_gain = state.getParameterAsValue(DatabaseIdentifiers::MASTER_GAIN).getValue();
+        {
+            float *c0_buf = buffer.getWritePointer(0);
+            for (int i = 0; i < buffer.getNumSamples(); ++i) {
+                c0_buf[i] *= master_gain;
+            }
+        }
+
+        const float *c0_buf = buffer.getReadPointer(0);
+        for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
+            float *buf = buffer.getWritePointer(channel);
+            std::memcpy(buf, c0_buf, sizeof(float) * (size_t)buffer.getNumSamples());
+        }
+    }
 }
 
 //==============================================================================
@@ -230,15 +257,12 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
         auto osc_one_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(), "Osc 1 Gain Attack", adr_range,
             0.05f, "s");
-
         auto osc_one_gain_decay = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(), "Osc 1 Gain Decay", adr_range,
             0.25f, "s");
-
         auto osc_one_gain_sustain = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(), "Osc 1 Gain Sustain",
             (NormalisableRange<float>) {0.0f, 1.0f}, 1.0f);
-
         auto osc_one_gain_release = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(), "Osc 1 Gain Release", adr_range,
             0.15f, "s");
@@ -246,6 +270,44 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
         osc_one_group->addChild(
             std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
             std::move(osc_one_gain_sustain), std::move(osc_one_gain_release));
+
+        auto osc_one_filter_enabled = std::make_unique<AudioParameterBool>(
+            DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(), "Osc 1 Filter Enabled", false);
+
+        NormalisableRange<float> cutoff_range = {1.0f, 10000.0f};
+        cutoff_range.setSkewForCentre(1000.0f);
+        auto osc_one_filter_cutoff = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(), "Osc 1 Filter Cutoff",
+            cutoff_range, 5000.0f, "Hz");
+
+        NormalisableRange<float> q_range = {0.5f, 20.0f};
+        q_range.setSkewForCentre(5.0f);
+        auto osc_one_filter_q = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString(), "Osc 1 Filter Q", q_range, 0.5f);
+
+        osc_one_group->addChild(
+            std::move(osc_one_filter_enabled), std::move(osc_one_filter_cutoff),
+            std::move(osc_one_filter_q));
+
+        //        auto osc_one_filter_attack = std::make_unique<AudioParameterFloat>(
+        //            DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK.toString(), "Osc 1 Filter Attack",
+        //            adr_range, 0.05f, "s");
+        //
+        //        auto osc_one_filter_decay = std::make_unique<AudioParameterFloat>(
+        //            DatabaseIdentifiers::OSC_ONE_FILTER_DECAY.toString(), "Osc 1 Filter Decay",
+        //            adr_range, 0.25f, "s");
+        //
+        //        auto osc_one_filter_sustain = std::make_unique<AudioParameterFloat>(
+        //            DatabaseIdentifiers::OSC_ONE_FILTER_SUSTAIN.toString(), "Osc 1 Filter
+        //            Sustain", (NormalisableRange<float>) {0.0f, 1.0f}, 1.0f);
+        //
+        //        auto osc_one_filter_release = std::make_unique<AudioParameterFloat>(
+        //            DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE.toString(), "Osc 1 Filter
+        //            Release", adr_range, 0.15f, "s");
+        //
+        //        osc_one_group->addChild(
+        //            std::move(osc_one_filter_attack), std::move(osc_one_filter_decay),
+        //            std::move(osc_one_filter_sustain), std::move(osc_one_filter_release));
     }
 
     return {std::move(master_gain_param), std::move(osc_one_group)};

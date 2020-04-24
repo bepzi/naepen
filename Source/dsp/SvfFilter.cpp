@@ -39,7 +39,7 @@ void SvfFilter::set_params(const SvfFilter::Params &params, double sample_rate) 
     }
 }
 
-[[nodiscard]] inline float SvfFilter::get_next_sample(float curr_sample) noexcept
+[[nodiscard]] float SvfFilter::get_next_sample(float curr_sample) noexcept
 {
     double v3 = curr_sample - ic2eq;
     double v1 = (a1 * ic1eq) + (a2 * v3);

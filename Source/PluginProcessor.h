@@ -63,9 +63,11 @@ private:
     std::shared_ptr<const BandlimitedOscillator::LookupTable> sine_table;
     std::shared_ptr<const BandlimitedOscillator::LookupTable> triangle_table;
     std::shared_ptr<const BandlimitedOscillator::LookupTable> square_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> sawtooth_table;
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> engineers_sawtooth_table;
+    std::shared_ptr<const BandlimitedOscillator::LookupTable> musicians_sawtooth_table;
 
-    SvfFilter filter;
+    SvfFilter osc_one_filter;
+
     MidiMessageCollector midi_collector;
 
     /**

@@ -22,5 +22,12 @@ private:
     APVTS::SliderAttachment gain_sustain_slider_attachment;
     APVTS::SliderAttachment gain_release_slider_attachment;
 
+    ToggleButton filter_enabled_button {"Filter Enabled"};
+    Slider filter_cutoff_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
+    Slider filter_q_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
+    APVTS::ButtonAttachment filter_enabled_button_attachment;
+    APVTS::SliderAttachment filter_cutoff_slider_attachment;
+    APVTS::SliderAttachment filter_q_slider_attachment;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OscOneComponent)
 };
