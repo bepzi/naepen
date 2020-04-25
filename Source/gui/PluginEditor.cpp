@@ -1,8 +1,8 @@
 #include "PluginEditor.h"
 #include "../DatabaseIdentifiers.h"
 
-static constexpr auto EDITOR_WIDTH = 640;
-static constexpr auto EDITOR_HEIGHT = 640;
+static constexpr auto EDITOR_WIDTH = 800;
+static constexpr auto EDITOR_HEIGHT = 800;
 
 static constexpr auto PADDING = 8;
 
@@ -40,5 +40,6 @@ void NaepenAudioProcessorEditor::resized()
 
     master_gain_slider.setBounds(area.removeFromLeft(128));
     area.removeFromLeft(128);
-    osc_one.setBounds(area);
+
+    osc_one.setBounds(area.removeFromTop(area.getHeight() / 2));
 }

@@ -16,4 +16,8 @@ const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED {"OscOneFilterEnabl
 const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF {"OscOneFilterCutoff"};
 const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_Q {"OscOneFilterQ"};
 
+const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK {"OscOneFilterAttack"};
+const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_DECAY {"OscOneFilterDecay"};
+const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_SUSTAIN {"OscOneFilterSustain"};
+const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE {"OscOneFilterRelease"};
 // ====================================================
