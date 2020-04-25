@@ -77,7 +77,7 @@ void OscillatorVoice::renderNextBlock(
 
         auto sample = osc->get_next_sample() * level * adsr_envelope.getNextSample();
 
-        if (*filter_enabled > 0.0f) {
+        if (*filter_enabled > 0.5f) {
             filter.set_params({*filter_cutoff, *filter_q}, getSampleRate());
             sample = filter.get_next_sample(sample);
         }
