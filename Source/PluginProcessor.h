@@ -70,6 +70,11 @@ private:
 
     std::atomic<float> *master_gain;
 
+    SvfFilter osc_one_filter;
+    std::atomic<float> *osc_one_filter_enabled;
+    std::atomic<float> *osc_one_filter_cutoff;
+    std::atomic<float> *osc_one_filter_q;
+
     /**
      * Sets up the automatable parameters for the synth.
      * Parameters _cannot_ be added outside of calling this method!

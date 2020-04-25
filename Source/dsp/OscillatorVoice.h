@@ -45,9 +45,4 @@ private:
 
     float level = 0.0f;
     ADSR adsr_envelope;
-
-    SvfFilter filter;
-    std::atomic<float> *filter_enabled;
-    std::atomic<float> *filter_cutoff;
-    std::atomic<float> *filter_q;
 };

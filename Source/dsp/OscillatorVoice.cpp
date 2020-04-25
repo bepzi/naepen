@@ -20,9 +20,6 @@ OscillatorVoice::OscillatorVoice(
     std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts) :
     osc(std::move(oscillator)), state(apvts)
 {
-    filter_enabled = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED);
-    filter_cutoff = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF);
-    filter_q = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q);
 }
 
 bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
@@ -76,12 +73,6 @@ void OscillatorVoice::renderNextBlock(
         }
 
         auto sample = osc->get_next_sample() * level * adsr_envelope.getNextSample();
-
-        if (*filter_enabled > 0.5f) {
-            filter.set_params({*filter_cutoff, *filter_q}, getSampleRate());
-            sample = filter.get_next_sample(sample);
-        }
-
         for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
             output_buffer.addSample(channel, i, sample);
         }

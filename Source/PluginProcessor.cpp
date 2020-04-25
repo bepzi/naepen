@@ -27,6 +27,11 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     synth.addSound(new OscillatorSound());
 
     master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
+
+    osc_one_filter_enabled =
+        state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED);
+    osc_one_filter_cutoff = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF);
+    osc_one_filter_q = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q);
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -159,6 +164,18 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+        for (int channel = 0; channel < buffer.getNumChannels(); channel++) {
+            if (*osc_one_filter_enabled > 0.5f) {
+                osc_one_filter.set_params(
+                    {*osc_one_filter_cutoff, *osc_one_filter_q}, getSampleRate());
+                buffer.setSample(
+                    channel, sample,
+                    osc_one_filter.get_next_sample(buffer.getSample(channel, sample)));
+            }
+        }
+    }
 
     buffer.applyGain(*master_gain);
 }
