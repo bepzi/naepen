@@ -20,11 +20,17 @@ OscOneComponent::OscOneComponent(APVTS &state) :
     filter_q_slider_attachment(
         state, DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString(), filter_q_slider)
 {
+    gain_attack_slider.setNumDecimalPlacesToDisplay(2);
+    gain_decay_slider.setNumDecimalPlacesToDisplay(2);
+    gain_sustain_slider.setNumDecimalPlacesToDisplay(2);
+    gain_release_slider.setNumDecimalPlacesToDisplay(2);
     addAndMakeVisible(gain_attack_slider);
     addAndMakeVisible(gain_decay_slider);
     addAndMakeVisible(gain_sustain_slider);
     addAndMakeVisible(gain_release_slider);
 
+    filter_cutoff_slider.setNumDecimalPlacesToDisplay(2);
+    filter_q_slider.setNumDecimalPlacesToDisplay(2);
     addAndMakeVisible(filter_enabled_button);
     addAndMakeVisible(filter_cutoff_slider);
     addAndMakeVisible(filter_q_slider);

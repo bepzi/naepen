@@ -25,6 +25,8 @@ NaepenAudioProcessor::NaepenAudioProcessor()
 {
     sine_table = std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine());
     synth.addSound(new OscillatorSound());
+
+    master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -98,8 +100,6 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     ignoreUnused(samplesPerBlock);
-    //    visualizer.setBufferSize(samplesPerBlock);
-    //    visualizer.setSamplesPerBlock(samplesPerBlock / 64);
 
     triangle_table =
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0, sampleRate));
@@ -134,7 +134,7 @@ bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) co
     return true;
 #else
     // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
+    // We only support mono or stereo.
     if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono() &&
         layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
         return false;
@@ -160,45 +160,7 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
-    // Apply oscillator 1's filter
-    // TODO: Somehow get smoother interpolation without checking the params every sample
-    if (state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED).getValue()) {
-        SvfFilter::Params filter_params = {
-            state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF).getValue(),
-            state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q).getValue(),
-        };
-        osc_one_filter.set_params(filter_params, getSampleRate());
-
-        {
-            float *c0_buf = buffer.getWritePointer(0);
-            for (int i = 0; i < buffer.getNumSamples(); ++i) {
-                c0_buf[i] = osc_one_filter.get_next_sample(c0_buf[i]);
-            }
-        }
-
-        const float *c0_buf = buffer.getReadPointer(0);
-        for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
-            float *buf = buffer.getWritePointer(channel);
-            std::memcpy(buf, c0_buf, sizeof(float) * (size_t)buffer.getNumSamples());
-        }
-    }
-
-    // Apply master gain
-    {
-        float master_gain = state.getParameterAsValue(DatabaseIdentifiers::MASTER_GAIN).getValue();
-        {
-            float *c0_buf = buffer.getWritePointer(0);
-            for (int i = 0; i < buffer.getNumSamples(); ++i) {
-                c0_buf[i] *= master_gain;
-            }
-        }
-
-        const float *c0_buf = buffer.getReadPointer(0);
-        for (int channel = 1; channel < buffer.getNumChannels(); ++channel) {
-            float *buf = buffer.getWritePointer(channel);
-            std::memcpy(buf, c0_buf, sizeof(float) * (size_t)buffer.getNumSamples());
-        }
-    }
+    buffer.applyGain(*master_gain);
 }
 
 //==============================================================================
@@ -227,14 +189,19 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
 #else
 void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 {
-    auto xml = state.state.toXmlString();
-    dest_data.append(xml.getCharPointer(), xml.getNumBytesAsUTF8());
+    auto copied_state = state.copyState();
+    std::unique_ptr<XmlElement> xml(copied_state.createXml());
+    copyXmlToBinary(*xml, dest_data);
 }
 
 void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
 {
-    auto xml = String::fromUTF8((const char *)data, size_in_bytes);
-    state.replaceState(ValueTree::fromXml(xml));
+    std::unique_ptr<XmlElement> xml(getXmlFromBinary(data, size_in_bytes));
+    if (xml) {
+        if (xml->hasTagName(state.state.getType())) {
+            state.replaceState(ValueTree::fromXml(*xml));
+        }
+    }
 }
 #endif
 

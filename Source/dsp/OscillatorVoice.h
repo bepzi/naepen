@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Oscillator.h"
+#include "SvfFilter.h"
 
 #include <JuceHeader.h>
 
@@ -43,16 +44,10 @@ private:
     AudioProcessorValueTreeState &state;
 
     float level = 0.0f;
-
     ADSR adsr_envelope;
-};
 
-//    void set_adsr(const ADSR::Parameters &params) noexcept
-//    {
-//        adsr_params = params;
-//    }
-//
-//    void set_table_idx(double idx) noexcept
-//    {
-//        table->set_index(idx * table->get_max_index());
-//    }
+    SvfFilter filter;
+    std::atomic<float> *filter_enabled;
+    std::atomic<float> *filter_cutoff;
+    std::atomic<float> *filter_q;
+};

@@ -66,9 +66,9 @@ private:
     std::shared_ptr<const BandlimitedOscillator::LookupTable> engineers_sawtooth_table;
     std::shared_ptr<const BandlimitedOscillator::LookupTable> musicians_sawtooth_table;
 
-    SvfFilter osc_one_filter;
-
     MidiMessageCollector midi_collector;
+
+    std::atomic<float> *master_gain;
 
     /**
      * Sets up the automatable parameters for the synth.
