@@ -159,10 +159,9 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
 {
     ScopedNoDenormals noDenormals;
 
-    buffer.clear();
-
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
@@ -259,7 +258,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(), "Osc 1 Filter Enabled", false);
 
         NormalisableRange<float> cutoff_range = {1.0f, 10000.0f};
-        cutoff_range.setSkewForCentre(1000.0f);
+        cutoff_range.setSkewForCentre(700.0f);
         auto osc_one_filter_cutoff = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(), "Osc 1 Filter Cutoff",
             cutoff_range, 5000.0f, "Hz");
