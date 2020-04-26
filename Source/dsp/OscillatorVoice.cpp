@@ -20,6 +20,10 @@ OscillatorVoice::OscillatorVoice(
     std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts) :
     osc(std::move(oscillator)), state(apvts)
 {
+    osc_one_filter_enabled =
+        state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED);
+    osc_one_filter_cutoff = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF);
+    osc_one_filter_q = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q);
 }
 
 bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
@@ -35,14 +39,23 @@ void OscillatorVoice::startNote(
     level = velocity * 0.3f;
     osc->set_freq(calc_freq(midi_note_number, pitch_wheel_pos));
 
-    ADSR::Parameters adsr_params = {
+    ADSR::Parameters osc_one_gain_params = {
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_DECAY).getValue(),
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN).getValue(),
         state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
     };
-    adsr_envelope.setParameters(adsr_params);
-    adsr_envelope.noteOn();
+    osc_one_gain_envelope.setParameters(osc_one_gain_params);
+    osc_one_gain_envelope.noteOn();
+
+    ADSR::Parameters osc_one_filter_params = {
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_DECAY).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_SUSTAIN).getValue(),
+        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE).getValue(),
+    };
+    osc_one_filter_envelope.setParameters(osc_one_filter_params);
+    osc_one_filter_envelope.noteOn();
 }
 
 void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
@@ -50,7 +63,8 @@ void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
     ignoreUnused(velocity);
 
     if (allow_tail_off) {
-        adsr_envelope.noteOff();
+        osc_one_gain_envelope.noteOff();
+        osc_one_filter_envelope.noteOff();
     } else {
         clearCurrentNote();
     }
@@ -67,12 +81,27 @@ void OscillatorVoice::renderNextBlock(
     AudioBuffer<float> &output_buffer, int start_sample, int num_samples)
 {
     for (int i = start_sample; i < start_sample + num_samples; ++i) {
-        if (!adsr_envelope.isActive()) {
+        if (!osc_one_gain_envelope.isActive()) {
             clearCurrentNote();
             break;
         }
 
-        auto sample = osc->get_next_sample() * level * adsr_envelope.getNextSample();
+        auto gain_env_sample = osc_one_gain_envelope.getNextSample();
+        auto sample = osc->get_next_sample() * level * gain_env_sample;
+
+        // Optionally apply the filter
+        if (osc_one_filter_envelope.isActive()) {
+            auto filter_env_sample = osc_one_filter_envelope.getNextSample();
+
+            if (*osc_one_filter_enabled > 0.5f) {
+                // TODO: This crackles
+                float cutoff = *osc_one_filter_cutoff * filter_env_sample;
+
+                osc_one_filter.set_params({cutoff, *osc_one_filter_q}, getSampleRate());
+                sample = osc_one_filter.get_next_sample(sample);
+            }
+        }
+
         for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
             output_buffer.addSample(channel, i, sample);
         }
@@ -83,14 +112,8 @@ void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
 {
     osc->set_sample_rate(new_rate);
 
-    adsr_envelope.setSampleRate(new_rate);
-    ADSR::Parameters adsr_params = {
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_DECAY).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
-    };
-    adsr_envelope.setParameters(adsr_params);
+    osc_one_gain_envelope.setSampleRate(new_rate);
+    osc_one_filter_envelope.setSampleRate(new_rate);
 }
 
 double OscillatorVoice::calc_freq(int nn, int wheel_pos)

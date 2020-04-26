@@ -27,11 +27,6 @@ NaepenAudioProcessor::NaepenAudioProcessor()
     synth.addSound(new OscillatorSound());
 
     master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
-
-    osc_one_filter_enabled =
-        state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED);
-    osc_one_filter_cutoff = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF);
-    osc_one_filter_q = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q);
 }
 
 NaepenAudioProcessor::~NaepenAudioProcessor() = default;
@@ -106,20 +101,21 @@ void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     ignoreUnused(samplesPerBlock);
 
-    triangle_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0, sampleRate));
+    //    triangle_table =
+    //        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0,
+    //        sampleRate));
     square_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sampleRate));
-    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-        make_engineers_sawtooth(20.0, sampleRate));
-    musicians_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-        make_musicians_sawtooth(20.0, sampleRate));
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(16.0, sampleRate));
+    //    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
+    //        make_engineers_sawtooth(20.0, sampleRate));
+    //    musicians_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
+    //        make_musicians_sawtooth(20.0, sampleRate));
 
     synth.clearVoices();
     synth.setCurrentPlaybackSampleRate(sampleRate);
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new OscillatorVoice(
-            std::make_unique<BandlimitedOscillator>(musicians_sawtooth_table), state));
+        synth.addVoice(
+            new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table), state));
     }
 
     midi_collector.reset(sampleRate);
@@ -163,18 +159,6 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-
-    for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
-        for (int channel = 0; channel < buffer.getNumChannels(); channel++) {
-            if (*osc_one_filter_enabled > 0.5f) {
-                osc_one_filter.set_params(
-                    {*osc_one_filter_cutoff, *osc_one_filter_q}, getSampleRate());
-                buffer.setSample(
-                    channel, sample,
-                    osc_one_filter.get_next_sample(buffer.getSample(channel, sample)));
-            }
-        }
-    }
 
     buffer.applyGain(*master_gain);
 }
@@ -276,7 +260,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 
         auto osc_one_filter_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK.toString(), "Osc 1 Filter Attack", adr_range,
-            0.05f, "s");
+            0.00f, "s");
         auto osc_one_filter_decay = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_FILTER_DECAY.toString(), "Osc 1 Filter Decay", adr_range,
             0.25f, "s");
@@ -285,7 +269,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             sustain_range, 1.0f);
         auto osc_one_filter_release = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE.toString(), "Osc 1 Filter Release",
-            adr_range, 0.15f, "s");
+            adr_range, 0.0f, "s");
 
         osc_one_group->addChild(
             std::move(osc_one_filter_attack), std::move(osc_one_filter_decay),
