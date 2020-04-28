@@ -1,5 +1,5 @@
 #include "PluginEditor.h"
-#include "../DatabaseIdentifiers.h"
+#include "DatabaseIdentifiers.h"
 
 static constexpr auto EDITOR_WIDTH = 800;
 static constexpr auto EDITOR_HEIGHT = 800;

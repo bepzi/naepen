@@ -1,5 +1,5 @@
 #include "OscOneComponent.h"
-#include "../DatabaseIdentifiers.h"
+#include "DatabaseIdentifiers.h"
 
 #include <JuceHeader.h>
 

@@ -1,6 +1,6 @@
 #include "OscillatorVoice.h"
 
-#include "../DatabaseIdentifiers.h"
+#include "DatabaseIdentifiers.h"
 
 bool OscillatorSound::appliesToNote(int midi_note_number)
 {
@@ -94,7 +94,7 @@ void OscillatorVoice::renderNextBlock(
             auto filter_env_sample = osc_one_filter_envelope.getNextSample();
 
             if (*osc_one_filter_enabled > 0.5f) {
-                // TODO: This crackles
+                // TODO: This crackles if the filter ADSR is shorter than the gain ADSR
                 float cutoff = *osc_one_filter_cutoff * filter_env_sample;
 
                 osc_one_filter.set_params({cutoff, *osc_one_filter_q}, getSampleRate());

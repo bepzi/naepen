@@ -335,7 +335,7 @@
  #define JucePlugin_Name                   "Naepen"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "A WIP polyphonic synthesizer"
+ #define JucePlugin_Desc                   "A polyphonic synthesizer"
 #endif
 #ifndef  JucePlugin_Manufacturer
  #define JucePlugin_Manufacturer           "Benjamin Zinn"

@@ -2344,6 +2344,7 @@ include_directories (
     "/usr/share/juce/modules/juce_audio_processors/format_types/VST3_SDK"
     "../../JuceLibraryCode"
     "/usr/share/juce/modules"
+    "../../Source"
     ${FFTW3_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
@@ -2554,6 +2555,7 @@ include_directories (
     "/usr/share/juce/modules/juce_audio_processors/format_types/VST3_SDK"
     "../../JuceLibraryCode"
     "/usr/share/juce/modules"
+    "../../Source"
     ${FFTW3_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
@@ -2619,6 +2621,7 @@ target_link_libraries (VST PRIVATE
     -shared
     -Wl,--no-undefined
     -fvisibility=hidden
+    -flto
     ${RT}
     ${DL}
     ${PTHREAD}
@@ -2671,6 +2674,7 @@ target_link_libraries (STANDALONE_PLUGIN PRIVATE
     SHARED_CODE
     
     -fvisibility=hidden
+    -flto
     ${RT}
     ${DL}
     ${PTHREAD}
@@ -2723,6 +2727,7 @@ target_compile_definitions (SHARED_CODE PRIVATE
 target_link_libraries (SHARED_CODE PRIVATE
     
     -fvisibility=hidden
+    -flto
     ${RT}
     ${DL}
     ${PTHREAD}
@@ -2747,7 +2752,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -flto -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Release)

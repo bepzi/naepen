@@ -6,7 +6,8 @@
               pluginName="Naepen" pluginManufacturer="Benjamin Zinn" aaxIdentifier="com.github.bepzi.naepen"
               version="0.1.0" projectLineFeed="&#10;" displaySplashScreen="0"
               reportAppUsage="0" splashScreenColour="Dark" bundleIdentifier="com.github.bepzi.naepen"
-              pluginDesc="A WIP polyphonic synthesizer" includeBinaryInJuceHeader="0">
+              pluginDesc="A polyphonic synthesizer" includeBinaryInJuceHeader="0"
+              headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
@@ -52,7 +53,7 @@
                 extraCompilerFlags="-Wno-implicit-int-float-conversion">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" optimisation="4" recommendedWarnings="LLVM"/>
-        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM"/>
+        <CONFIGURATION isDebug="0" name="Release" recommendedWarnings="LLVM" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../usr/share/juce/modules"/>

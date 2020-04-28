@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../PluginProcessor.h"
 #include "OscOneComponent.h"
+#include "PluginProcessor.h"
 
 #include <JuceHeader.h>
 
