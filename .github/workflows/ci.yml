@@ -25,10 +25,13 @@ jobs:
 
     - name: Build with CMake, Clang
       run: |
+        ls -l /usr/share/juce/modules/juce_audio_basics/buffers
+        echo "========================================================"
+
+        cd Builds/CLion
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
-              -DCMAKE_CXX_COMPILER=$(which clang++) \
-              -S Builds/CLion -B Builds/CLion/build
-        cmake --build Builds/CLion/build -j
+              -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
+        cmake --build build -j
 
     - name: Build with Makefile, GCC
       run: |
