@@ -26,6 +26,9 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Build with Makefile
       run: |
+        sudo apt install juce-modules-source juce-tools
+        sudo apt install libfftw3-dev libxinerama-dev libwebkit2gtk-4.0-dev
+        sudo apt install libcurl4-openssl-dev libflac-dev libvorbis-dev libogg-dev libjack-dev
         cd Builds/LinuxMakefile
         CXX=$(which clang++) CONFIG=Debug make -j VST
         CXX=$(which clang++) CONFIG=Release make -j VST
