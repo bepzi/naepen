@@ -7,8 +7,6 @@
 
 class OscillatorSound : public SynthesiserSound {
 public:
-    OscillatorSound() noexcept = default;
-
     bool appliesToNote(int /* midi_note_number */) override;
     bool appliesToChannel(int /* midi_channel */) override;
 };

@@ -29,14 +29,14 @@ jobs:
         unzip juce-5.4.7-linux.zip
         sudo cp -r JUCE /usr/share/juce
 
-    # - name: Build with CMake, Clang
-    #   run: |
-    #     cd Builds/CLion
-    #     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
-    #           -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
-    #     cmake --build build -j
-
     - name: Build with Makefile, GCC
       run: |
         cd Builds/LinuxMakefile
         CC=$(which gcc) CXX=$(which g++) CONFIG=Debug make -j
+
+    - name: Build with CMake, Clang
+      run: |
+        cd Builds/CLion
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
+              -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
+        cmake --build build -j
