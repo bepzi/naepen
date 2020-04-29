@@ -2,3 +2,4 @@
 **/.idea
 # */Builds/LinuxMakefile/build
 # */Builds/CLion/cmake-build-*
+wavetable_experiments
