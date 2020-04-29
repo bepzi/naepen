@@ -10,7 +10,7 @@ public:
      * This method will likely be called repeatedly from the audio thread,
      * so don't do anything slow when implementing it!
      */
-    [[nodiscard]] inline virtual float get_next_sample() = 0;
+    [[nodiscard]] virtual float get_next_sample() = 0;
 
     /**
      * Informs this oscillator what frequency in Hz it will be expected to produce.
