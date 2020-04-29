@@ -19,16 +19,15 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install libfftw3-dev libxinerama-dev libpng-dev \
+        sudo apt install libfftw3-dev libxinerama-dev \
                          libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
                          libvorbis-dev libogg-dev libjack-dev
 
-    - name: Set up latest stable JUCE
+    - name: Install latest stable JUCE
       run: |
         wget https://github.com/juce-framework/JUCE/releases/download/5.4.7/juce-5.4.7-linux.zip
         unzip juce-5.4.7-linux.zip
-        ./JUCE/Projucer --set-global-search-path linux defaultJuceModulePath ./JUCE/modules
-        ./JUCE/Projucer --resave naepen.jucer
+        sudo cp -r JUCE /usr/share/juce
 
     # - name: Build with CMake, Clang
     #   run: |
