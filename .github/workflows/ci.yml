@@ -16,19 +16,21 @@ jobs:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v2
 
-    # Runs a single command using the runners shell
-    # - name: Build with CMake
-    #   run: |
-    #     echo $(pwd)
-    #     echo $GITHUB_WORKSPACE
-    #     ls
-
-    # Runs a set of commands using the runners shell
-    - name: Build with Makefile
+    - name: Install dependencies
       run: |
-        sudo apt install juce-modules-source juce-tools
-        sudo apt install libfftw3-dev libxinerama-dev libwebkit2gtk-4.0-dev
-        sudo apt install libcurl4-openssl-dev libflac-dev libvorbis-dev libogg-dev libjack-dev
+        sudo apt update
+        sudo apt install juce-modules-source libfftw3-dev libxinerama-dev \
+                         libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
+                         libvorbis-dev libogg-dev libjack-dev
+
+    - name: Build with CMake, Clang
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
+              -DCMAKE_CXX_COMPILER=$(which clang++) \
+              -S Builds/CLion -B Builds/CLion/build
+        cmake --build Builds/CLion/build -j
+
+    - name: Build with Makefile, GCC
+      run: |
         cd Builds/LinuxMakefile
-        CXX=$(which clang++) CONFIG=Debug make -j VST
-        CXX=$(which clang++) CONFIG=Release make -j VST
+        CC=$(which gcc) CXX=$(which g++) CONFIG=Debug make -j
