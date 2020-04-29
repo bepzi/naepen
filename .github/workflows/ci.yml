@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install libfftw3-dev libxinerama-dev libasound2-dev libfreetype-dev \
+        sudo apt install libfftw3-dev libxinerama-dev libasound2-dev libfreetype6-dev \
                          libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
                          libvorbis-dev libogg-dev libjack-dev
 
