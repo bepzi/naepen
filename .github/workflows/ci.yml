@@ -23,15 +23,12 @@ jobs:
                          libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
                          libvorbis-dev libogg-dev libjack-dev
 
-    - name: Build with CMake, Clang
-      run: |
-        ls -l /usr/share/juce/modules/juce_audio_basics/buffers
-        echo "========================================================"
-
-        cd Builds/CLion
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
-              -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
-        cmake --build build -j
+    # - name: Build with CMake, Clang
+    #   run: |
+    #     cd Builds/CLion
+    #     cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
+    #           -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
+    #     cmake --build build -j
 
     - name: Build with Makefile, GCC
       run: |
