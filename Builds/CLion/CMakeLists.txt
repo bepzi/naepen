@@ -2538,7 +2538,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wextra -Wno-implicit-int-float-conversion")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -2752,7 +2752,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -flto -Wall -Wshadow-all -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Wconditional-uninitialized -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion -Wunused-private-field -Wbool-conversion -Wextra-semi -Wunreachable-code -Wzero-as-null-pointer-constant -Wcast-align -Winconsistent-missing-destructor-override -Wshift-sign-overflow -Wnullable-to-nonnull-conversion -Wno-missing-field-initializers -Wno-ignored-qualifiers -Wno-implicit-int-float-conversion")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -flto -Wall -Wextra -Wno-implicit-int-float-conversion")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Release)
