@@ -7,18 +7,8 @@
 static constexpr size_t MAX_POLYPHONY = 12;
 
 //==============================================================================
-NaepenAudioProcessor::NaepenAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-    :
-    AudioProcessor(BusesProperties()
-#if !JucePlugin_IsMidiEffect
-#if !JucePlugin_IsSynth
-                       .withInput("Input", AudioChannelSet::stereo(), true)
-#endif
-                       .withOutput("Output", AudioChannelSet::stereo(), true)
-#endif
-                       ),
-#endif
+NaepenAudioProcessor::NaepenAudioProcessor() :
+    AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)),
     state(
         *this, nullptr, Identifier(DatabaseIdentifiers::DATABASE_TYPE_ID),
         create_parameter_layout())
@@ -39,29 +29,17 @@ const String NaepenAudioProcessor::getName() const
 
 bool NaepenAudioProcessor::acceptsMidi() const
 {
-#if JucePlugin_WantsMidiInput
     return true;
-#else
-    return false;
-#endif
 }
 
 bool NaepenAudioProcessor::producesMidi() const
 {
-#if JucePlugin_ProducesMidiOutput
-    return true;
-#else
     return false;
-#endif
 }
 
 bool NaepenAudioProcessor::isMidiEffect() const
 {
-#if JucePlugin_IsMidiEffect
-    return true;
-#else
     return false;
-#endif
 }
 
 double NaepenAudioProcessor::getTailLengthSeconds() const
@@ -127,29 +105,14 @@ void NaepenAudioProcessor::releaseResources()
     // spare memory, etc.
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
 bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const
 {
-#if JucePlugin_IsMidiEffect
-    ignoreUnused(layouts);
-    return true;
-#else
     // This is the place where you check if the layout is supported.
     // We only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono() &&
-        layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
-        return false;
-
-        // This checks if the input layout matches the output layout
-#if !JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-#endif
-
-    return true;
-#endif
+    return !(
+        layouts.getMainOutputChannelSet() != AudioChannelSet::mono() &&
+        layouts.getMainOutputChannelSet() != AudioChannelSet::stereo());
 }
-#endif
 
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
 {
