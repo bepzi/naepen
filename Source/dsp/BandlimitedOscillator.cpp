@@ -62,9 +62,12 @@ BandlimitedOscillator::from_full_bandwidth(std::array<double, T> waveform)
     fftw_execute(p);
     fftw_destroy_plan(p);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warray-bounds"
     // Zero the DC-offset and Nyquist
     fft[0][0] = fft[1][0] = 0.0;
     fft[0][T / 2] = fft[1][T / 2] = 0.0;
+#pragma clang diagnostic pop
 
     // Calculate top harmonic and freq for the initial wavetable
     size_t max_harmonic = T / 2;

@@ -210,9 +210,9 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
     // Global parameters
     // ====================================================
+    NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.01f};
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain",
-        (NormalisableRange<float>) {0.0f, 1.0f, 0.01f}, 1.0f);
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 1.0f);
 
     // Parameters for Oscillator 1
     // ====================================================

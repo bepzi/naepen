@@ -50,7 +50,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" enableGNUExtensions="0" linuxExtraPkgConfig="fftw3"
-                extraCompilerFlags="-Wall -Wextra">
+                extraCompilerFlags="-Wall -Wextra -Wswitch -Wparentheses -Wshadow -pedantic -Wno-unknown-pragmas">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" optimisation="4"/>
         <CONFIGURATION isDebug="0" name="Release" linkTimeOptimisation="1"/>
