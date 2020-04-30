@@ -10,6 +10,10 @@
               headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
+      <FILE id="n02P1N" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
+            file="Source/OscillatorAudioProcessor.cpp"/>
+      <FILE id="oKUDus" name="OscillatorAudioProcessor.h" compile="0" resource="0"
+            file="Source/OscillatorAudioProcessor.h"/>
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
         <FILE id="SNNGmY" name="InterpolatingOscillator.cpp" compile="1" resource="0"
               file="Source/dsp/InterpolatingOscillator.cpp"/>

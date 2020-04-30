@@ -1,10 +1,10 @@
 #include "PluginProcessor.h"
+#include "OscillatorAudioProcessor.h"
+
 #include "dsp/OscillatorVoice.h"
 #include "gui/PluginEditor.h"
 
 #include "DatabaseIdentifiers.h"
-
-static constexpr size_t MAX_POLYPHONY = 12;
 
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor() :
@@ -13,62 +13,50 @@ NaepenAudioProcessor::NaepenAudioProcessor() :
         *this, nullptr, Identifier(DatabaseIdentifiers::DATABASE_TYPE_ID),
         create_parameter_layout())
 {
-    sine_table = std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine());
-    synth.addSound(new OscillatorSound());
+    graph.setBusesLayout(getBusesLayout());
+    graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
 
     master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
 }
-
-NaepenAudioProcessor::~NaepenAudioProcessor() = default;
 
 //==============================================================================
 const String NaepenAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
-
 bool NaepenAudioProcessor::acceptsMidi() const
 {
     return true;
 }
-
 bool NaepenAudioProcessor::producesMidi() const
 {
     return false;
 }
-
 bool NaepenAudioProcessor::isMidiEffect() const
 {
     return false;
 }
-
 double NaepenAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
-
 int NaepenAudioProcessor::getNumPrograms()
 {
-    return 1;  // NB: some hosts don't cope very well if you tell them there are 0 programs,
-               // so this should be at least 1, even if you're not really implementing programs.
+    return 1;
 }
-
 int NaepenAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
-
 void NaepenAudioProcessor::setCurrentProgram(int index)
 {
     ignoreUnused(index);
 }
-
 const String NaepenAudioProcessor::getProgramName(int index)
 {
     ignoreUnused(index);
     return {};
 }
-
 void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 {
     ignoreUnused(index, new_name);
@@ -77,41 +65,23 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    ignoreUnused(samplesPerBlock);
-
-    //    triangle_table =
-    //        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0,
-    //        sampleRate));
-    square_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(16.0, sampleRate));
-    //    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-    //        make_engineers_sawtooth(20.0, sampleRate));
-    //    musicians_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-    //        make_musicians_sawtooth(20.0, sampleRate));
-
-    synth.clearVoices();
-    synth.setCurrentPlaybackSampleRate(sampleRate);
-    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(
-            new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table), state));
-    }
+    graph.setRateAndBufferSizeDetails(sampleRate, samplesPerBlock);
+    graph.prepareToPlay(sampleRate, samplesPerBlock);
 
     midi_collector.reset(sampleRate);
 }
 
 void NaepenAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    graph.releaseResources();
 }
 
 bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const
 {
     // This is the place where you check if the layout is supported.
     // We only support mono or stereo.
-    return !(
-        layouts.getMainOutputChannelSet() != AudioChannelSet::mono() &&
-        layouts.getMainOutputChannelSet() != AudioChannelSet::stereo());
+    return layouts.getMainOutputChannelSet() == AudioChannelSet::mono() ||
+           layouts.getMainOutputChannelSet() == AudioChannelSet::stereo();
 }
 
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
@@ -119,9 +89,9 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     ScopedNoDenormals noDenormals;
 
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
-    keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+    virtual_keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    graph.processBlock(buffer, midiMessages);
 
     buffer.applyGain(*master_gain);
 }
