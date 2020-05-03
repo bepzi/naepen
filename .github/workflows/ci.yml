@@ -10,7 +10,7 @@ on:
     - cron: "0 12 */15 * *"
 
 jobs:
-  build_linux:
+  linux:
     runs-on: ubuntu-latest
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
@@ -43,14 +43,19 @@ jobs:
 
         sudo cp -r JUCE /usr/share/juce
 
-    - name: Build with Makefile, GCC
-      run: |
-        cd Builds/LinuxMakefile
-        CC=$(which gcc) CXX=$(which g++) CONFIG=Debug make -j
-
-    - name: Build with CMake, Clang
+    - name: Build with CMake, Clang, Debug
       run: |
         cd Builds/CLion
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) \
               -DCMAKE_CXX_COMPILER=$(which clang++) -S . -B build
         cmake --build build -j
+
+    - name: Build with Makefile, GCC, Release
+      run: |
+        cd Builds/LinuxMakefile
+        CC=$(which gcc) CXX=$(which g++) CONFIG=Release make -j
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: naepen_ubuntu-18.04_vst2
+        path: Builds/LinuxMakefile/build/naepen.so
