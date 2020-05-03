@@ -54,8 +54,3 @@ jobs:
       run: |
         cd Builds/LinuxMakefile
         CC=$(which gcc) CXX=$(which g++) CONFIG=Release make -j
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: naepen_ubuntu-18.04_vst2
-        path: Builds/LinuxMakefile/build/naepen.so
