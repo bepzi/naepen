@@ -22,8 +22,6 @@ public:
     void processBlock(AudioBuffer<float> &, MidiBuffer &) override;
 
 private:
-    AudioProcessorValueTreeState &state;
-
     Synthesiser synth;
 
     // Waveform lookup tables, computed once at startup

@@ -49,5 +49,4 @@ private:
     std::atomic<float> *osc_one_filter_enabled;
     std::atomic<float> *osc_one_filter_cutoff;
     std::atomic<float> *osc_one_filter_q;
-    ADSR osc_one_filter_envelope;
 };

@@ -47,15 +47,6 @@ void OscillatorVoice::startNote(
     };
     osc_one_gain_envelope.setParameters(osc_one_gain_params);
     osc_one_gain_envelope.noteOn();
-
-    ADSR::Parameters osc_one_filter_params = {
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_DECAY).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_SUSTAIN).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE).getValue(),
-    };
-    osc_one_filter_envelope.setParameters(osc_one_filter_params);
-    osc_one_filter_envelope.noteOn();
 }
 
 void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
@@ -64,7 +55,6 @@ void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
 
     if (allow_tail_off) {
         osc_one_gain_envelope.noteOff();
-        osc_one_filter_envelope.noteOff();
     } else {
         clearCurrentNote();
     }
@@ -90,16 +80,9 @@ void OscillatorVoice::renderNextBlock(
         auto sample = osc->get_next_sample() * level * gain_env_sample;
 
         // Optionally apply the filter
-        if (osc_one_filter_envelope.isActive()) {
-            auto filter_env_sample = osc_one_filter_envelope.getNextSample();
-
-            if (*osc_one_filter_enabled > 0.5f) {
-                // TODO: This crackles if the filter ADSR is shorter than the gain ADSR
-                float cutoff = *osc_one_filter_cutoff * filter_env_sample;
-
-                osc_one_filter.set_params({cutoff, *osc_one_filter_q}, getSampleRate());
-                sample = osc_one_filter.get_next_sample(sample);
-            }
+        if (*osc_one_filter_enabled > 0.5f) {
+            osc_one_filter.set_params({*osc_one_filter_cutoff, *osc_one_filter_q}, getSampleRate());
+            sample = osc_one_filter.get_next_sample(sample);
         }
 
         for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
@@ -113,7 +96,6 @@ void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
     osc->set_sample_rate(new_rate);
 
     osc_one_gain_envelope.setSampleRate(new_rate);
-    osc_one_filter_envelope.setSampleRate(new_rate);
 }
 
 double OscillatorVoice::calc_freq(int nn, int wheel_pos)

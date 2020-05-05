@@ -222,23 +222,6 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
         osc_one_group->addChild(
             std::move(osc_one_filter_enabled), std::move(osc_one_filter_cutoff),
             std::move(osc_one_filter_q));
-
-        auto osc_one_filter_attack = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_ONE_FILTER_ATTACK.toString(), "Osc 1 Filter Attack", adr_range,
-            0.00f, "s");
-        auto osc_one_filter_decay = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_ONE_FILTER_DECAY.toString(), "Osc 1 Filter Decay", adr_range,
-            0.25f, "s");
-        auto osc_one_filter_sustain = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_ONE_FILTER_SUSTAIN.toString(), "Osc 1 Filter Sustain",
-            sustain_range, 1.0f);
-        auto osc_one_filter_release = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_ONE_FILTER_RELEASE.toString(), "Osc 1 Filter Release",
-            adr_range, 0.0f, "s");
-
-        osc_one_group->addChild(
-            std::move(osc_one_filter_attack), std::move(osc_one_filter_decay),
-            std::move(osc_one_filter_sustain), std::move(osc_one_filter_release));
     }
 
     return {std::move(master_gain_param), std::move(osc_one_group)};

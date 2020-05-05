@@ -19,10 +19,5 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_ONE_FILTER_CUTOFF;
     static const Identifier OSC_ONE_FILTER_Q;
 
-    static const Identifier OSC_ONE_FILTER_ATTACK;
-    static const Identifier OSC_ONE_FILTER_DECAY;
-    static const Identifier OSC_ONE_FILTER_SUSTAIN;
-    static const Identifier OSC_ONE_FILTER_RELEASE;
-
     // ====================================================
 };

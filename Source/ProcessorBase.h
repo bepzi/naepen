@@ -4,8 +4,7 @@
 
 class ProcessorBase : public AudioProcessor {
 public:
-    ProcessorBase() = default;
-    ~ProcessorBase() = default;
+    explicit ProcessorBase(AudioProcessorValueTreeState &apvts) : state(apvts) {}
 
     //==============================================================================
     AudioProcessorEditor *createEditor() override
@@ -60,6 +59,9 @@ public:
     {
         ignoreUnused(data, sizeInBytes);
     }
+
+protected:
+    AudioProcessorValueTreeState &state;
 
 private:
     //==============================================================================
