@@ -1,7 +1,6 @@
 #include "PluginProcessor.h"
-#include "OscillatorAudioProcessor.h"
 
-#include "dsp/OscillatorVoice.h"
+#include "processors/OscillatorAudioProcessor.h"
 #include "gui/PluginEditor.h"
 
 #include "DatabaseIdentifiers.h"

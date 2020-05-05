@@ -23,7 +23,6 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
 {
     midi_keyboard.setOctaveForMiddleC(4);
 
-    master_gain_slider.setNumDecimalPlacesToDisplay(2);
     addAndMakeVisible(master_gain_slider);
 
     addAndMakeVisible(midi_keyboard);
