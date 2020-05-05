@@ -33,10 +33,10 @@
               file="Source/dsp/InterpolatingOscillator.h"/>
       </GROUP>
       <GROUP id="{B2BE71AD-D467-E1B9-66C3-742F3C86202F}" name="gui">
-        <FILE id="EuvIe4" name="OscOneComponent.cpp" compile="1" resource="0"
-              file="Source/gui/OscOneComponent.cpp"/>
-        <FILE id="fG4aWD" name="OscOneComponent.h" compile="0" resource="0"
-              file="Source/gui/OscOneComponent.h"/>
+        <FILE id="EuvIe4" name="OscillatorComponent.cpp" compile="1" resource="0"
+              file="Source/gui/OscillatorComponent.cpp"/>
+        <FILE id="fG4aWD" name="OscillatorComponent.h" compile="0" resource="0"
+              file="Source/gui/OscillatorComponent.h"/>
         <FILE id="y6emzS" name="PluginEditor.cpp" compile="1" resource="0"
               file="Source/gui/PluginEditor.cpp"/>
         <FILE id="eyGWBy" name="PluginEditor.h" compile="0" resource="0" file="Source/gui/PluginEditor.h"/>

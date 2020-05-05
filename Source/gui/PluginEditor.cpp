@@ -11,7 +11,14 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     naepenProcessor(proc),
     master_gain_slider_attachment(
         naepenProcessor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
-    osc_one(naepenProcessor.state),
+    osc_one_component(
+        naepenProcessor.state, DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
     midi_keyboard(naepenProcessor.virtual_keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {
     midi_keyboard.setOctaveForMiddleC(4);
@@ -20,7 +27,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     addAndMakeVisible(master_gain_slider);
 
     addAndMakeVisible(midi_keyboard);
-    addAndMakeVisible(osc_one);
+    addAndMakeVisible(osc_one_component);
 
     setSize(EDITOR_WIDTH, EDITOR_HEIGHT);
 }
@@ -41,5 +48,5 @@ void NaepenAudioProcessorEditor::resized()
     master_gain_slider.setBounds(area.removeFromLeft(128));
     area.removeFromLeft(128);
 
-    osc_one.setBounds(area.removeFromTop(area.getHeight() / 2));
+    osc_one_component.setBounds(area.removeFromTop(area.getHeight() / 2));
 }

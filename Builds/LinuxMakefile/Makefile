@@ -99,7 +99,7 @@ OBJECTS_SHARED_CODE := \
   $(JUCE_OBJDIR)/OscillatorVoice_ec71a885.o \
   $(JUCE_OBJDIR)/SvfFilter_5a56bdce.o \
   $(JUCE_OBJDIR)/BandlimitedOscillator_9537e858.o \
-  $(JUCE_OBJDIR)/OscOneComponent_44572263.o \
+  $(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o \
   $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o \
   $(JUCE_OBJDIR)/PluginProcessor_a059e380.o \
   $(JUCE_OBJDIR)/DatabaseIdentifiers_382cb350.o \
@@ -188,9 +188,9 @@ $(JUCE_OBJDIR)/BandlimitedOscillator_9537e858.o: ../../Source/dsp/BandlimitedOsc
 	@echo "Compiling BandlimitedOscillator.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/OscOneComponent_44572263.o: ../../Source/gui/OscOneComponent.cpp
+$(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o: ../../Source/gui/OscillatorComponent.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling OscOneComponent.cpp"
+	@echo "Compiling OscillatorComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o: ../../Source/gui/PluginEditor.cpp

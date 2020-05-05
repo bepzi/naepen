@@ -6,6 +6,8 @@
 
 #include "DatabaseIdentifiers.h"
 
+using APVTS = juce::AudioProcessorValueTreeState;
+
 //==============================================================================
 NaepenAudioProcessor::NaepenAudioProcessor() :
     AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)),
@@ -164,8 +166,8 @@ void NaepenAudioProcessor::initialize_graph()
         }
     }
 
-    // NOTE: We don't actually have to wire up the MIDI input node to the osc_one node,
-    // probably because osc_one AudioProcessor _doesn't_ accept MIDI and we handle retrieving
+    // NOTE: We don't actually have to wire up the MIDI input node to the osc_one_component node,
+    // probably because osc_one_component AudioProcessor _doesn't_ accept MIDI and we handle retrieving
     // messages, the virtual keyboard, etc. in this AudioProcessor before passing
     // it on to the graph to handle. I think.
 }
