@@ -14,11 +14,11 @@ jobs:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v2
 
-      # https://stackoverflow.com/a/22866610
-      # https://stackoverflow.com/a/367167
-    - name: Validate code formatting with clang-format
-      run: |
-        ! find Source/ -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\)' -exec clang-format -style=file -output-replacements-xml {} \; | grep -c "<replacement " >/dev/null
+    #   # https://stackoverflow.com/a/22866610
+    #   # https://stackoverflow.com/a/367167
+    # - name: Validate code formatting with clang-format
+    #   run: |
+    #     ! find Source/ -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\)' -exec clang-format -style=file -output-replacements-xml {} \; | grep -c "<replacement " >/dev/null
 
     - name: Install dependencies
       run: |
