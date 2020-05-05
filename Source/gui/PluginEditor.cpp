@@ -12,7 +12,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     master_gain_slider_attachment(
         naepenProcessor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
     osc_one(naepenProcessor.state),
-    midi_keyboard(naepenProcessor.keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
+    midi_keyboard(naepenProcessor.virtual_keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {
     midi_keyboard.setOctaveForMiddleC(4);
 

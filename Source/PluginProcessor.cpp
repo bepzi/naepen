@@ -1,96 +1,59 @@
 #include "PluginProcessor.h"
+#include "OscillatorAudioProcessor.h"
+
 #include "dsp/OscillatorVoice.h"
 #include "gui/PluginEditor.h"
 
 #include "DatabaseIdentifiers.h"
 
-static constexpr size_t MAX_POLYPHONY = 12;
-
 //==============================================================================
-NaepenAudioProcessor::NaepenAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-    :
-    AudioProcessor(BusesProperties()
-#if !JucePlugin_IsMidiEffect
-#if !JucePlugin_IsSynth
-                       .withInput("Input", AudioChannelSet::stereo(), true)
-#endif
-                       .withOutput("Output", AudioChannelSet::stereo(), true)
-#endif
-                       ),
-#endif
+NaepenAudioProcessor::NaepenAudioProcessor() :
+    AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)),
     state(
         *this, nullptr, Identifier(DatabaseIdentifiers::DATABASE_TYPE_ID),
         create_parameter_layout())
 {
-    sine_table = std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine());
-    synth.addSound(new OscillatorSound());
-
     master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
 }
-
-NaepenAudioProcessor::~NaepenAudioProcessor() = default;
 
 //==============================================================================
 const String NaepenAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
-
 bool NaepenAudioProcessor::acceptsMidi() const
 {
-#if JucePlugin_WantsMidiInput
     return true;
-#else
-    return false;
-#endif
 }
-
 bool NaepenAudioProcessor::producesMidi() const
 {
-#if JucePlugin_ProducesMidiOutput
-    return true;
-#else
     return false;
-#endif
 }
-
 bool NaepenAudioProcessor::isMidiEffect() const
 {
-#if JucePlugin_IsMidiEffect
-    return true;
-#else
     return false;
-#endif
 }
-
 double NaepenAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
-
 int NaepenAudioProcessor::getNumPrograms()
 {
-    return 1;  // NB: some hosts don't cope very well if you tell them there are 0 programs,
-               // so this should be at least 1, even if you're not really implementing programs.
+    return 1;
 }
-
 int NaepenAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
-
 void NaepenAudioProcessor::setCurrentProgram(int index)
 {
     ignoreUnused(index);
 }
-
 const String NaepenAudioProcessor::getProgramName(int index)
 {
     ignoreUnused(index);
     return {};
 }
-
 void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 {
     ignoreUnused(index, new_name);
@@ -99,66 +62,37 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    ignoreUnused(samplesPerBlock);
+    processor_graph.setPlayConfigDetails(
+        getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
+    processor_graph.prepareToPlay(sampleRate, samplesPerBlock);
 
-    //    triangle_table =
-    //        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0,
-    //        sampleRate));
-    square_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(16.0, sampleRate));
-    //    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-    //        make_engineers_sawtooth(20.0, sampleRate));
-    //    musicians_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-    //        make_musicians_sawtooth(20.0, sampleRate));
-
-    synth.clearVoices();
-    synth.setCurrentPlaybackSampleRate(sampleRate);
-    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(
-            new OscillatorVoice(std::make_unique<BandlimitedOscillator>(square_table), state));
-    }
+    initialize_graph();
 
     midi_collector.reset(sampleRate);
 }
 
 void NaepenAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    processor_graph.releaseResources();
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
 bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const
 {
-#if JucePlugin_IsMidiEffect
-    ignoreUnused(layouts);
-    return true;
-#else
-    // This is the place where you check if the layout is supported.
-    // We only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono() &&
-        layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() == AudioChannelSet::disabled()) {
         return false;
+    }
 
-        // This checks if the input layout matches the output layout
-#if !JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-#endif
-
-    return true;
-#endif
+    return layouts.getMainOutputChannelSet() == AudioChannelSet::stereo();
 }
-#endif
 
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
 {
     ScopedNoDenormals noDenormals;
 
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
-    keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
+    virtual_keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    processor_graph.processBlock(buffer, midiMessages);
 
     buffer.applyGain(*master_gain);
 }
@@ -205,14 +139,45 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
 }
 #endif
 
+void NaepenAudioProcessor::initialize_graph()
+{
+    processor_graph.clear();
+
+    audio_output_node =
+        processor_graph.addNode(std::make_unique<AudioProcessorGraph::AudioGraphIOProcessor>(
+            AudioProcessorGraph::AudioGraphIOProcessor::audioOutputNode));
+    midi_input_node =
+        processor_graph.addNode(std::make_unique<AudioProcessorGraph::AudioGraphIOProcessor>(
+            AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
+
+    osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
+    osc_one_node->getProcessor()->setPlayConfigDetails(
+        getMainBusNumInputChannels(), getMainBusNumOutputChannels(), getSampleRate(),
+        getBlockSize());
+
+    for (int channel = 0; channel < getMainBusNumOutputChannels(); ++channel) {
+        if (!processor_graph.addConnection(
+                {{osc_one_node->nodeID, channel}, {audio_output_node->nodeID, channel}})) {
+            std::fprintf(
+                stderr, "Failed to connect osc1 node to audio output node for channel %d\n",
+                channel);
+        }
+    }
+
+    // NOTE: We don't actually have to wire up the MIDI input node to the osc_one node,
+    // probably because osc_one AudioProcessor _doesn't_ accept MIDI and we handle retrieving
+    // messages, the virtual keyboard, etc. in this AudioProcessor before passing
+    // it on to the graph to handle. I think.
+}
+
 // TODO: Add static methods to each automatable component to generate their own parameters
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
     // Global parameters
     // ====================================================
+    NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.001f};
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain",
-        (NormalisableRange<float>) {0.0f, 1.0f, 0.01f}, 1.0f);
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 0.5f);
 
     // Parameters for Oscillator 1
     // ====================================================

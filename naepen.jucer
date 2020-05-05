@@ -10,6 +10,11 @@
               headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
+      <FILE id="DDM35Z" name="ProcessorBase.h" compile="0" resource="0" file="Source/ProcessorBase.h"/>
+      <FILE id="n02P1N" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
+            file="Source/OscillatorAudioProcessor.cpp"/>
+      <FILE id="oKUDus" name="OscillatorAudioProcessor.h" compile="0" resource="0"
+            file="Source/OscillatorAudioProcessor.h"/>
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
         <FILE id="SNNGmY" name="InterpolatingOscillator.cpp" compile="1" resource="0"
               file="Source/dsp/InterpolatingOscillator.cpp"/>
@@ -50,7 +55,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" enableGNUExtensions="0" linuxExtraPkgConfig="fftw3"
-                extraCompilerFlags="-Wall -Wextra">
+                extraCompilerFlags="-Wall -Wextra -Wswitch -Wparentheses -Wshadow -pedantic -Wno-unknown-pragmas">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" optimisation="4"/>
         <CONFIGURATION isDebug="0" name="Release" linkTimeOptimisation="1"/>

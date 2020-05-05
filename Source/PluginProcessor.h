@@ -7,8 +7,6 @@
 
 #include <JuceHeader.h>
 
-using APVTS = juce::AudioProcessorValueTreeState;
-
 /**
  * Handles audio, MIDI I/O, and processing logic.
  */
@@ -16,15 +14,12 @@ class NaepenAudioProcessor : public AudioProcessor {
 public:
     //==============================================================================
     NaepenAudioProcessor();
-    ~NaepenAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-#ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported(const BusesLayout &layouts) const override;
-#endif
 
     void processBlock(AudioBuffer<float> &, MidiBuffer &) override;
 
@@ -52,19 +47,20 @@ public:
     void setStateInformation(const void *data, int sizeInBytes) override;
 
     // Holds all of our state, including the automatable parameters
-    APVTS state;
-    MidiKeyboardState keyboard_state;
+    AudioProcessorValueTreeState state;
+
+    // State for the on-screen MIDI keyboard
+    MidiKeyboardState virtual_keyboard_state;
 
 private:
-    Synthesiser synth;
+    using AudioGraphIOProcessor = AudioProcessorGraph::AudioGraphIOProcessor;
+    using Node = AudioProcessorGraph::Node;
 
-    // Waveform lookup tables, computed once at startup
-    // and then copied around (by shared_ptr) to many oscillators/voices
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> sine_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> triangle_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> square_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> engineers_sawtooth_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> musicians_sawtooth_table;
+    AudioProcessorGraph processor_graph;
+    void initialize_graph();
+    Node::Ptr midi_input_node;
+    Node::Ptr audio_output_node;
+    Node::Ptr osc_one_node;
 
     MidiMessageCollector midi_collector;
 
@@ -74,7 +70,7 @@ private:
      * Sets up the automatable parameters for the synth.
      * Parameters _cannot_ be added outside of calling this method!
      */
-    static APVTS::ParameterLayout create_parameter_layout();
+    static AudioProcessorValueTreeState::ParameterLayout create_parameter_layout();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NaepenAudioProcessor)
 };

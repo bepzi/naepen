@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
   schedule:
@@ -15,6 +13,12 @@ jobs:
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v2
+
+    #   # https://stackoverflow.com/a/22866610
+    #   # https://stackoverflow.com/a/367167
+    # - name: Validate code formatting with clang-format
+    #   run: |
+    #     ! find Source/ -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\)' -exec clang-format -style=file -output-replacements-xml {} \; | grep -c "<replacement " >/dev/null
 
     - name: Install dependencies
       run: |
@@ -54,8 +58,3 @@ jobs:
       run: |
         cd Builds/LinuxMakefile
         CC=$(which gcc) CXX=$(which g++) CONFIG=Release make -j
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: naepen_ubuntu-18.04_vst2
-        path: Builds/LinuxMakefile/build/naepen.so

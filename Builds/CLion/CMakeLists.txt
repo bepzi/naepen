@@ -50,6 +50,9 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
+    "../../Source/ProcessorBase.h"
+    "../../Source/OscillatorAudioProcessor.cpp"
+    "../../Source/OscillatorAudioProcessor.h"
     "../../Source/dsp/InterpolatingOscillator.cpp"
     "../../Source/dsp/OscillatorVoice.cpp"
     "../../Source/dsp/SvfFilter.cpp"
@@ -1199,6 +1202,8 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JuceHeader.h"
 )
 
+set_source_files_properties ("../../Source/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/BandlimitedOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/OscillatorVoice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -2538,7 +2543,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wextra")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -g -ggdb -O1 -Wall -Wextra -Wswitch -Wparentheses -Wshadow -pedantic -Wno-unknown-pragmas")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -2752,7 +2757,7 @@ target_link_libraries (SHARED_CODE PRIVATE
     ${JACK_LIBRARIES}
 )
 
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -flto -Wall -Wextra")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -pthread -fPIC -O3 -flto -Wall -Wextra -Wswitch -Wparentheses -Wshadow -pedantic -Wno-unknown-pragmas")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} ")
 
 endif (CMAKE_BUILD_TYPE STREQUAL Release)
