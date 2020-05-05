@@ -13,6 +13,8 @@ OscillatorAudioProcessor::OscillatorAudioProcessor(AudioProcessorValueTreeState 
 
 void OscillatorAudioProcessor::prepareToPlay(double sample_rate, int samples_per_block)
 {
+    ignoreUnused(samples_per_block);
+
     //    triangle_table =
     //        std::make_shared<const BandlimitedOscillator::LookupTable>(make_triangle(20.0,
     //        sampleRate));

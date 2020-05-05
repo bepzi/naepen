@@ -163,6 +163,11 @@ void NaepenAudioProcessor::initialize_graph()
                 channel);
         }
     }
+
+    // NOTE: We don't actually have to wire up the MIDI input node to the osc_one node,
+    // probably because osc_one AudioProcessor _doesn't_ accept MIDI and we handle retrieving
+    // messages, the virtual keyboard, etc. in this AudioProcessor before passing
+    // it on to the graph to handle. I think.
 }
 
 // TODO: Add static methods to each automatable component to generate their own parameters
