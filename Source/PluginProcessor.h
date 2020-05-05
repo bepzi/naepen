@@ -53,7 +53,13 @@ public:
     MidiKeyboardState virtual_keyboard_state;
 
 private:
-    AudioProcessorGraph graph;
+    using AudioGraphIOProcessor = AudioProcessorGraph::AudioGraphIOProcessor;
+    using Node = AudioProcessorGraph::Node;
+
+    AudioProcessorGraph processor_graph;
+    void initialize_graph();
+    Node::Ptr audio_output_node;
+    Node::Ptr osc_one_node;
 
     MidiMessageCollector midi_collector;
 

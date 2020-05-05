@@ -50,6 +50,7 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
+    "../../Source/ProcessorBase.h"
     "../../Source/OscillatorAudioProcessor.cpp"
     "../../Source/OscillatorAudioProcessor.h"
     "../../Source/dsp/InterpolatingOscillator.cpp"
@@ -1201,6 +1202,7 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JuceHeader.h"
 )
 
+set_source_files_properties ("../../Source/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/BandlimitedOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)

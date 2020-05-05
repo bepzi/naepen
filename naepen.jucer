@@ -10,6 +10,7 @@
               headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
+      <FILE id="DDM35Z" name="ProcessorBase.h" compile="0" resource="0" file="Source/ProcessorBase.h"/>
       <FILE id="n02P1N" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
             file="Source/OscillatorAudioProcessor.cpp"/>
       <FILE id="oKUDus" name="OscillatorAudioProcessor.h" compile="0" resource="0"

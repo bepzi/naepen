@@ -13,9 +13,6 @@ NaepenAudioProcessor::NaepenAudioProcessor() :
         *this, nullptr, Identifier(DatabaseIdentifiers::DATABASE_TYPE_ID),
         create_parameter_layout())
 {
-    graph.setBusesLayout(getBusesLayout());
-    graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
-
     master_gain = state.getRawParameterValue(DatabaseIdentifiers::MASTER_GAIN);
 }
 
@@ -65,23 +62,27 @@ void NaepenAudioProcessor::changeProgramName(int index, const String &new_name)
 //==============================================================================
 void NaepenAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    graph.setRateAndBufferSizeDetails(sampleRate, samplesPerBlock);
-    graph.prepareToPlay(sampleRate, samplesPerBlock);
+    processor_graph.setPlayConfigDetails(
+        getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
+    processor_graph.prepareToPlay(sampleRate, samplesPerBlock);
+
+    initialize_graph();
 
     midi_collector.reset(sampleRate);
 }
 
 void NaepenAudioProcessor::releaseResources()
 {
-    graph.releaseResources();
+    processor_graph.releaseResources();
 }
 
 bool NaepenAudioProcessor::isBusesLayoutSupported(const BusesLayout &layouts) const
 {
-    // This is the place where you check if the layout is supported.
-    // We only support mono or stereo.
-    return layouts.getMainOutputChannelSet() == AudioChannelSet::mono() ||
-           layouts.getMainOutputChannelSet() == AudioChannelSet::stereo();
+    if (layouts.getMainOutputChannelSet() == AudioChannelSet::disabled()) {
+        return false;
+    }
+
+    return layouts.getMainOutputChannelSet() == AudioChannelSet::stereo();
 }
 
 void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &midiMessages)
@@ -91,7 +92,7 @@ void NaepenAudioProcessor::processBlock(AudioBuffer<float> &buffer, MidiBuffer &
     midi_collector.removeNextBlockOfMessages(midiMessages, buffer.getNumSamples());
     virtual_keyboard_state.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
-    graph.processBlock(buffer, midiMessages);
+    processor_graph.processBlock(buffer, midiMessages);
 
     buffer.applyGain(*master_gain);
 }
@@ -138,14 +139,40 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
 }
 #endif
 
+void NaepenAudioProcessor::initialize_graph()
+{
+    processor_graph.clear();
+
+    audio_output_node =
+        processor_graph.addNode(std::make_unique<AudioProcessorGraph::AudioGraphIOProcessor>(
+            AudioProcessorGraph::AudioGraphIOProcessor::audioOutputNode));
+    midi_input_node =
+        processor_graph.addNode(std::make_unique<AudioProcessorGraph::AudioGraphIOProcessor>(
+            AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
+
+    osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
+    osc_one_node->getProcessor()->setPlayConfigDetails(
+        getMainBusNumInputChannels(), getMainBusNumOutputChannels(), getSampleRate(),
+        getBlockSize());
+
+    for (int channel = 0; channel < getMainBusNumOutputChannels(); ++channel) {
+        if (!processor_graph.addConnection(
+                {{osc_one_node->nodeID, channel}, {audio_output_node->nodeID, channel}})) {
+            std::fprintf(
+                stderr, "Failed to connect osc1 node to audio output node for channel %d\n",
+                channel);
+        }
+    }
+}
+
 // TODO: Add static methods to each automatable component to generate their own parameters
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
     // Global parameters
     // ====================================================
-    NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.01f};
+    NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.001f};
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 1.0f);
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 0.5f);
 
     // Parameters for Oscillator 1
     // ====================================================
