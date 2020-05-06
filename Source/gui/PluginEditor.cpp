@@ -9,8 +9,7 @@ static constexpr auto PADDING = 8;
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &proc) :
     AudioProcessorEditor(proc),
     naepenProcessor(proc),
-    master_gain_slider_attachment(
-        naepenProcessor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
+    main_mixer_component(naepenProcessor.state),
     osc_one_component(
         naepenProcessor.state, DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
@@ -31,9 +30,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
 {
     midi_keyboard.setOctaveForMiddleC(4);
 
-    addAndMakeVisible(master_gain_slider);
-
     addAndMakeVisible(midi_keyboard);
+
+    addAndMakeVisible(main_mixer_component);
 
     addAndMakeVisible(osc_one_component);
     addAndMakeVisible(osc_two_component);
@@ -54,8 +53,8 @@ void NaepenAudioProcessorEditor::resized()
     midi_keyboard.setBounds(area.removeFromBottom(64));
     area.removeFromBottom(PADDING);
 
-    master_gain_slider.setBounds(area.removeFromLeft(128));
-    area.removeFromLeft(128);
+    main_mixer_component.setBounds(
+        area.removeFromLeft(area.getWidth() / 3).removeFromBottom(area.getHeight() / 4));
 
     osc_one_component.setBounds(area.removeFromTop(area.getHeight() / 2));
     osc_two_component.setBounds(area);

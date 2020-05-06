@@ -17,13 +17,23 @@ bool OscillatorSound::appliesToChannel(int midi_channel)
 //==============================================================================
 
 OscillatorVoice::OscillatorVoice(
-    std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts) :
-    osc(std::move(oscillator)), state(apvts)
+    std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
+    std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
+    std::atomic<float> *gain_sustain, std::atomic<float> *gain_release,
+    std::atomic<float> *filter_enabled, std::atomic<float> *filter_cutoff,
+    std::atomic<float> *filter_q) :
+    osc(std::move(oscillator)),
+    state(apvts),
+
+    gain_attack(gain_attack),
+    gain_decay(gain_decay),
+    gain_sustain(gain_sustain),
+    gain_release(gain_release),
+
+    filter_enabled(filter_enabled),
+    filter_cutoff(filter_cutoff),
+    filter_q(filter_q)
 {
-    osc_one_filter_enabled =
-        state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED);
-    osc_one_filter_cutoff = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF);
-    osc_one_filter_q = state.getRawParameterValue(DatabaseIdentifiers::OSC_ONE_FILTER_Q);
 }
 
 bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
@@ -40,13 +50,9 @@ void OscillatorVoice::startNote(
     osc->set_freq(calc_freq(midi_note_number, pitch_wheel_pos));
 
     ADSR::Parameters osc_one_gain_params = {
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_DECAY).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN).getValue(),
-        state.getParameterAsValue(DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE).getValue(),
-    };
-    osc_one_gain_envelope.setParameters(osc_one_gain_params);
-    osc_one_gain_envelope.noteOn();
+        *gain_attack, *gain_decay, *gain_sustain, *gain_release};
+    gain_envelope.setParameters(osc_one_gain_params);
+    gain_envelope.noteOn();
 }
 
 void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
@@ -54,7 +60,7 @@ void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
     ignoreUnused(velocity);
 
     if (allow_tail_off) {
-        osc_one_gain_envelope.noteOff();
+        gain_envelope.noteOff();
     } else {
         clearCurrentNote();
     }
@@ -71,18 +77,18 @@ void OscillatorVoice::renderNextBlock(
     AudioBuffer<float> &output_buffer, int start_sample, int num_samples)
 {
     for (int i = start_sample; i < start_sample + num_samples; ++i) {
-        if (!osc_one_gain_envelope.isActive()) {
+        if (!gain_envelope.isActive()) {
             clearCurrentNote();
             break;
         }
 
-        auto gain_env_sample = osc_one_gain_envelope.getNextSample();
+        auto gain_env_sample = gain_envelope.getNextSample();
         auto sample = osc->get_next_sample() * level * gain_env_sample;
 
         // Optionally apply the filter
-        if (*osc_one_filter_enabled > 0.5f) {
-            osc_one_filter.set_params({*osc_one_filter_cutoff, *osc_one_filter_q}, getSampleRate());
-            sample = osc_one_filter.get_next_sample(sample);
+        if (*filter_enabled > 0.5f) {
+            filter.set_params({*filter_cutoff, *filter_q}, getSampleRate());
+            sample = filter.get_next_sample(sample);
         }
 
         for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
@@ -95,7 +101,7 @@ void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
 {
     osc->set_sample_rate(new_rate);
 
-    osc_one_gain_envelope.setSampleRate(new_rate);
+    gain_envelope.setSampleRate(new_rate);
 }
 
 double OscillatorVoice::calc_freq(int nn, int wheel_pos)

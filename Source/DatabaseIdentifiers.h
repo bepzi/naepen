@@ -10,6 +10,8 @@ struct DatabaseIdentifiers {
     // Parameters for Oscillator 1
     // ====================================================
     static const Identifier OSC_ONE_GROUP;
+
+    static const Identifier OSC_ONE_GAIN;
     static const Identifier OSC_ONE_GAIN_ATTACK;
     static const Identifier OSC_ONE_GAIN_DECAY;
     static const Identifier OSC_ONE_GAIN_SUSTAIN;
@@ -22,6 +24,8 @@ struct DatabaseIdentifiers {
     // Parameters for Oscillator 2
     // ====================================================
     static const Identifier OSC_TWO_GROUP;
+
+    static const Identifier OSC_TWO_GAIN;
     static const Identifier OSC_TWO_GAIN_ATTACK;
     static const Identifier OSC_TWO_GAIN_DECAY;
     static const Identifier OSC_TWO_GAIN_SUSTAIN;

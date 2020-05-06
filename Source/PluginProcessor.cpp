@@ -132,10 +132,8 @@ void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
 {
     std::unique_ptr<XmlElement> xml(getXmlFromBinary(data, size_in_bytes));
-    if (xml) {
-        if (xml->hasTagName(state.state.getType())) {
-            state.replaceState(ValueTree::fromXml(*xml));
-        }
+    if (xml && xml->hasTagName(state.state.getType())) {
+        state.replaceState(ValueTree::fromXml(*xml));
     }
 }
 #endif
@@ -151,12 +149,28 @@ void NaepenAudioProcessor::initialize_graph()
         processor_graph.addNode(std::make_unique<AudioProcessorGraph::AudioGraphIOProcessor>(
             AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
 
-    osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
+    osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
+        state, DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()));
     osc_one_node->getProcessor()->setPlayConfigDetails(
         getMainBusNumInputChannels(), getMainBusNumOutputChannels(), getSampleRate(),
         getBlockSize());
 
-    osc_two_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(state));
+    osc_two_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
+        state, DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString()));
     osc_two_node->getProcessor()->setPlayConfigDetails(
         getMainBusNumInputChannels(), getMainBusNumOutputChannels(), getSampleRate(),
         getBlockSize());
@@ -193,6 +207,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 
         NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
 
+        auto osc_one_gain = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_GAIN.toString(), "Osc 1 Gain", master_gain_range, 0.5f);
         auto osc_one_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(), "Osc 1 Gain Attack", adr_range,
             0.05f, "s");
@@ -207,7 +223,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_one_group->addChild(
-            std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
+            std::move(osc_one_gain), std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
             std::move(osc_one_gain_sustain), std::move(osc_one_gain_release));
 
         auto osc_one_filter_enabled = std::make_unique<AudioParameterBool>(
@@ -238,6 +254,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 
         NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
 
+        auto osc_two_gain = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_TWO_GAIN.toString(), "Osc 2 Gain", master_gain_range, 0.5f);
         auto osc_two_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(), "Osc 2 Gain Attack", adr_range,
             0.05f, "s");
@@ -252,7 +270,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_two_group->addChild(
-            std::move(osc_two_gain_attack), std::move(osc_two_gain_decay),
+            std::move(osc_two_gain), std::move(osc_two_gain_attack), std::move(osc_two_gain_decay),
             std::move(osc_two_gain_sustain), std::move(osc_two_gain_release));
 
         auto osc_two_filter_enabled = std::make_unique<AudioParameterBool>(

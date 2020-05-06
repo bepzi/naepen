@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MainMixerComponent.h"
 #include "OscillatorComponent.h"
 #include "PluginProcessor.h"
 
@@ -15,8 +16,7 @@ public:
 private:
     NaepenAudioProcessor &naepenProcessor;
 
-    Slider master_gain_slider {Slider::LinearVertical, Slider::TextBoxBelow};
-    AudioProcessorValueTreeState::SliderAttachment master_gain_slider_attachment;
+    MainMixerComponent main_mixer_component;
 
     OscillatorComponent osc_one_component;
     OscillatorComponent osc_two_component;

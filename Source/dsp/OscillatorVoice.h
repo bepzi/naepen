@@ -13,7 +13,12 @@ public:
 
 class OscillatorVoice : public SynthesiserVoice {
 public:
-    OscillatorVoice(std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts);
+    OscillatorVoice(
+        std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
+        std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
+        std::atomic<float> *gain_sustain, std::atomic<float> *gain_release,
+        std::atomic<float> *filter_enabled, std::atomic<float> *filter_cutoff,
+        std::atomic<float> *filter_q);
 
     bool canPlaySound(SynthesiserSound *sound) override;
 
@@ -43,10 +48,14 @@ private:
 
     float level = 0.0f;
 
-    ADSR osc_one_gain_envelope;
+    ADSR gain_envelope;
+    std::atomic<float> *gain_attack;
+    std::atomic<float> *gain_decay;
+    std::atomic<float> *gain_sustain;
+    std::atomic<float> *gain_release;
 
-    SvfFilter osc_one_filter;
-    std::atomic<float> *osc_one_filter_enabled;
-    std::atomic<float> *osc_one_filter_cutoff;
-    std::atomic<float> *osc_one_filter_q;
+    SvfFilter filter;
+    std::atomic<float> *filter_enabled;
+    std::atomic<float> *filter_cutoff;
+    std::atomic<float> *filter_q;
 };

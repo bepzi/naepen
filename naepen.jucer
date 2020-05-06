@@ -35,6 +35,10 @@
               file="Source/dsp/InterpolatingOscillator.h"/>
       </GROUP>
       <GROUP id="{B2BE71AD-D467-E1B9-66C3-742F3C86202F}" name="gui">
+        <FILE id="vR7305" name="MainMixerComponent.cpp" compile="1" resource="0"
+              file="Source/gui/MainMixerComponent.cpp"/>
+        <FILE id="AV5Vg0" name="MainMixerComponent.h" compile="0" resource="0"
+              file="Source/gui/MainMixerComponent.h"/>
         <FILE id="EuvIe4" name="OscillatorComponent.cpp" compile="1" resource="0"
               file="Source/gui/OscillatorComponent.cpp"/>
         <FILE id="fG4aWD" name="OscillatorComponent.h" compile="0" resource="0"

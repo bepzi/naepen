@@ -14,7 +14,10 @@
  */
 class OscillatorAudioProcessor : public ProcessorBase {
 public:
-    explicit OscillatorAudioProcessor(AudioProcessorValueTreeState &apvts);
+    OscillatorAudioProcessor(
+        AudioProcessorValueTreeState &apvts, const String &gain_id, const String &gain_attack_id,
+        const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
+        const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id);
 
     void prepareToPlay(double sample_rate, int samples_per_block) override;
     void releaseResources() override;
@@ -23,6 +26,18 @@ public:
 
 private:
     Synthesiser synth;
+
+    // Oscillator parameters
+    std::atomic<float> *gain;
+
+    std::atomic<float> *gain_attack;
+    std::atomic<float> *gain_decay;
+    std::atomic<float> *gain_sustain;
+    std::atomic<float> *gain_release;
+
+    std::atomic<float> *filter_enabled;
+    std::atomic<float> *filter_cutoff;
+    std::atomic<float> *filter_q;
 
     // Waveform lookup tables, computed once at startup
     // and then copied around (by shared_ptr) to many oscillators/voices

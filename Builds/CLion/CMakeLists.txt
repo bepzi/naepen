@@ -62,6 +62,8 @@ add_library (SHARED_CODE STATIC
     "../../Source/dsp/OscillatorVoice.h"
     "../../Source/dsp/Oscillator.h"
     "../../Source/dsp/InterpolatingOscillator.h"
+    "../../Source/gui/MainMixerComponent.cpp"
+    "../../Source/gui/MainMixerComponent.h"
     "../../Source/gui/OscillatorComponent.cpp"
     "../../Source/gui/OscillatorComponent.h"
     "../../Source/gui/PluginEditor.cpp"
@@ -1209,6 +1211,7 @@ set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FI
 set_source_files_properties ("../../Source/dsp/OscillatorVoice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/Oscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/InterpolatingOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/MainMixerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/OscillatorComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
