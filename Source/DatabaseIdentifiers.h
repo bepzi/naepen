@@ -19,5 +19,15 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_ONE_FILTER_CUTOFF;
     static const Identifier OSC_ONE_FILTER_Q;
 
+    // Parameters for Oscillator 2
     // ====================================================
+    static const Identifier OSC_TWO_GROUP;
+    static const Identifier OSC_TWO_GAIN_ATTACK;
+    static const Identifier OSC_TWO_GAIN_DECAY;
+    static const Identifier OSC_TWO_GAIN_SUSTAIN;
+    static const Identifier OSC_TWO_GAIN_RELEASE;
+
+    static const Identifier OSC_TWO_FILTER_ENABLED;
+    static const Identifier OSC_TWO_FILTER_CUTOFF;
+    static const Identifier OSC_TWO_FILTER_Q;
 };

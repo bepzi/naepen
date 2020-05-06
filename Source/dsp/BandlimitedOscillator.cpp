@@ -251,33 +251,3 @@ BandlimitedOscillator::LookupTable make_engineers_sawtooth(double top_freq, doub
 
     return BandlimitedOscillator::from_full_bandwidth(samples);
 }
-
-BandlimitedOscillator::LookupTable make_musicians_sawtooth(double top_freq, double sample_rate)
-{
-    assert(top_freq > 0.0);
-    assert(sample_rate > 0.0);
-
-    std::array<double, BandlimitedOscillator::T> samples = {};
-
-    double phase = 0.0;
-    double phase_delta = (2 * M_PI) / (double)(BandlimitedOscillator::T);
-    auto num_harmonics = (size_t)(sample_rate / (2.0 * top_freq));
-
-    for (auto &f : samples) {
-        for (size_t i = 1; i <= num_harmonics; ++i) {
-            float amp = 1.0f / i;
-            if (i > (size_t)(num_harmonics / 1.4)) {
-                amp = 0.75f / i;
-            }
-
-            f += std::sin(phase * i) * amp;
-        }
-
-        // Sine wave summation makes an "inverted" sawtooth, so flip it back over
-        f = -f;
-
-        phase += phase_delta;
-    }
-
-    return BandlimitedOscillator::from_full_bandwidth(samples);
-}

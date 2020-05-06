@@ -60,7 +60,9 @@ private:
     void initialize_graph();
     [[maybe_unused]] Node::Ptr midi_input_node;
     Node::Ptr audio_output_node;
+
     Node::Ptr osc_one_node;
+    Node::Ptr osc_two_node;
 
     MidiMessageCollector midi_collector;
 

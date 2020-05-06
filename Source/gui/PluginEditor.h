@@ -19,6 +19,7 @@ private:
     AudioProcessorValueTreeState::SliderAttachment master_gain_slider_attachment;
 
     OscillatorComponent osc_one_component;
+    OscillatorComponent osc_two_component;
 
     MidiKeyboardComponent midi_keyboard;
 
