@@ -11,18 +11,24 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     naepenProcessor(proc),
     main_mixer_component(naepenProcessor.state),
     osc_one_component(
-        naepenProcessor.state, DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
+        naepenProcessor.state,
+
+        DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+
         DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
     osc_two_component(
-        naepenProcessor.state, DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
+        naepenProcessor.state,
+
+        DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE.toString(),
+
         DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString()),

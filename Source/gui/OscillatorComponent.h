@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WaveformSelectorListBoxModel.h"
+
 #include <JuceHeader.h>
 
 class OscillatorComponent : public Component {
@@ -14,6 +16,11 @@ public:
 
 private:
     using APVTS = juce::AudioProcessorValueTreeState;
+
+    // TODO: Perhaps this should be done with a TreeView?
+    void populate_waveform_selector();
+    std::unique_ptr<WaveformSelectorListBoxModel> waveform_selector_model;
+    ListBox waveform_selector;
 
     Slider gain_attack_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
     Slider gain_decay_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};

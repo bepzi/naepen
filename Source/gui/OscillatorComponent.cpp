@@ -6,6 +6,9 @@ OscillatorComponent::OscillatorComponent(
     APVTS &state, const String &gain_attack_id, const String &gain_decay_id,
     const String &gain_sustain_id, const String &gain_release_id, const String &filter_enabled_id,
     const String &filter_cutoff_id, const String &filter_q_id) :
+    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>()),
+    waveform_selector("", waveform_selector_model.get()),
+
     gain_attack_slider_attachment(state, gain_attack_id, gain_attack_slider),
     gain_decay_slider_attachment(state, gain_decay_id, gain_decay_slider),
     gain_sustain_slider_attachment(state, gain_sustain_id, gain_sustain_slider),
@@ -15,6 +18,9 @@ OscillatorComponent::OscillatorComponent(
     filter_cutoff_slider_attachment(state, filter_cutoff_id, filter_cutoff_slider),
     filter_q_slider_attachment(state, filter_q_id, filter_q_slider)
 {
+    populate_waveform_selector();
+    addAndMakeVisible(waveform_selector);
+
     addAndMakeVisible(gain_attack_slider);
     addAndMakeVisible(gain_decay_slider);
     addAndMakeVisible(gain_sustain_slider);
@@ -55,18 +61,28 @@ void OscillatorComponent::resized()
 
     auto gain_controls = area.removeFromTop(row_height);
     auto filter_controls = area.removeFromBottom(row_height);
+    auto waveform_controls = area.reduced(0, 32);
 
-    {
-        gain_attack_slider.setBounds(gain_controls.removeFromLeft(col_width));
-        gain_decay_slider.setBounds(gain_controls.removeFromLeft(col_width));
-        gain_sustain_slider.setBounds(gain_controls.removeFromLeft(col_width));
-        gain_release_slider.setBounds(gain_controls.removeFromLeft(col_width));
-    }
+    waveform_selector.setBounds(waveform_controls.removeFromLeft(col_width * 2)
+                                    .removeFromTop(waveform_controls.getHeight() / 2));
 
-    {
-        filter_controls.removeFromLeft(col_width);
-        filter_enabled_button.setBounds(filter_controls.removeFromLeft(col_width));
-        filter_cutoff_slider.setBounds(filter_controls.removeFromLeft(col_width));
-        filter_q_slider.setBounds(filter_controls.removeFromLeft(col_width));
-    }
+    gain_attack_slider.setBounds(gain_controls.removeFromLeft(col_width));
+    gain_decay_slider.setBounds(gain_controls.removeFromLeft(col_width));
+    gain_sustain_slider.setBounds(gain_controls.removeFromLeft(col_width));
+    gain_release_slider.setBounds(gain_controls.removeFromLeft(col_width));
+
+    filter_enabled_button.setBounds(filter_controls.removeFromLeft(col_width));
+    filter_cutoff_slider.setBounds(filter_controls.removeFromLeft(col_width));
+    filter_q_slider.setBounds(filter_controls.removeFromLeft(col_width));
+}
+
+// ==========================================
+void OscillatorComponent::populate_waveform_selector()
+{
+    waveform_selector_model->add_item("Sine");
+    waveform_selector_model->add_item("Triangle");
+    waveform_selector_model->add_item("Square");
+    waveform_selector_model->add_item("Engineer's Sawtooth");
+
+    waveform_selector.updateContent();
 }

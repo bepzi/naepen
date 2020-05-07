@@ -46,6 +46,10 @@
         <FILE id="y6emzS" name="PluginEditor.cpp" compile="1" resource="0"
               file="Source/gui/PluginEditor.cpp"/>
         <FILE id="eyGWBy" name="PluginEditor.h" compile="0" resource="0" file="Source/gui/PluginEditor.h"/>
+        <FILE id="Swo5ET" name="WaveformSelectorListBoxModel.cpp" compile="1"
+              resource="0" file="Source/gui/WaveformSelectorListBoxModel.cpp"/>
+        <FILE id="ekqfi8" name="WaveformSelectorListBoxModel.h" compile="0"
+              resource="0" file="Source/gui/WaveformSelectorListBoxModel.h"/>
         <FILE id="keSoR7" name="WaveformVisualizerComponent.h" compile="0"
               resource="0" file="Source/gui/WaveformVisualizerComponent.h"/>
       </GROUP>

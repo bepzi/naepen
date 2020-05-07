@@ -68,6 +68,8 @@ add_library (SHARED_CODE STATIC
     "../../Source/gui/OscillatorComponent.h"
     "../../Source/gui/PluginEditor.cpp"
     "../../Source/gui/PluginEditor.h"
+    "../../Source/gui/WaveformSelectorListBoxModel.cpp"
+    "../../Source/gui/WaveformSelectorListBoxModel.h"
     "../../Source/gui/WaveformVisualizerComponent.h"
     "../../Source/PluginProcessor.cpp"
     "../../Source/PluginProcessor.h"
@@ -1214,6 +1216,7 @@ set_source_files_properties ("../../Source/dsp/InterpolatingOscillator.h" PROPER
 set_source_files_properties ("../../Source/gui/MainMixerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/OscillatorComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/WaveformSelectorListBoxModel.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/DatabaseIdentifiers.h" PROPERTIES HEADER_FILE_ONLY TRUE)

@@ -102,6 +102,7 @@ OBJECTS_SHARED_CODE := \
   $(JUCE_OBJDIR)/MainMixerComponent_55ea1d6a.o \
   $(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o \
   $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o \
+  $(JUCE_OBJDIR)/WaveformSelectorListBoxModel_cf1d2415.o \
   $(JUCE_OBJDIR)/PluginProcessor_a059e380.o \
   $(JUCE_OBJDIR)/DatabaseIdentifiers_382cb350.o \
   $(JUCE_OBJDIR)/include_juce_audio_basics_8a4e984a.o \
@@ -202,6 +203,11 @@ $(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o: ../../Source/gui/OscillatorCompon
 $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o: ../../Source/gui/PluginEditor.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling PluginEditor.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/WaveformSelectorListBoxModel_cf1d2415.o: ../../Source/gui/WaveformSelectorListBoxModel.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling WaveformSelectorListBoxModel.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PluginProcessor_a059e380.o: ../../Source/PluginProcessor.cpp
