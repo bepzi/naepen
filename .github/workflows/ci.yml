@@ -14,38 +14,12 @@ jobs:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v2
 
-    #   # https://stackoverflow.com/a/22866610
-    #   # https://stackoverflow.com/a/367167
-    # - name: Validate code formatting with clang-format
-    #   run: |
-    #     ! find Source/ -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\)' -exec clang-format -style=file -output-replacements-xml {} \; | grep -c "<replacement " >/dev/null
-
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install libfftw3-dev libxinerama-dev libasound2-dev libfreetype6-dev \
                          libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
                          libvorbis-dev libogg-dev libjack-dev
-
-    - name: Install latest stable JUCE
-      run: |
-        wget https://github.com/juce-framework/JUCE/releases/download/5.4.7/juce-5.4.7-linux.zip
-        unzip juce-5.4.7-linux.zip
-
-        # The ArchLinux maintainers have fixed a number of Linux-related bugs
-        git clone --depth 1 https://git.archlinux.org/svntogit/community.git --branch packages/juce
-        cp community/repos/community-x86_64/*.patch .
-        cp community/repos/community-x86_64/*.h .
-
-        cd JUCE
-        patch -Np1 -i "../juce-5.4.5-jucepath.patch"
-        patch -Np1 -i "../juce-5.4.5-juce_vst.patch"
-        patch -Np1 -i "../juce-5.4.5-fix_include_defines.patch"
-        patch -Np1 -i "../juce-5.4.5-link_to_systemlibs.patch"
-        cd ..
-        cp juce_VSTInterface.h JUCE/modules/juce_audio_processors/format_types
-
-        sudo cp -r JUCE /usr/share/juce
 
     - name: Build with CMake, Clang, Debug
       run: |

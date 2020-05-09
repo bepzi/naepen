@@ -10,7 +10,7 @@ On Arch Linux:
 
 ```bash
 sudo pacman -S juce fftw
-git clone <repo_url.git> <repo> && cd <repo>
+git clone --recurse-submodules <repo_url.git> <repo> && cd <repo>
 cd Builds/LinuxMakefile  # Alternatively, build with CMake
 CONFIG=Release make -j
 ```
