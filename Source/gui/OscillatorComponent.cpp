@@ -5,12 +5,14 @@
 #include <JuceHeader.h>
 
 OscillatorComponent::OscillatorComponent(
-    APVTS &state, const Identifier &waveform_id, const String &gain_attack_id,
+    APVTS &state, const Identifier &waveform_id, const String &pan_id, const String &gain_attack_id,
     const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
     const String &filter_type_id, const String &filter_enabled_id, const String &filter_cutoff_id,
     const String &filter_q_id) :
     waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
+
+    pan_slider_attachment(state, pan_id, pan_slider),
 
     gain_attack_slider_attachment(state, gain_attack_id, gain_attack_slider),
     gain_decay_slider_attachment(state, gain_decay_id, gain_decay_slider),
@@ -25,6 +27,8 @@ OscillatorComponent::OscillatorComponent(
     waveform_selector.updateContent();
     waveform_selector.selectRow(0);
     addAndMakeVisible(waveform_selector);
+
+    addAndMakeVisible(pan_slider);
 
     addAndMakeVisible(gain_attack_slider);
     addAndMakeVisible(gain_decay_slider);
@@ -79,7 +83,9 @@ void OscillatorComponent::resized()
     auto waveform_controls = area.reduced(0, 32);
 
     waveform_selector.setBounds(waveform_controls.removeFromLeft(col_width * 2)
-                                    .removeFromTop(waveform_controls.getHeight() / 2));
+                                    .reduced(0, waveform_controls.getHeight() / 2));
+
+    pan_slider.setBounds(waveform_controls.removeFromLeft(col_width));
 
     gain_attack_slider.setBounds(gain_controls.removeFromLeft(col_width));
     gain_decay_slider.setBounds(gain_controls.removeFromLeft(col_width));

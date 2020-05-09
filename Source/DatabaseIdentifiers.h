@@ -13,6 +13,8 @@ struct DatabaseIdentifiers {
 
     static const Identifier OSC_ONE_WAVEFORM;
 
+    static const Identifier OSC_ONE_PAN;
+
     static const Identifier OSC_ONE_GAIN;
     static const Identifier OSC_ONE_GAIN_ATTACK;
     static const Identifier OSC_ONE_GAIN_DECAY;
@@ -29,6 +31,8 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_TWO_GROUP;
 
     static const Identifier OSC_TWO_WAVEFORM;
+
+    static const Identifier OSC_TWO_PAN;
 
     static const Identifier OSC_TWO_GAIN;
     static const Identifier OSC_TWO_GAIN_ATTACK;

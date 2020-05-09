@@ -15,7 +15,7 @@ class OscillatorVoice : public SynthesiserVoice {
 public:
     OscillatorVoice(
         std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
-        std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
+        std::atomic<float> *pan, std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
         std::atomic<float> *gain_sustain, std::atomic<float> *gain_release,
         Identifier filter_type_id, std::atomic<float> *filter_enabled,
         std::atomic<float> *filter_cutoff, std::atomic<float> *filter_q);
@@ -47,6 +47,8 @@ private:
     AudioProcessorValueTreeState &state;
 
     float level = 0.0f;
+
+    std::atomic<float> *pan;
 
     ADSR gain_envelope;
     std::atomic<float> *gain_attack;

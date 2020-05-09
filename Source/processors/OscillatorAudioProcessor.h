@@ -17,10 +17,10 @@
 class OscillatorAudioProcessor : public ProcessorBase, public ValueTree::Listener {
 public:
     OscillatorAudioProcessor(
-        AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &gain_id,
-        const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
-        const String &gain_release_id, Identifier filter_type_id, const String &filter_enabled_id,
-        const String &filter_cutoff_id, const String &filter_q_id);
+        AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &pan_id,
+        const String &gain_id, const String &gain_attack_id, const String &gain_decay_id,
+        const String &gain_sustain_id, const String &gain_release_id, Identifier filter_type_id,
+        const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id);
 
     ~OscillatorAudioProcessor();
 
@@ -35,6 +35,8 @@ private:
     Synthesiser synth;
 
     // Oscillator parameters
+    std::atomic<float> *pan;
+
     std::atomic<float> *gain;
 
     std::atomic<float> *gain_attack;
