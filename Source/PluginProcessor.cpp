@@ -178,10 +178,11 @@ void NaepenAudioProcessor::initialize_graph()
         getBlockSize());
 
     for (int channel = 0; channel < getMainBusNumOutputChannels(); ++channel) {
-        jassert(processor_graph.addConnection(
-            {{osc_one_node->nodeID, channel}, {audio_output_node->nodeID, channel}}));
-        jassert(processor_graph.addConnection(
-            {{osc_two_node->nodeID, channel}, {audio_output_node->nodeID, channel}}));
+        // TODO: Be more robust against failure to connect graph nodes
+        processor_graph.addConnection(
+            {{osc_one_node->nodeID, channel}, {audio_output_node->nodeID, channel}});
+        processor_graph.addConnection(
+            {{osc_two_node->nodeID, channel}, {audio_output_node->nodeID, channel}});
     }
 
     // NOTE: We don't actually have to wire up the MIDI input node to the osc_one_component node,
