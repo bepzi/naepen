@@ -94,13 +94,16 @@ OBJECTS_STANDALONE_PLUGIN := \
   $(JUCE_OBJDIR)/include_juce_audio_plugin_client_Standalone_1a871192.o \
 
 OBJECTS_SHARED_CODE := \
-  $(JUCE_OBJDIR)/OscillatorAudioProcessor_cd0e52a5.o \
+  $(JUCE_OBJDIR)/OscillatorAudioProcessor_8a361feb.o \
+  $(JUCE_OBJDIR)/NoiseOscillator_2b0a7b6d.o \
   $(JUCE_OBJDIR)/InterpolatingOscillator_bec3d0d1.o \
   $(JUCE_OBJDIR)/OscillatorVoice_ec71a885.o \
   $(JUCE_OBJDIR)/SvfFilter_5a56bdce.o \
   $(JUCE_OBJDIR)/BandlimitedOscillator_9537e858.o \
-  $(JUCE_OBJDIR)/OscOneComponent_44572263.o \
+  $(JUCE_OBJDIR)/MainMixerComponent_55ea1d6a.o \
+  $(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o \
   $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o \
+  $(JUCE_OBJDIR)/WaveformSelectorListBoxModel_cf1d2415.o \
   $(JUCE_OBJDIR)/PluginProcessor_a059e380.o \
   $(JUCE_OBJDIR)/DatabaseIdentifiers_382cb350.o \
   $(JUCE_OBJDIR)/include_juce_audio_basics_8a4e984a.o \
@@ -163,9 +166,14 @@ $(JUCE_OBJDIR)/include_juce_audio_plugin_client_Standalone_1a871192.o: ../../Juc
 	@echo "Compiling include_juce_audio_plugin_client_Standalone.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_STANDALONE_PLUGIN) $(JUCE_CFLAGS_STANDALONE_PLUGIN) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/OscillatorAudioProcessor_cd0e52a5.o: ../../Source/OscillatorAudioProcessor.cpp
+$(JUCE_OBJDIR)/OscillatorAudioProcessor_8a361feb.o: ../../Source/processors/OscillatorAudioProcessor.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling OscillatorAudioProcessor.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/NoiseOscillator_2b0a7b6d.o: ../../Source/dsp/NoiseOscillator.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling NoiseOscillator.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/InterpolatingOscillator_bec3d0d1.o: ../../Source/dsp/InterpolatingOscillator.cpp
@@ -188,14 +196,24 @@ $(JUCE_OBJDIR)/BandlimitedOscillator_9537e858.o: ../../Source/dsp/BandlimitedOsc
 	@echo "Compiling BandlimitedOscillator.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/OscOneComponent_44572263.o: ../../Source/gui/OscOneComponent.cpp
+$(JUCE_OBJDIR)/MainMixerComponent_55ea1d6a.o: ../../Source/gui/MainMixerComponent.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling OscOneComponent.cpp"
+	@echo "Compiling MainMixerComponent.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/OscillatorComponent_d640c54a.o: ../../Source/gui/OscillatorComponent.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling OscillatorComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PluginEditor_3a966f5d.o: ../../Source/gui/PluginEditor.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling PluginEditor.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/WaveformSelectorListBoxModel_cf1d2415.o: ../../Source/gui/WaveformSelectorListBoxModel.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling WaveformSelectorListBoxModel.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/PluginProcessor_a059e380.o: ../../Source/PluginProcessor.cpp

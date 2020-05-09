@@ -22,6 +22,7 @@ public:
     using LookupTable = std::vector<std::pair<float, std::array<float, T + 1>>>;
 
     explicit BandlimitedOscillator(std::shared_ptr<const LookupTable> t);
+    explicit BandlimitedOscillator(const BandlimitedOscillator &other);
     ~BandlimitedOscillator() override = default;
 
     [[nodiscard]] float get_next_sample() override;

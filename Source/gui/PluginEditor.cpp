@@ -9,18 +9,44 @@ static constexpr auto PADDING = 8;
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &proc) :
     AudioProcessorEditor(proc),
     naepenProcessor(proc),
-    master_gain_slider_attachment(
-        naepenProcessor.state, DatabaseIdentifiers::MASTER_GAIN.toString(), master_gain_slider),
-    osc_one(naepenProcessor.state),
+    main_mixer_component(naepenProcessor.state),
+    osc_one_component(
+        naepenProcessor.state,
+
+        DatabaseIdentifiers::OSC_ONE_WAVEFORM,
+
+        DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+
+        DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
+
+    osc_two_component(
+        naepenProcessor.state,
+
+        DatabaseIdentifiers::OSC_TWO_WAVEFORM,
+
+        DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE.toString(),
+
+        DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString()),
     midi_keyboard(naepenProcessor.virtual_keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {
     midi_keyboard.setOctaveForMiddleC(4);
 
-    master_gain_slider.setNumDecimalPlacesToDisplay(2);
-    addAndMakeVisible(master_gain_slider);
-
     addAndMakeVisible(midi_keyboard);
-    addAndMakeVisible(osc_one);
+
+    addAndMakeVisible(main_mixer_component);
+
+    addAndMakeVisible(osc_one_component);
+    addAndMakeVisible(osc_two_component);
 
     setSize(EDITOR_WIDTH, EDITOR_HEIGHT);
 }
@@ -38,8 +64,9 @@ void NaepenAudioProcessorEditor::resized()
     midi_keyboard.setBounds(area.removeFromBottom(64));
     area.removeFromBottom(PADDING);
 
-    master_gain_slider.setBounds(area.removeFromLeft(128));
-    area.removeFromLeft(128);
+    main_mixer_component.setBounds(
+        area.removeFromLeft(area.getWidth() / 3).removeFromBottom(area.getHeight() / 4));
 
-    osc_one.setBounds(area.removeFromTop(area.getHeight() / 2));
+    osc_one_component.setBounds(area.removeFromTop(area.getHeight() / 2));
+    osc_two_component.setBounds(area);
 }

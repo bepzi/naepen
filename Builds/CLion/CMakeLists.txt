@@ -50,9 +50,11 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../../../../../../usr/share/juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
-    "../../Source/ProcessorBase.h"
-    "../../Source/OscillatorAudioProcessor.cpp"
-    "../../Source/OscillatorAudioProcessor.h"
+    "../../Source/processors/OscillatorAudioProcessor.cpp"
+    "../../Source/processors/OscillatorAudioProcessor.h"
+    "../../Source/processors/ProcessorBase.h"
+    "../../Source/dsp/NoiseOscillator.cpp"
+    "../../Source/dsp/NoiseOscillator.h"
     "../../Source/dsp/InterpolatingOscillator.cpp"
     "../../Source/dsp/OscillatorVoice.cpp"
     "../../Source/dsp/SvfFilter.cpp"
@@ -62,10 +64,14 @@ add_library (SHARED_CODE STATIC
     "../../Source/dsp/OscillatorVoice.h"
     "../../Source/dsp/Oscillator.h"
     "../../Source/dsp/InterpolatingOscillator.h"
-    "../../Source/gui/OscOneComponent.cpp"
-    "../../Source/gui/OscOneComponent.h"
+    "../../Source/gui/MainMixerComponent.cpp"
+    "../../Source/gui/MainMixerComponent.h"
+    "../../Source/gui/OscillatorComponent.cpp"
+    "../../Source/gui/OscillatorComponent.h"
     "../../Source/gui/PluginEditor.cpp"
     "../../Source/gui/PluginEditor.h"
+    "../../Source/gui/WaveformSelectorListBoxModel.cpp"
+    "../../Source/gui/WaveformSelectorListBoxModel.h"
     "../../Source/gui/WaveformVisualizerComponent.h"
     "../../Source/PluginProcessor.cpp"
     "../../Source/PluginProcessor.h"
@@ -1202,15 +1208,18 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JuceHeader.h"
 )
 
-set_source_files_properties ("../../Source/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/processors/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/processors/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/dsp/NoiseOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/BandlimitedOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/OscillatorVoice.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/Oscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/InterpolatingOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
-set_source_files_properties ("../../Source/gui/OscOneComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/MainMixerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/OscillatorComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/PluginEditor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/gui/WaveformSelectorListBoxModel.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/gui/WaveformVisualizerComponent.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/PluginProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/DatabaseIdentifiers.h" PROPERTIES HEADER_FILE_ONLY TRUE)

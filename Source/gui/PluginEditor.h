@@ -1,6 +1,7 @@
 #pragma once
 
-#include "OscOneComponent.h"
+#include "MainMixerComponent.h"
+#include "OscillatorComponent.h"
 #include "PluginProcessor.h"
 
 #include <JuceHeader.h>
@@ -8,7 +9,6 @@
 class NaepenAudioProcessorEditor : public AudioProcessorEditor {
 public:
     explicit NaepenAudioProcessorEditor(NaepenAudioProcessor &processor);
-    ~NaepenAudioProcessorEditor() override = default;
 
     void paint(Graphics &) override;
     void resized() override;
@@ -16,10 +16,10 @@ public:
 private:
     NaepenAudioProcessor &naepenProcessor;
 
-    Slider master_gain_slider {Slider::LinearVertical, Slider::TextBoxBelow};
-    APVTS::SliderAttachment master_gain_slider_attachment;
+    MainMixerComponent main_mixer_component;
 
-    OscOneComponent osc_one;
+    OscillatorComponent osc_one_component;
+    OscillatorComponent osc_two_component;
 
     MidiKeyboardComponent midi_keyboard;
 

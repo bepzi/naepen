@@ -2,10 +2,16 @@
 
 #include <JuceHeader.h>
 
+/**
+ * Subclass of AudioProcessor that handles some of the tedium of implementing AudioProcessor.
+ *
+ * Notably, these AudioProcessors don't have a GUI, don't save their state, and don't accept
+ * MIDI - although they can still respond to MIDI messages if their parent AudioProcessor
+ * handles those messages before passing them into this processor's `processBlock()`.
+ */
 class ProcessorBase : public AudioProcessor {
 public:
-    ProcessorBase() = default;
-    ~ProcessorBase() = default;
+    explicit ProcessorBase(AudioProcessorValueTreeState &apvts) : state(apvts) {}
 
     //==============================================================================
     AudioProcessorEditor *createEditor() override
@@ -60,6 +66,9 @@ public:
     {
         ignoreUnused(data, sizeInBytes);
     }
+
+protected:
+    AudioProcessorValueTreeState &state;
 
 private:
     //==============================================================================

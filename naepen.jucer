@@ -10,12 +10,18 @@
               headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
-      <FILE id="DDM35Z" name="ProcessorBase.h" compile="0" resource="0" file="Source/ProcessorBase.h"/>
-      <FILE id="n02P1N" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
-            file="Source/OscillatorAudioProcessor.cpp"/>
-      <FILE id="oKUDus" name="OscillatorAudioProcessor.h" compile="0" resource="0"
-            file="Source/OscillatorAudioProcessor.h"/>
+      <GROUP id="{41B85368-F388-4262-FE4C-BD6AC376C775}" name="processors">
+        <FILE id="LBiEBT" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
+              file="Source/processors/OscillatorAudioProcessor.cpp"/>
+        <FILE id="dZ116i" name="OscillatorAudioProcessor.h" compile="0" resource="0"
+              file="Source/processors/OscillatorAudioProcessor.h"/>
+        <FILE id="prCE7Q" name="ProcessorBase.h" compile="0" resource="0" file="Source/processors/ProcessorBase.h"/>
+      </GROUP>
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
+        <FILE id="uxEzY1" name="NoiseOscillator.cpp" compile="1" resource="0"
+              file="Source/dsp/NoiseOscillator.cpp"/>
+        <FILE id="hPzotY" name="NoiseOscillator.h" compile="0" resource="0"
+              file="Source/dsp/NoiseOscillator.h"/>
         <FILE id="SNNGmY" name="InterpolatingOscillator.cpp" compile="1" resource="0"
               file="Source/dsp/InterpolatingOscillator.cpp"/>
         <FILE id="qiVSIx" name="OscillatorVoice.cpp" compile="1" resource="0"
@@ -33,13 +39,21 @@
               file="Source/dsp/InterpolatingOscillator.h"/>
       </GROUP>
       <GROUP id="{B2BE71AD-D467-E1B9-66C3-742F3C86202F}" name="gui">
-        <FILE id="EuvIe4" name="OscOneComponent.cpp" compile="1" resource="0"
-              file="Source/gui/OscOneComponent.cpp"/>
-        <FILE id="fG4aWD" name="OscOneComponent.h" compile="0" resource="0"
-              file="Source/gui/OscOneComponent.h"/>
+        <FILE id="vR7305" name="MainMixerComponent.cpp" compile="1" resource="0"
+              file="Source/gui/MainMixerComponent.cpp"/>
+        <FILE id="AV5Vg0" name="MainMixerComponent.h" compile="0" resource="0"
+              file="Source/gui/MainMixerComponent.h"/>
+        <FILE id="EuvIe4" name="OscillatorComponent.cpp" compile="1" resource="0"
+              file="Source/gui/OscillatorComponent.cpp"/>
+        <FILE id="fG4aWD" name="OscillatorComponent.h" compile="0" resource="0"
+              file="Source/gui/OscillatorComponent.h"/>
         <FILE id="y6emzS" name="PluginEditor.cpp" compile="1" resource="0"
               file="Source/gui/PluginEditor.cpp"/>
         <FILE id="eyGWBy" name="PluginEditor.h" compile="0" resource="0" file="Source/gui/PluginEditor.h"/>
+        <FILE id="Swo5ET" name="WaveformSelectorListBoxModel.cpp" compile="1"
+              resource="0" file="Source/gui/WaveformSelectorListBoxModel.cpp"/>
+        <FILE id="ekqfi8" name="WaveformSelectorListBoxModel.h" compile="0"
+              resource="0" file="Source/gui/WaveformSelectorListBoxModel.h"/>
         <FILE id="keSoR7" name="WaveformVisualizerComponent.h" compile="0"
               resource="0" file="Source/gui/WaveformVisualizerComponent.h"/>
       </GROUP>

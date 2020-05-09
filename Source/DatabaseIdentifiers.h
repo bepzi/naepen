@@ -10,6 +10,10 @@ struct DatabaseIdentifiers {
     // Parameters for Oscillator 1
     // ====================================================
     static const Identifier OSC_ONE_GROUP;
+
+    static const Identifier OSC_ONE_WAVEFORM;
+
+    static const Identifier OSC_ONE_GAIN;
     static const Identifier OSC_ONE_GAIN_ATTACK;
     static const Identifier OSC_ONE_GAIN_DECAY;
     static const Identifier OSC_ONE_GAIN_SUSTAIN;
@@ -19,10 +23,19 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_ONE_FILTER_CUTOFF;
     static const Identifier OSC_ONE_FILTER_Q;
 
-    static const Identifier OSC_ONE_FILTER_ATTACK;
-    static const Identifier OSC_ONE_FILTER_DECAY;
-    static const Identifier OSC_ONE_FILTER_SUSTAIN;
-    static const Identifier OSC_ONE_FILTER_RELEASE;
-
+    // Parameters for Oscillator 2
     // ====================================================
+    static const Identifier OSC_TWO_GROUP;
+
+    static const Identifier OSC_TWO_WAVEFORM;
+
+    static const Identifier OSC_TWO_GAIN;
+    static const Identifier OSC_TWO_GAIN_ATTACK;
+    static const Identifier OSC_TWO_GAIN_DECAY;
+    static const Identifier OSC_TWO_GAIN_SUSTAIN;
+    static const Identifier OSC_TWO_GAIN_RELEASE;
+
+    static const Identifier OSC_TWO_FILTER_ENABLED;
+    static const Identifier OSC_TWO_FILTER_CUTOFF;
+    static const Identifier OSC_TWO_FILTER_Q;
 };

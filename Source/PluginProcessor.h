@@ -58,9 +58,11 @@ private:
 
     AudioProcessorGraph processor_graph;
     void initialize_graph();
-    Node::Ptr midi_input_node;
+    [[maybe_unused]] Node::Ptr midi_input_node;
     Node::Ptr audio_output_node;
+
     Node::Ptr osc_one_node;
+    Node::Ptr osc_two_node;
 
     MidiMessageCollector midi_collector;
 
