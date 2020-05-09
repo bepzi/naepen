@@ -13,7 +13,8 @@ jobs:
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v2
-      submodules: recursive
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
