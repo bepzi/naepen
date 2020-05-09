@@ -75,7 +75,7 @@
         <CONFIGURATION isDebug="0" name="Release" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_audio_basics" path="./juce/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="juce/modules"/>
         <MODULEPATH id="juce_audio_devices" path="./juce/modules"/>
         <MODULEPATH id="juce_audio_formats" path="./juce/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="./juce/modules"/>
@@ -87,8 +87,8 @@
         <MODULEPATH id="juce_events" path="./juce/modules"/>
         <MODULEPATH id="juce_graphics" path="./juce/modules"/>
         <MODULEPATH id="juce_gui_basics" path="./juce/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="./juce/modules"/>
         <MODULEPATH id="juce_opengl" path="./juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="juce/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1">
@@ -105,8 +105,8 @@
         <MODULEPATH id="juce_events" path="../../../../../usr/share/juce/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../../usr/share/juce/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../../usr/share/juce/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../../usr/share/juce/modules"/>
         <MODULEPATH id="juce_opengl" path="../../../../../usr/share/juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="juce/modules"/>
       </MODULEPATHS>
     </CLION>
   </EXPORTFORMATS>
@@ -131,5 +131,5 @@
     <LINUX/>
   </LIVE_SETTINGS>
   <JUCEOPTIONS JUCE_VST3_CAN_REPLACE_VST2="0" JUCE_STRICT_REFCOUNTEDPOINTER="1"
-               JUCE_DSP_USE_STATIC_FFTW="1"/>
+               JUCE_DSP_USE_STATIC_FFTW="1" JUCE_WEB_BROWSER="0"/>
 </JUCERPROJECT>

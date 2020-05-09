@@ -101,7 +101,11 @@
 #endif
 
 #ifndef    JUCE_USE_ANDROID_OBOE
- //#define JUCE_USE_ANDROID_OBOE 0
+ //#define JUCE_USE_ANDROID_OBOE 1
+#endif
+
+#ifndef    JUCE_USE_OBOE_STABILIZED_CALLBACK
+ //#define JUCE_USE_OBOE_STABILIZED_CALLBACK 0
 #endif
 
 #ifndef    JUCE_USE_ANDROID_OPENSLES
@@ -181,6 +185,10 @@
  //#define JUCE_PLUGINHOST_LADSPA 0
 #endif
 
+#ifndef    JUCE_CUSTOM_VST3_SDK
+ //#define JUCE_CUSTOM_VST3_SDK 0
+#endif
+
 //==============================================================================
 // juce_audio_utils flags:
 
@@ -212,7 +220,7 @@
 #endif
 
 #ifndef    JUCE_INCLUDE_ZLIB_CODE
- //#define JUCE_INCLUDE_ZLIB_CODE 0
+ //#define JUCE_INCLUDE_ZLIB_CODE 1
 #endif
 
 #ifndef    JUCE_USE_CURL
@@ -292,7 +300,11 @@
 // juce_gui_extra flags:
 
 #ifndef    JUCE_WEB_BROWSER
- //#define JUCE_WEB_BROWSER 1
+ #define   JUCE_WEB_BROWSER 0
+#endif
+
+#ifndef    JUCE_USE_WINRT_WEBVIEW
+ //#define JUCE_USE_WINRT_WEBVIEW 0
 #endif
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
