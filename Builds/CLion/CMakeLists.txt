@@ -53,6 +53,8 @@ add_library (SHARED_CODE STATIC
     "../../Source/processors/OscillatorAudioProcessor.cpp"
     "../../Source/processors/OscillatorAudioProcessor.h"
     "../../Source/processors/ProcessorBase.h"
+    "../../Source/dsp/NoiseOscillator.cpp"
+    "../../Source/dsp/NoiseOscillator.h"
     "../../Source/dsp/InterpolatingOscillator.cpp"
     "../../Source/dsp/OscillatorVoice.cpp"
     "../../Source/dsp/SvfFilter.cpp"
@@ -1208,6 +1210,7 @@ add_library (SHARED_CODE STATIC
 
 set_source_files_properties ("../../Source/processors/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/processors/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../Source/dsp/NoiseOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/BandlimitedOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/SvfFilter.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/OscillatorVoice.h" PROPERTIES HEADER_FILE_ONLY TRUE)

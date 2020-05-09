@@ -9,6 +9,16 @@ BandlimitedOscillator::BandlimitedOscillator(std::shared_ptr<const LookupTable> 
 {
 }
 
+BandlimitedOscillator::BandlimitedOscillator(const BandlimitedOscillator &other)
+{
+    lookup_table = other.lookup_table;
+
+    phase = other.phase;
+    phase_incr = other.phase_incr;
+    sample_rate = other.sample_rate;
+    idx = other.idx;
+}
+
 float BandlimitedOscillator::get_next_sample()
 {
     auto sample = get_table_sample(phase, (*lookup_table)[idx].second);

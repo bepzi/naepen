@@ -5,14 +5,15 @@
 static constexpr size_t MAX_POLYPHONY = 16;
 
 OscillatorAudioProcessor::OscillatorAudioProcessor(
-    AudioProcessorValueTreeState &apvts, const String &waveform_id, const String &gain_id,
+    AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &gain_id,
     const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
     const String &gain_release_id, const String &filter_enabled_id, const String &filter_cutoff_id,
     const String &filter_q_id) :
-    ProcessorBase(apvts), waveform_id(waveform_id)
+    ProcessorBase(apvts), oscillator_id(oscillator_id)
 {
-    sine_table = std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine());
-    current_waveform = sine_table;
+    sine_osc = std::make_shared<BandlimitedOscillator>(
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine()));
+    white_noise_osc = std::make_shared<NoiseOscillator>();
 
     synth.addSound(new OscillatorSound());
 
@@ -39,32 +40,16 @@ void OscillatorAudioProcessor::prepareToPlay(double sample_rate, int samples_per
 {
     ignoreUnused(samples_per_block);
 
-    triangle_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-        make_triangle(20.0, sample_rate));
-    square_table =
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sample_rate));
-    engineers_sawtooth_table = std::make_shared<const BandlimitedOscillator::LookupTable>(
-        make_engineers_sawtooth(20.0, sample_rate));
+    triangle_osc = std::make_shared<BandlimitedOscillator>(
+        std::make_shared<const BandlimitedOscillator::LookupTable>(
+            make_triangle(20.0, sample_rate)));
+    square_osc = std::make_shared<BandlimitedOscillator>(
+        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sample_rate)));
+    engineers_sawtooth_osc = std::make_shared<BandlimitedOscillator>(
+        std::make_shared<const BandlimitedOscillator::LookupTable>(
+            make_engineers_sawtooth(20.0, sample_rate)));
 
-    current_waveform = sine_table;
-    auto waveform_name = state.state.getProperty(waveform_id, "Sine").toString();
-    if (waveform_name == "Sine") {
-        current_waveform = sine_table;
-    } else if (waveform_name == "Triangle") {
-        current_waveform = triangle_table;
-    } else if (waveform_name == "Square") {
-        current_waveform = square_table;
-    } else if (waveform_name == "EngineersSawtooth") {
-        current_waveform = engineers_sawtooth_table;
-    }
-
-    synth.clearVoices();
-    synth.setCurrentPlaybackSampleRate(sample_rate);
-    for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
-        synth.addVoice(new OscillatorVoice(
-            std::make_unique<BandlimitedOscillator>(current_waveform), state, gain_attack,
-            gain_decay, gain_sustain, gain_release, filter_enabled, filter_cutoff, filter_q));
-    }
+    update_current_oscillator();
 }
 
 void OscillatorAudioProcessor::releaseResources() {}
@@ -81,30 +66,44 @@ void OscillatorAudioProcessor::valueTreePropertyChanged(
 {
     ignoreUnused(treeWhosePropertyHasChanged);
 
-    if (property.toString() != waveform_id) {
+    if (property != oscillator_id) {
         return;
     }
 
-    // TODO: Just use a hashmap <String, shared_ptr>
-    auto waveform_name = state.state.getProperty(property, "Sine").toString();
-    if (waveform_name == "Sine") {
-        current_waveform = sine_table;
-    } else if (waveform_name == "Triangle") {
-        current_waveform = triangle_table;
-    } else if (waveform_name == "Square") {
-        current_waveform = square_table;
-    } else if (waveform_name == "EngineersSawtooth") {
-        current_waveform = engineers_sawtooth_table;
-    } else {
-        // Waveform name in the ValueTree that we don't recognize
-        return;
-    }
+    update_current_oscillator();
+}
+
+void OscillatorAudioProcessor::update_current_oscillator()
+{
+    auto waveform_name = state.state.getProperty(oscillator_id, "Sine").toString();
 
     synth.clearVoices();
     synth.setCurrentPlaybackSampleRate(getSampleRate());
     for (size_t i = 0; i < MAX_POLYPHONY; ++i) {
+        std::unique_ptr<Oscillator> osc_copy = nullptr;
+
+        // TODO: Do a table lookup
+        // TODO: This is ugly as sin, redo this
+        if (waveform_name == "Sine") {
+            osc_copy = std::make_unique<BandlimitedOscillator>(
+                *(dynamic_cast<BandlimitedOscillator *>(sine_osc.get())));
+        } else if (waveform_name == "Triangle") {
+            osc_copy = std::make_unique<BandlimitedOscillator>(
+                *(dynamic_cast<BandlimitedOscillator *>(triangle_osc.get())));
+        } else if (waveform_name == "Square") {
+            osc_copy = std::make_unique<BandlimitedOscillator>(
+                *(dynamic_cast<BandlimitedOscillator *>(square_osc.get())));
+        } else if (waveform_name == "EngineersSawtooth") {
+            osc_copy = std::make_unique<BandlimitedOscillator>(
+                *(dynamic_cast<BandlimitedOscillator *>(engineers_sawtooth_osc.get())));
+        } else if (waveform_name == "WhiteNoise") {
+            osc_copy = std::make_unique<NoiseOscillator>(
+                *(dynamic_cast<NoiseOscillator *>(white_noise_osc.get())));
+        }
+
+        jassert(osc_copy != nullptr);
         synth.addVoice(new OscillatorVoice(
-            std::make_unique<BandlimitedOscillator>(current_waveform), state, gain_attack,
-            gain_decay, gain_sustain, gain_release, filter_enabled, filter_cutoff, filter_q));
+            std::move(osc_copy), state, gain_attack, gain_decay, gain_sustain, gain_release,
+            filter_enabled, filter_cutoff, filter_q));
     }
 }

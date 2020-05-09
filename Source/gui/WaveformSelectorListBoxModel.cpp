@@ -10,7 +10,8 @@ WaveformSelectorListBoxModel::WaveformSelectorListBoxModel(
         {{"Sine", "Sine"},
          {"Triangle", "Triangle"},
          {"Square", "Square"},
-         {"EngineersSawtooth", "Engineer's Sawtooth"}})
+         {"EngineersSawtooth", "Engineer's Sawtooth"},
+         {"WhiteNoise", "White Noise"}})
 {
 }
 

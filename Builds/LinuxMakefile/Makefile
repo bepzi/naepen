@@ -95,6 +95,7 @@ OBJECTS_STANDALONE_PLUGIN := \
 
 OBJECTS_SHARED_CODE := \
   $(JUCE_OBJDIR)/OscillatorAudioProcessor_8a361feb.o \
+  $(JUCE_OBJDIR)/NoiseOscillator_2b0a7b6d.o \
   $(JUCE_OBJDIR)/InterpolatingOscillator_bec3d0d1.o \
   $(JUCE_OBJDIR)/OscillatorVoice_ec71a885.o \
   $(JUCE_OBJDIR)/SvfFilter_5a56bdce.o \
@@ -168,6 +169,11 @@ $(JUCE_OBJDIR)/include_juce_audio_plugin_client_Standalone_1a871192.o: ../../Juc
 $(JUCE_OBJDIR)/OscillatorAudioProcessor_8a361feb.o: ../../Source/processors/OscillatorAudioProcessor.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling OscillatorAudioProcessor.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/NoiseOscillator_2b0a7b6d.o: ../../Source/dsp/NoiseOscillator.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling NoiseOscillator.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_SHARED_CODE) $(JUCE_CFLAGS_SHARED_CODE) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/InterpolatingOscillator_bec3d0d1.o: ../../Source/dsp/InterpolatingOscillator.cpp

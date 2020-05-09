@@ -18,6 +18,10 @@
         <FILE id="prCE7Q" name="ProcessorBase.h" compile="0" resource="0" file="Source/processors/ProcessorBase.h"/>
       </GROUP>
       <GROUP id="{DB431E87-93D8-CE0E-EDD8-D2FD17A781E1}" name="dsp">
+        <FILE id="uxEzY1" name="NoiseOscillator.cpp" compile="1" resource="0"
+              file="Source/dsp/NoiseOscillator.cpp"/>
+        <FILE id="hPzotY" name="NoiseOscillator.h" compile="0" resource="0"
+              file="Source/dsp/NoiseOscillator.h"/>
         <FILE id="SNNGmY" name="InterpolatingOscillator.cpp" compile="1" resource="0"
               file="Source/dsp/InterpolatingOscillator.cpp"/>
         <FILE id="qiVSIx" name="OscillatorVoice.cpp" compile="1" resource="0"

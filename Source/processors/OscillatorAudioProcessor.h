@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ProcessorBase.h"
+
 #include "dsp/BandlimitedOscillator.h"
+#include "dsp/NoiseOscillator.h"
 #include "dsp/Oscillator.h"
 
 #include <JuceHeader.h>
@@ -15,7 +17,7 @@
 class OscillatorAudioProcessor : public ProcessorBase, public ValueTree::Listener {
 public:
     OscillatorAudioProcessor(
-        AudioProcessorValueTreeState &apvts, const String &waveform_id, const String &gain_id,
+        AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &gain_id,
         const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
         const String &gain_release_id, const String &filter_enabled_id,
         const String &filter_cutoff_id, const String &filter_q_id);
@@ -44,13 +46,15 @@ private:
     std::atomic<float> *filter_cutoff;
     std::atomic<float> *filter_q;
 
-    const String &waveform_id;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> current_waveform;
+    Identifier oscillator_id;
 
-    // Waveform lookup tables, computed once at startup
-    // and then copied around (by shared_ptr) to many oscillators/voices
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> sine_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> triangle_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> square_table;
-    std::shared_ptr<const BandlimitedOscillator::LookupTable> engineers_sawtooth_table;
+    // TODO: Can we share these between AudioProcessors?
+    std::shared_ptr<Oscillator> sine_osc;
+    std::shared_ptr<Oscillator> triangle_osc;
+    std::shared_ptr<Oscillator> square_osc;
+    std::shared_ptr<Oscillator> engineers_sawtooth_osc;
+
+    std::shared_ptr<Oscillator> white_noise_osc;
+
+    void update_current_oscillator();
 };
