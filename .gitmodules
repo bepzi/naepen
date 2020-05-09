@@ -1,0 +1,3 @@
+[submodule "juce"]
+	path = juce
+	url = git@github.com:DISTRHO/juce.git
