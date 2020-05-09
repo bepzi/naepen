@@ -11,9 +11,11 @@ public:
         double Q;
     };
 
-    enum class Type { LOWPASS, HIGHPASS, BANDPASS };
+    enum class Type { LOWPASS = 0, HIGHPASS, BANDPASS };
 
     void set_type(SvfFilter::Type type) noexcept;
+
+    SvfFilter::Type get_type() const noexcept;
 
     void set_params(const SvfFilter::Params &params, double sample_rate) noexcept;
 

@@ -155,6 +155,7 @@ void NaepenAudioProcessor::initialize_graph()
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+        DatabaseIdentifiers::OSC_ONE_FILTER_TYPE,
         DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()));
@@ -168,6 +169,7 @@ void NaepenAudioProcessor::initialize_graph()
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE.toString(),
+        DatabaseIdentifiers::OSC_TWO_FILTER_TYPE,
         DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString()));
@@ -196,6 +198,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
     NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.001f};
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
         DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 0.5f);
+
+    const StringArray filter_type_choices = {"Lowpass", "Highpass", "Bandpass"};
 
     // Parameters for Oscillator 1
     // ====================================================
@@ -226,6 +230,9 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             std::move(osc_one_gain), std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
             std::move(osc_one_gain_sustain), std::move(osc_one_gain_release));
 
+        auto osc_one_filter_type = std::make_unique<AudioParameterChoice>(
+            DatabaseIdentifiers::OSC_ONE_FILTER_TYPE.toString(), "Osc 1 Filter Type",
+            filter_type_choices, 0);
         auto osc_one_filter_enabled = std::make_unique<AudioParameterBool>(
             DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(), "Osc 1 Filter Enabled", false);
 
@@ -240,8 +247,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString(), "Osc 1 Filter Q", q_range, 0.5f);
 
         osc_one_group->addChild(
-            std::move(osc_one_filter_enabled), std::move(osc_one_filter_cutoff),
-            std::move(osc_one_filter_q));
+            std::move(osc_one_filter_type), std::move(osc_one_filter_enabled),
+            std::move(osc_one_filter_cutoff), std::move(osc_one_filter_q));
     }
 
     // Parameters for Oscillator 2
@@ -255,7 +262,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
         NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
 
         auto osc_two_gain = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_TWO_GAIN.toString(), "Osc 2 Gain", master_gain_range, 0.5f);
+            DatabaseIdentifiers::OSC_TWO_GAIN.toString(), "Osc 2 Gain", master_gain_range, 0.0f);
         auto osc_two_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(), "Osc 2 Gain Attack", adr_range,
             0.05f, "s");
@@ -273,6 +280,9 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             std::move(osc_two_gain), std::move(osc_two_gain_attack), std::move(osc_two_gain_decay),
             std::move(osc_two_gain_sustain), std::move(osc_two_gain_release));
 
+        auto osc_two_filter_type = std::make_unique<AudioParameterChoice>(
+            DatabaseIdentifiers::OSC_TWO_FILTER_TYPE.toString(), "Osc 2 Filter Type",
+            filter_type_choices, 0);
         auto osc_two_filter_enabled = std::make_unique<AudioParameterBool>(
             DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(), "Osc 2 Filter Enabled", false);
 
@@ -287,8 +297,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString(), "Osc 2 Filter Q", q_range, 0.5f);
 
         osc_two_group->addChild(
-            std::move(osc_two_filter_enabled), std::move(osc_two_filter_cutoff),
-            std::move(osc_two_filter_q));
+            std::move(osc_two_filter_type), std::move(osc_two_filter_enabled),
+            std::move(osc_two_filter_cutoff), std::move(osc_two_filter_q));
     }
 
     return {std::move(master_gain_param), std::move(osc_one_group), std::move(osc_two_group)};

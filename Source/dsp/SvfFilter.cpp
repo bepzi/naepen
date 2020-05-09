@@ -9,6 +9,11 @@ void SvfFilter::set_type(SvfFilter::Type type) noexcept
     reset();
 }
 
+SvfFilter::Type SvfFilter::get_type() const noexcept
+{
+    return current_type;
+}
+
 void SvfFilter::set_params(const SvfFilter::Params &params, double sample_rate) noexcept
 {
     assert(sample_rate > 0.0);

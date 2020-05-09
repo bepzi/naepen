@@ -19,7 +19,7 @@ public:
     OscillatorAudioProcessor(
         AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &gain_id,
         const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
-        const String &gain_release_id, const String &filter_enabled_id,
+        const String &gain_release_id, Identifier filter_type_id, const String &filter_enabled_id,
         const String &filter_cutoff_id, const String &filter_q_id);
 
     ~OscillatorAudioProcessor();
@@ -42,11 +42,12 @@ private:
     std::atomic<float> *gain_sustain;
     std::atomic<float> *gain_release;
 
+    Identifier oscillator_id;
+
+    Identifier filter_type_id;
     std::atomic<float> *filter_enabled;
     std::atomic<float> *filter_cutoff;
     std::atomic<float> *filter_q;
-
-    Identifier oscillator_id;
 
     // TODO: Can we share these between AudioProcessors?
     std::shared_ptr<Oscillator> sine_osc;

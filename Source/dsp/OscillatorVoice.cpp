@@ -19,7 +19,7 @@ bool OscillatorSound::appliesToChannel(int midi_channel)
 OscillatorVoice::OscillatorVoice(
     std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
     std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
-    std::atomic<float> *gain_sustain, std::atomic<float> *gain_release,
+    std::atomic<float> *gain_sustain, std::atomic<float> *gain_release, Identifier filter_type_id,
     std::atomic<float> *filter_enabled, std::atomic<float> *filter_cutoff,
     std::atomic<float> *filter_q) :
     osc(std::move(oscillator)),
@@ -30,6 +30,7 @@ OscillatorVoice::OscillatorVoice(
     gain_sustain(gain_sustain),
     gain_release(gain_release),
 
+    filter_type_id(filter_type_id),
     filter_enabled(filter_enabled),
     filter_cutoff(filter_cutoff),
     filter_q(filter_q)
@@ -76,6 +77,12 @@ void OscillatorVoice::controllerMoved(int, int) {}
 void OscillatorVoice::renderNextBlock(
     AudioBuffer<float> &output_buffer, int start_sample, int num_samples)
 {
+    auto filter_type = static_cast<SvfFilter::Type>(
+        reinterpret_cast<AudioParameterChoice *>(state.getParameter(filter_type_id))->getIndex());
+    if (filter_type != filter.get_type()) {
+        filter.set_type(filter_type);
+    }
+
     for (int i = start_sample; i < start_sample + num_samples; ++i) {
         if (!gain_envelope.isActive()) {
             clearCurrentNote();
