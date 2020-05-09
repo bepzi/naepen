@@ -16,6 +16,7 @@ const Identifier DatabaseIdentifiers::OSC_ONE_GAIN_DECAY {"OscOneGainDecay"};
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN {"OscOneGainSustain"};
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE {"OscOneGainRelease"};
 
+const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_TYPE {"OscOneFilterType"};
 const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED {"OscOneFilterEnabled"};
 const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF {"OscOneFilterCutoff"};
 const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_Q {"OscOneFilterQ"};
@@ -32,6 +33,7 @@ const Identifier DatabaseIdentifiers::OSC_TWO_GAIN_DECAY {"OscTwoGainDecay"};
 const Identifier DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN {"OscTwoGainSustain"};
 const Identifier DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE {"OscTwoGainRelease"};
 
+const Identifier DatabaseIdentifiers::OSC_TWO_FILTER_TYPE {"OscTwoFilterType"};
 const Identifier DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED {"OscTwoFilterEnabled"};
 const Identifier DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF {"OscTwoFilterCutoff"};
 const Identifier DatabaseIdentifiers::OSC_TWO_FILTER_Q {"OscTwoFilterQ"};

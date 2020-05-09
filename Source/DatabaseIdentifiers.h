@@ -19,6 +19,7 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_ONE_GAIN_SUSTAIN;
     static const Identifier OSC_ONE_GAIN_RELEASE;
 
+    static const Identifier OSC_ONE_FILTER_TYPE;
     static const Identifier OSC_ONE_FILTER_ENABLED;
     static const Identifier OSC_ONE_FILTER_CUTOFF;
     static const Identifier OSC_ONE_FILTER_Q;
@@ -35,6 +36,7 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_TWO_GAIN_SUSTAIN;
     static const Identifier OSC_TWO_GAIN_RELEASE;
 
+    static const Identifier OSC_TWO_FILTER_TYPE;
     static const Identifier OSC_TWO_FILTER_ENABLED;
     static const Identifier OSC_TWO_FILTER_CUTOFF;
     static const Identifier OSC_TWO_FILTER_Q;

@@ -7,9 +7,12 @@ static constexpr size_t MAX_POLYPHONY = 16;
 OscillatorAudioProcessor::OscillatorAudioProcessor(
     AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &gain_id,
     const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
-    const String &gain_release_id, const String &filter_enabled_id, const String &filter_cutoff_id,
-    const String &filter_q_id) :
-    ProcessorBase(apvts), oscillator_id(oscillator_id)
+    const String &gain_release_id, Identifier filter_type_id, const String &filter_enabled_id,
+    const String &filter_cutoff_id, const String &filter_q_id) :
+    ProcessorBase(apvts),
+
+    oscillator_id(oscillator_id),
+    filter_type_id(filter_type_id)
 {
     sine_osc = std::make_shared<BandlimitedOscillator>(
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine()));
@@ -104,6 +107,6 @@ void OscillatorAudioProcessor::update_current_oscillator()
         jassert(osc_copy != nullptr);
         synth.addVoice(new OscillatorVoice(
             std::move(osc_copy), state, gain_attack, gain_decay, gain_sustain, gain_release,
-            filter_enabled, filter_cutoff, filter_q));
+            filter_type_id, filter_enabled, filter_cutoff, filter_q));
     }
 }
