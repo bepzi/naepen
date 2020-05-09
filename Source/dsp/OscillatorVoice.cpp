@@ -1,5 +1,7 @@
 #include "OscillatorVoice.h"
 
+#include <utility>
+
 #include "DatabaseIdentifiers.h"
 
 bool OscillatorSound::appliesToNote(int midi_note_number)
@@ -30,7 +32,7 @@ OscillatorVoice::OscillatorVoice(
     gain_sustain(gain_sustain),
     gain_release(gain_release),
 
-    filter_type_id(filter_type_id),
+    filter_type_id(std::move(filter_type_id)),
     filter_enabled(filter_enabled),
     filter_cutoff(filter_cutoff),
     filter_q(filter_q)
