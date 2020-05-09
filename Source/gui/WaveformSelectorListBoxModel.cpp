@@ -1,5 +1,19 @@
 #include "WaveformSelectorListBoxModel.h"
 
+#include <utility>
+
+WaveformSelectorListBoxModel::WaveformSelectorListBoxModel(
+    AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
+    state(apvts),
+    waveform_id(std::move(waveform_id)),
+    waveforms(
+        {{"Sine", "Sine"},
+         {"Triangle", "Triangle"},
+         {"Square", "Square"},
+         {"EngineersSawtooth", "Engineer's Sawtooth"}})
+{
+}
+
 int WaveformSelectorListBoxModel::getNumRows()
 {
     return waveforms.size();
@@ -21,13 +35,14 @@ void WaveformSelectorListBoxModel::paintListBoxItem(
         g.setColour(Colours::lightgrey);
     }
 
-    g.drawText(waveforms[rowNumber], area, Justification::centredLeft);
+    g.drawText(waveforms[rowNumber].second, area, Justification::centredLeft);
 }
 
-/**
- * Remember to call updateContent() on the parent ListBox once you're done adding items.
- */
-void WaveformSelectorListBoxModel::add_item(const String &item)
+void WaveformSelectorListBoxModel::selectedRowsChanged(int row)
 {
-    waveforms.push_back(item);
+    if (row < 0) {
+        return;
+    }
+
+    state.state.setProperty(waveform_id, waveforms[row].first, nullptr);
 }

@@ -8,6 +8,8 @@ const Identifier DatabaseIdentifiers::MASTER_GAIN {"MasterGain"};
 // ====================================================
 const Identifier DatabaseIdentifiers::OSC_ONE_GROUP {"OscOneGroup"};
 
+const Identifier DatabaseIdentifiers::OSC_ONE_WAVEFORM {"OscOneWaveform"};
+
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN {"OscOneGain"};
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK {"OscOneGainAttack"};
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN_DECAY {"OscOneGainDecay"};
@@ -21,6 +23,8 @@ const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_Q {"OscOneFilterQ"};
 // Parameters for Oscillator 2
 // ====================================================
 const Identifier DatabaseIdentifiers::OSC_TWO_GROUP {"OscTwoGroup"};
+
+const Identifier DatabaseIdentifiers::OSC_TWO_WAVEFORM {"OscTwoWaveform"};
 
 const Identifier DatabaseIdentifiers::OSC_TWO_GAIN {"OscTwoGain"};
 const Identifier DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK {"OscTwoGainAttack"};

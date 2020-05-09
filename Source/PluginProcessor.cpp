@@ -150,7 +150,8 @@ void NaepenAudioProcessor::initialize_graph()
             AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
 
     osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
+        state, DatabaseIdentifiers::OSC_ONE_WAVEFORM.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
@@ -163,7 +164,8 @@ void NaepenAudioProcessor::initialize_graph()
         getBlockSize());
 
     osc_two_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
+        state, DatabaseIdentifiers::OSC_TWO_WAVEFORM.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),

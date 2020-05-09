@@ -13,6 +13,8 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     osc_one_component(
         naepenProcessor.state,
 
+        DatabaseIdentifiers::OSC_ONE_WAVEFORM,
+
         DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
@@ -21,8 +23,11 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
         DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
+
     osc_two_component(
         naepenProcessor.state,
+
+        DatabaseIdentifiers::OSC_TWO_WAVEFORM,
 
         DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),

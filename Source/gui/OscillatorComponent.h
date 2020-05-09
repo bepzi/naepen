@@ -7,9 +7,10 @@
 class OscillatorComponent : public Component {
 public:
     OscillatorComponent(
-        AudioProcessorValueTreeState &state, const String &gain_attack_id,
-        const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
-        const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id);
+        AudioProcessorValueTreeState &state, const Identifier &waveform_id,
+        const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
+        const String &gain_release_id, const String &filter_enabled_id,
+        const String &filter_cutoff_id, const String &filter_q_id);
 
     void paint(Graphics &) override;
     void resized() override;

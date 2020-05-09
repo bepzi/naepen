@@ -3,10 +3,10 @@
 #include <JuceHeader.h>
 
 OscillatorComponent::OscillatorComponent(
-    APVTS &state, const String &gain_attack_id, const String &gain_decay_id,
-    const String &gain_sustain_id, const String &gain_release_id, const String &filter_enabled_id,
-    const String &filter_cutoff_id, const String &filter_q_id) :
-    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>()),
+    APVTS &state, const Identifier &waveform_id, const String &gain_attack_id,
+    const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
+    const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id) :
+    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
 
     gain_attack_slider_attachment(state, gain_attack_id, gain_attack_slider),
@@ -79,10 +79,7 @@ void OscillatorComponent::resized()
 // ==========================================
 void OscillatorComponent::populate_waveform_selector()
 {
-    waveform_selector_model->add_item("Sine");
-    waveform_selector_model->add_item("Triangle");
-    waveform_selector_model->add_item("Square");
-    waveform_selector_model->add_item("Engineer's Sawtooth");
-
     waveform_selector.updateContent();
+
+    waveform_selector.selectRow(0);
 }
