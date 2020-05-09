@@ -150,7 +150,8 @@ void NaepenAudioProcessor::initialize_graph()
             AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
 
     osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_ONE_WAVEFORM, DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
+        state, DatabaseIdentifiers::OSC_ONE_WAVEFORM, DatabaseIdentifiers::OSC_ONE_PAN.toString(),
+        DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
@@ -164,7 +165,8 @@ void NaepenAudioProcessor::initialize_graph()
         getBlockSize());
 
     osc_two_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_TWO_WAVEFORM, DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
+        state, DatabaseIdentifiers::OSC_TWO_WAVEFORM, DatabaseIdentifiers::OSC_TWO_PAN.toString(),
+        DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
@@ -196,11 +198,13 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
     // Global parameters
     // ====================================================
-    NormalisableRange<float> master_gain_range = {0.0f, 1.0f, 0.001f};
+    NormalisableRange<float> gain_range = {0.0f, 1.0f, 0.001f};
     auto master_gain_param = std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", master_gain_range, 0.5f);
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", gain_range, 0.5f);
 
     const StringArray filter_type_choices = {"Lowpass", "Highpass", "Bandpass"};
+
+    NormalisableRange<float> pan_range = {0.0f, 1.0f, 0.001f};
 
     // Parameters for Oscillator 1
     // ====================================================
@@ -212,8 +216,11 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 
         NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
 
+        auto osc_one_pan = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_ONE_PAN.toString(), "Osc 1 Pan", pan_range, 0.5f);
+
         auto osc_one_gain = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_ONE_GAIN.toString(), "Osc 1 Gain", master_gain_range, 0.5f);
+            DatabaseIdentifiers::OSC_ONE_GAIN.toString(), "Osc 1 Gain", gain_range, 0.5f);
         auto osc_one_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(), "Osc 1 Gain Attack", adr_range,
             0.05f, "s");
@@ -228,8 +235,9 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_one_group->addChild(
-            std::move(osc_one_gain), std::move(osc_one_gain_attack), std::move(osc_one_gain_decay),
-            std::move(osc_one_gain_sustain), std::move(osc_one_gain_release));
+            std::move(osc_one_pan), std::move(osc_one_gain), std::move(osc_one_gain_attack),
+            std::move(osc_one_gain_decay), std::move(osc_one_gain_sustain),
+            std::move(osc_one_gain_release));
 
         auto osc_one_filter_type = std::make_unique<AudioParameterChoice>(
             DatabaseIdentifiers::OSC_ONE_FILTER_TYPE.toString(), "Osc 1 Filter Type",
@@ -262,8 +270,11 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 
         NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
 
+        auto osc_two_pan = std::make_unique<AudioParameterFloat>(
+            DatabaseIdentifiers::OSC_TWO_PAN.toString(), "Osc 2 Pan", pan_range, 0.5f);
+
         auto osc_two_gain = std::make_unique<AudioParameterFloat>(
-            DatabaseIdentifiers::OSC_TWO_GAIN.toString(), "Osc 2 Gain", master_gain_range, 0.0f);
+            DatabaseIdentifiers::OSC_TWO_GAIN.toString(), "Osc 2 Gain", gain_range, 0.0f);
         auto osc_two_gain_attack = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(), "Osc 2 Gain Attack", adr_range,
             0.05f, "s");
@@ -278,8 +289,9 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_two_group->addChild(
-            std::move(osc_two_gain), std::move(osc_two_gain_attack), std::move(osc_two_gain_decay),
-            std::move(osc_two_gain_sustain), std::move(osc_two_gain_release));
+            std::move(osc_two_pan), std::move(osc_two_gain), std::move(osc_two_gain_attack),
+            std::move(osc_two_gain_decay), std::move(osc_two_gain_sustain),
+            std::move(osc_two_gain_release));
 
         auto osc_two_filter_type = std::make_unique<AudioParameterChoice>(
             DatabaseIdentifiers::OSC_TWO_FILTER_TYPE.toString(), "Osc 2 Filter Type",

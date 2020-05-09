@@ -20,12 +20,14 @@ bool OscillatorSound::appliesToChannel(int midi_channel)
 
 OscillatorVoice::OscillatorVoice(
     std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
-    std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
+    std::atomic<float> *pan, std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
     std::atomic<float> *gain_sustain, std::atomic<float> *gain_release, Identifier filter_type_id,
     std::atomic<float> *filter_enabled, std::atomic<float> *filter_cutoff,
     std::atomic<float> *filter_q) :
     osc(std::move(oscillator)),
     state(apvts),
+
+    pan(pan),
 
     gain_attack(gain_attack),
     gain_decay(gain_decay),
@@ -79,6 +81,8 @@ void OscillatorVoice::controllerMoved(int, int) {}
 void OscillatorVoice::renderNextBlock(
     AudioBuffer<float> &output_buffer, int start_sample, int num_samples)
 {
+    jassert(output_buffer.getNumChannels() == 2);
+
     auto filter_type = static_cast<SvfFilter::Type>(
         reinterpret_cast<AudioParameterChoice *>(state.getParameter(filter_type_id))->getIndex());
     if (filter_type != filter.get_type()) {
@@ -100,9 +104,9 @@ void OscillatorVoice::renderNextBlock(
             sample = filter.get_next_sample(sample);
         }
 
-        for (int channel = 0; channel < output_buffer.getNumChannels(); ++channel) {
-            output_buffer.addSample(channel, i, sample);
-        }
+        output_buffer.addSample(
+            0, i, sample * sinf((1 - *pan) * MathConstants<float>::halfPi));  // Left
+        output_buffer.addSample(1, i, sample * sinf(*pan * MathConstants<float>::halfPi));  // Right
     }
 }
 
