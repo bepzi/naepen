@@ -1,24 +1,30 @@
 #include "OscillatorAudioProcessor.h"
 
+#include <utility>
+
 #include "dsp/OscillatorVoice.h"
 
 static constexpr size_t MAX_POLYPHONY = 16;
 
 OscillatorAudioProcessor::OscillatorAudioProcessor(
-    AudioProcessorValueTreeState &apvts, Identifier oscillator_id, const String &pan_id,
+    AudioProcessorValueTreeState &apvts, Identifier oscillator_id,
+    const String &detune_semitones_id, const String &detune_cents_id, const String &pan_id,
     const String &gain_id, const String &gain_attack_id, const String &gain_decay_id,
     const String &gain_sustain_id, const String &gain_release_id, Identifier filter_type_id,
     const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id) :
     ProcessorBase(apvts),
 
-    oscillator_id(oscillator_id),
-    filter_type_id(filter_type_id)
+    oscillator_id(std::move(oscillator_id)),
+    filter_type_id(std::move(filter_type_id))
 {
     sine_osc = std::make_shared<BandlimitedOscillator>(
         std::make_shared<const BandlimitedOscillator::LookupTable>(make_sine()));
     white_noise_osc = std::make_shared<NoiseOscillator>();
 
     synth.addSound(new OscillatorSound());
+
+    detune_semitones = state.getRawParameterValue(detune_semitones_id);
+    detune_cents = state.getRawParameterValue(detune_cents_id);
 
     pan = state.getRawParameterValue(pan_id);
 
@@ -108,7 +114,8 @@ void OscillatorAudioProcessor::update_current_oscillator()
 
         jassert(osc_copy != nullptr);
         synth.addVoice(new OscillatorVoice(
-            std::move(osc_copy), state, pan, gain_attack, gain_decay, gain_sustain, gain_release,
-            filter_type_id, filter_enabled, filter_cutoff, filter_q));
+            std::move(osc_copy), state, detune_semitones, detune_cents, pan, gain_attack,
+            gain_decay, gain_sustain, gain_release, filter_type_id, filter_enabled, filter_cutoff,
+            filter_q));
     }
 }

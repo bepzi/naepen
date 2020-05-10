@@ -5,12 +5,16 @@
 #include <JuceHeader.h>
 
 OscillatorComponent::OscillatorComponent(
-    APVTS &state, const Identifier &waveform_id, const String &pan_id, const String &gain_attack_id,
+    APVTS &state, const Identifier &waveform_id, const String &detune_semitones_id,
+    const String &detune_cents_id, const String &pan_id, const String &gain_attack_id,
     const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
     const String &filter_type_id, const String &filter_enabled_id, const String &filter_cutoff_id,
     const String &filter_q_id) :
     waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
+
+    detune_semitones_slider_attachment(state, detune_semitones_id, detune_semitones_slider),
+    detune_cents_slider_attachment(state, detune_cents_id, detune_cents_slider),
 
     pan_slider_attachment(state, pan_id, pan_slider),
 
@@ -27,6 +31,9 @@ OscillatorComponent::OscillatorComponent(
     waveform_selector.updateContent();
     waveform_selector.selectRow(0);
     addAndMakeVisible(waveform_selector);
+
+    addAndMakeVisible(detune_semitones_slider);
+    addAndMakeVisible(detune_cents_slider);
 
     addAndMakeVisible(pan_slider);
 
@@ -80,12 +87,17 @@ void OscillatorComponent::resized()
 
     auto gain_controls = area.removeFromTop(row_height);
     auto filter_controls = area.removeFromBottom(row_height);
-    auto waveform_controls = area.reduced(0, 32);
+    auto waveform_controls = area.reduced(0, 8);
 
     waveform_selector.setBounds(waveform_controls.removeFromLeft(col_width * 2)
                                     .reduced(0, waveform_controls.getHeight() / 2));
 
-    pan_slider.setBounds(waveform_controls.removeFromLeft(col_width));
+    auto detune_controls = waveform_controls.removeFromLeft(col_width);
+    detune_semitones_slider.setBounds(
+        detune_controls.removeFromTop(detune_controls.getHeight() / 2));
+    detune_cents_slider.setBounds(detune_controls);
+
+    pan_slider.setBounds(waveform_controls.removeFromRight(col_width).reduced(0, 32));
 
     gain_attack_slider.setBounds(gain_controls.removeFromLeft(col_width));
     gain_decay_slider.setBounds(gain_controls.removeFromLeft(col_width));

@@ -150,12 +150,19 @@ void NaepenAudioProcessor::initialize_graph()
             AudioProcessorGraph::AudioGraphIOProcessor::midiInputNode));
 
     osc_one_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_ONE_WAVEFORM, DatabaseIdentifiers::OSC_ONE_PAN.toString(),
+        state, DatabaseIdentifiers::OSC_ONE_WAVEFORM,
+
+        DatabaseIdentifiers::OSC_ONE_DETUNE_SEMITONES.toString(),
+        DatabaseIdentifiers::OSC_ONE_DETUNE_CENTS.toString(),
+
+        DatabaseIdentifiers::OSC_ONE_PAN.toString(),
+
         DatabaseIdentifiers::OSC_ONE_GAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_ONE_GAIN_RELEASE.toString(),
+
         DatabaseIdentifiers::OSC_ONE_FILTER_TYPE,
         DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_ONE_FILTER_CUTOFF.toString(),
@@ -165,12 +172,19 @@ void NaepenAudioProcessor::initialize_graph()
         getBlockSize());
 
     osc_two_node = processor_graph.addNode(std::make_unique<OscillatorAudioProcessor>(
-        state, DatabaseIdentifiers::OSC_TWO_WAVEFORM, DatabaseIdentifiers::OSC_TWO_PAN.toString(),
+        state, DatabaseIdentifiers::OSC_TWO_WAVEFORM,
+
+        DatabaseIdentifiers::OSC_TWO_DETUNE_SEMITONES.toString(),
+        DatabaseIdentifiers::OSC_TWO_DETUNE_CENTS.toString(),
+
+        DatabaseIdentifiers::OSC_TWO_PAN.toString(),
+
         DatabaseIdentifiers::OSC_TWO_GAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_ATTACK.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_DECAY.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_SUSTAIN.toString(),
         DatabaseIdentifiers::OSC_TWO_GAIN_RELEASE.toString(),
+
         DatabaseIdentifiers::OSC_TWO_FILTER_TYPE,
         DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
@@ -196,25 +210,36 @@ void NaepenAudioProcessor::initialize_graph()
 // TODO: Add static methods to each automatable component to generate their own parameters
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
-    // Global parameters
-    // ====================================================
     NormalisableRange<float> gain_range = {0.0f, 1.0f, 0.001f};
-    auto master_gain_param = std::make_unique<AudioParameterFloat>(
-        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", gain_range, 0.5f);
 
     const StringArray filter_type_choices = {"Lowpass", "Highpass", "Bandpass"};
 
+    NormalisableRange<float> adr_range = {0.0f, 5.0f, 0.001f};
+    adr_range.setSkewForCentre(0.75f);
+
+    NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
+
+    NormalisableRange<int> detune_semitones_range = {-12, 12};
+    NormalisableRange<int> detune_cents_range = {-100, 100};
+
     NormalisableRange<float> pan_range = {0.0f, 1.0f, 0.001f};
+
+    // Global parameters
+    // ====================================================
+    auto master_gain_param = std::make_unique<AudioParameterFloat>(
+        DatabaseIdentifiers::MASTER_GAIN.toString(), "Master Gain", gain_range, 0.5f);
 
     // Parameters for Oscillator 1
     // ====================================================
     auto osc_one_group = std::make_unique<AudioProcessorParameterGroup>(
         DatabaseIdentifiers::OSC_ONE_GROUP.toString(), "Oscillator 1", "|");
     {
-        NormalisableRange<float> adr_range = {0.0f, 5.0f, 0.001f};
-        adr_range.setSkewForCentre(0.75f);
-
-        NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
+        auto osc_one_detune_semitones = std::make_unique<AudioParameterInt>(
+            DatabaseIdentifiers::OSC_ONE_DETUNE_SEMITONES.toString(), "Osc 1 Detune Semitones",
+            detune_semitones_range.start, detune_semitones_range.end, 0);
+        auto osc_one_detune_cents = std::make_unique<AudioParameterInt>(
+            DatabaseIdentifiers::OSC_ONE_DETUNE_CENTS.toString(), "Osc 1 Detune Cents",
+            detune_cents_range.start, detune_cents_range.end, 0);
 
         auto osc_one_pan = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_ONE_PAN.toString(), "Osc 1 Pan", pan_range, 0.5f);
@@ -235,6 +260,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_one_group->addChild(
+            std::move(osc_one_detune_semitones), std::move(osc_one_detune_cents),
             std::move(osc_one_pan), std::move(osc_one_gain), std::move(osc_one_gain_attack),
             std::move(osc_one_gain_decay), std::move(osc_one_gain_sustain),
             std::move(osc_one_gain_release));
@@ -265,10 +291,12 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
     auto osc_two_group = std::make_unique<AudioProcessorParameterGroup>(
         DatabaseIdentifiers::OSC_TWO_GROUP.toString(), "Oscillator 2", "|");
     {
-        NormalisableRange<float> adr_range = {0.0f, 5.0f, 0.001f};
-        adr_range.setSkewForCentre(0.75f);
-
-        NormalisableRange<float> sustain_range = {0.0f, 1.0f, 0.01f};
+        auto osc_two_detune_semitones = std::make_unique<AudioParameterInt>(
+            DatabaseIdentifiers::OSC_TWO_DETUNE_SEMITONES.toString(), "Osc 2 Detune Semitones",
+            detune_semitones_range.start, detune_semitones_range.end, 0);
+        auto osc_two_detune_cents = std::make_unique<AudioParameterInt>(
+            DatabaseIdentifiers::OSC_TWO_DETUNE_CENTS.toString(), "Osc 2 Detune Cents",
+            detune_cents_range.start, detune_cents_range.end, 0);
 
         auto osc_two_pan = std::make_unique<AudioParameterFloat>(
             DatabaseIdentifiers::OSC_TWO_PAN.toString(), "Osc 2 Pan", pan_range, 0.5f);
@@ -289,6 +317,7 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             0.15f, "s");
 
         osc_two_group->addChild(
+            std::move(osc_two_detune_semitones), std::move(osc_two_detune_cents),
             std::move(osc_two_pan), std::move(osc_two_gain), std::move(osc_two_gain_attack),
             std::move(osc_two_gain_decay), std::move(osc_two_gain_sustain),
             std::move(osc_two_gain_release));
