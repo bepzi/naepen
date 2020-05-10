@@ -1,12 +1,15 @@
 #pragma once
 
+#include "NaepenLookAndFeel.h"
 #include "dsp/BandlimitedOscillator.h"
 
 #include <JuceHeader.h>
 
 class WaveformSelectorListBoxModel : public ListBoxModel {
 public:
-    WaveformSelectorListBoxModel(AudioProcessorValueTreeState &avpts, Identifier waveform_id);
+    WaveformSelectorListBoxModel(
+        NaepenLookAndFeel &look_and_feel, AudioProcessorValueTreeState &avpts,
+        Identifier waveform_id);
 
     int getNumRows() override;
     void paintListBoxItem(
@@ -15,6 +18,8 @@ public:
     void selectedRowsChanged(int row) override;
 
 private:
+    NaepenLookAndFeel &look_and_feel;
+
     AudioProcessorValueTreeState &state;
 
     Identifier waveform_id;

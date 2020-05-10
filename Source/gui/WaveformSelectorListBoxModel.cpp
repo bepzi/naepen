@@ -3,7 +3,8 @@
 #include <utility>
 
 WaveformSelectorListBoxModel::WaveformSelectorListBoxModel(
-    AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
+    NaepenLookAndFeel &look_and_feel, AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
+    look_and_feel(look_and_feel),
     state(apvts),
     waveform_id(std::move(waveform_id)),
     waveforms(
@@ -30,10 +31,10 @@ void WaveformSelectorListBoxModel::paintListBoxItem(
     Rectangle<int> area = {0, 0, width, height};
     area.reduce(2, 0);
     if (rowIsSelected) {
-        g.fillAll(Colours::darkgrey);
-        g.setColour(Colours::white);
+        g.fillAll(Colour(NaepenLookAndFeel::highlighted_fill_argb));
+        g.setColour(Colour(NaepenLookAndFeel::highlighted_text_argb));
     } else {
-        g.setColour(Colours::lightgrey);
+        g.setColour(Colour(NaepenLookAndFeel::default_text_argb));
     }
 
     g.drawText(waveforms[rowNumber].second, area, Justification::centredLeft);

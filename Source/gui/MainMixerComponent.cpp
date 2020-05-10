@@ -31,7 +31,7 @@ void MainMixerComponent::paint(Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour(Colours::lightgrey);
+    g.setColour(getLookAndFeel().findColour(TooltipWindow::outlineColourId));
     g.drawRoundedRectangle(from_rect_int(getLocalBounds()), 8, 2);
 }
 

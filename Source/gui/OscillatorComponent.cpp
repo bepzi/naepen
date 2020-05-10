@@ -10,7 +10,8 @@ OscillatorComponent::OscillatorComponent(
     const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
     const String &filter_type_id, const String &filter_enabled_id, const String &filter_cutoff_id,
     const String &filter_q_id) :
-    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
+    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(
+        (NaepenLookAndFeel &)getLookAndFeel(), state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
 
     detune_semitones_slider_attachment(state, detune_semitones_id, detune_semitones_slider),
@@ -72,7 +73,7 @@ void OscillatorComponent::paint(Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour(Colours::lightgrey);
+    g.setColour(getLookAndFeel().findColour(TooltipWindow::outlineColourId));
     g.drawRoundedRectangle(from_rect_int(getLocalBounds()), 8, 2);
 }
 

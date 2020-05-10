@@ -8,10 +8,11 @@ static constexpr auto PADDING = 8;
 
 NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &proc) :
     AudioProcessorEditor(proc),
-    naepenProcessor(proc),
-    main_mixer_component(naepenProcessor.state),
+    look_and_feel(),
+    naepen_processor(proc),
+    main_mixer_component(naepen_processor.state),
     osc_one_component(
-        naepenProcessor.state,
+        naepen_processor.state,
 
         DatabaseIdentifiers::OSC_ONE_WAVEFORM,
 
@@ -31,7 +32,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
         DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
 
     osc_two_component(
-        naepenProcessor.state,
+        naepen_processor.state,
 
         DatabaseIdentifiers::OSC_TWO_WAVEFORM,
 
@@ -49,8 +50,11 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
         DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_CUTOFF.toString(),
         DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString()),
-    midi_keyboard(naepenProcessor.virtual_keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
+    midi_keyboard(
+        naepen_processor.virtual_keyboard_state, MidiKeyboardComponent::horizontalKeyboard)
 {
+    setLookAndFeel(&look_and_feel);
+
     midi_keyboard.setOctaveForMiddleC(4);
 
     addAndMakeVisible(midi_keyboard);
@@ -61,6 +65,11 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     addAndMakeVisible(osc_two_component);
 
     setSize(EDITOR_WIDTH, EDITOR_HEIGHT);
+}
+
+NaepenAudioProcessorEditor::~NaepenAudioProcessorEditor()
+{
+    setLookAndFeel(nullptr);
 }
 
 void NaepenAudioProcessorEditor::paint(Graphics &g)

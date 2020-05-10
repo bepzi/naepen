@@ -43,6 +43,8 @@
               file="Source/gui/MainMixerComponent.cpp"/>
         <FILE id="AV5Vg0" name="MainMixerComponent.h" compile="0" resource="0"
               file="Source/gui/MainMixerComponent.h"/>
+        <FILE id="hnBhjF" name="NaepenLookAndFeel.h" compile="0" resource="0"
+              file="Source/gui/NaepenLookAndFeel.h"/>
         <FILE id="EuvIe4" name="OscillatorComponent.cpp" compile="1" resource="0"
               file="Source/gui/OscillatorComponent.cpp"/>
         <FILE id="fG4aWD" name="OscillatorComponent.h" compile="0" resource="0"
