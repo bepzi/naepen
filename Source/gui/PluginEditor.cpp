@@ -12,7 +12,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
     naepen_processor(proc),
     main_mixer_component(naepen_processor.state),
     osc_one_component(
-        naepen_processor.state,
+        "Oscillator One", naepen_processor.state,
 
         DatabaseIdentifiers::OSC_ONE_WAVEFORM,
 
@@ -32,7 +32,7 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
         DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString()),
 
     osc_two_component(
-        naepen_processor.state,
+        "Oscillator Two", naepen_processor.state,
 
         DatabaseIdentifiers::OSC_TWO_WAVEFORM,
 
