@@ -7,9 +7,7 @@
 
 class WaveformSelectorListBoxModel : public ListBoxModel {
 public:
-    WaveformSelectorListBoxModel(
-        NaepenLookAndFeel &look_and_feel, AudioProcessorValueTreeState &avpts,
-        Identifier waveform_id);
+    WaveformSelectorListBoxModel(AudioProcessorValueTreeState &avpts, Identifier waveform_id);
 
     int getNumRows() override;
     void paintListBoxItem(
@@ -18,8 +16,6 @@ public:
     void selectedRowsChanged(int row) override;
 
 private:
-    NaepenLookAndFeel &look_and_feel;
-
     AudioProcessorValueTreeState &state;
 
     Identifier waveform_id;

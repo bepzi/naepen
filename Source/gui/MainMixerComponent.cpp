@@ -1,6 +1,7 @@
 #include "MainMixerComponent.h"
 
 #include "DatabaseIdentifiers.h"
+#include "NaepenLookAndFeel.h"
 
 MainMixerComponent::MainMixerComponent(AudioProcessorValueTreeState &state) :
     master_gain_slider_attachment(
@@ -16,23 +17,12 @@ MainMixerComponent::MainMixerComponent(AudioProcessorValueTreeState &state) :
     addAndMakeVisible(osc_two_gain_slider);
 }
 
-/**
- * Stupid helper function because there's no native way in JUCE
- * to convert from Rectangle<int> to Rectangle<float>
- */
-static Rectangle<float> from_rect_int(Rectangle<int> int_rect)
-{
-    return {
-        (float)int_rect.getX(), (float)int_rect.getY(), (float)int_rect.getWidth(),
-        (float)int_rect.getHeight()};
-}
-
 void MainMixerComponent::paint(Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour(getLookAndFeel().findColour(TooltipWindow::outlineColourId));
-    g.drawRoundedRectangle(from_rect_int(getLocalBounds()), 8, 2);
+    g.setColour(Colour(NaepenLookAndFeel::outline_argb));
+    g.drawRoundedRectangle(getLocalBounds().toFloat(), 8, 3);
 }
 
 void MainMixerComponent::resized()

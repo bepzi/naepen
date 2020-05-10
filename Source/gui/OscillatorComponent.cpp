@@ -10,8 +10,7 @@ OscillatorComponent::OscillatorComponent(
     const String &gain_decay_id, const String &gain_sustain_id, const String &gain_release_id,
     const String &filter_type_id, const String &filter_enabled_id, const String &filter_cutoff_id,
     const String &filter_q_id) :
-    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(
-        (NaepenLookAndFeel &)getLookAndFeel(), state, waveform_id)),
+    waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
 
     detune_semitones_slider_attachment(state, detune_semitones_id, detune_semitones_slider),
@@ -58,23 +57,12 @@ OscillatorComponent::OscillatorComponent(
     addAndMakeVisible(filter_q_slider);
 }
 
-/**
- * Stupid helper function because there's no native way in JUCE
- * to convert from Rectangle<int> to Rectangle<float>
- */
-static Rectangle<float> from_rect_int(Rectangle<int> int_rect)
-{
-    return {
-        (float)int_rect.getX(), (float)int_rect.getY(), (float)int_rect.getWidth(),
-        (float)int_rect.getHeight()};
-}
-
 void OscillatorComponent::paint(Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour(getLookAndFeel().findColour(TooltipWindow::outlineColourId));
-    g.drawRoundedRectangle(from_rect_int(getLocalBounds()), 8, 2);
+    g.setColour(Colour(NaepenLookAndFeel::outline_argb));
+    g.drawRoundedRectangle(getLocalBounds().toFloat(), 8, 3);
 }
 
 // TODO: Rework this, this is just temporary -- probably use Grid/Flexbox?

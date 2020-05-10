@@ -23,8 +23,8 @@ private:
     std::unique_ptr<WaveformSelectorListBoxModel> waveform_selector_model;
     ListBox waveform_selector;
 
-    Slider detune_semitones_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
-    Slider detune_cents_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
+    Slider detune_semitones_slider {Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox};
+    Slider detune_cents_slider {Slider::RotaryHorizontalVerticalDrag, Slider::NoTextBox};
     APVTS::SliderAttachment detune_semitones_slider_attachment;
     APVTS::SliderAttachment detune_cents_slider_attachment;
 

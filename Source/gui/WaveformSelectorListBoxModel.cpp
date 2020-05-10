@@ -3,8 +3,7 @@
 #include <utility>
 
 WaveformSelectorListBoxModel::WaveformSelectorListBoxModel(
-    NaepenLookAndFeel &look_and_feel, AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
-    look_and_feel(look_and_feel),
+    AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
     state(apvts),
     waveform_id(std::move(waveform_id)),
     waveforms(
