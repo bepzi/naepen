@@ -6,10 +6,21 @@ A polyphonic synthesizer.
 
 ### Building
 
-On Arch Linux:
+**Arch Linux**
 
 ```bash
-sudo pacman -S juce fftw
+sudo pacman -S fftw
+git clone --recurse-submodules <repo_url.git> <repo> && cd <repo>
+cd Builds/LinuxMakefile  # Alternatively, build with CMake
+CONFIG=Release make -j
+```
+
+**Ubuntu 18.04**
+
+```bash
+sudo apt install libfftw3-dev libxinerama-dev libasound2-dev libfreetype6-dev \
+                 libwebkit2gtk-4.0-dev libcurl4-openssl-dev libflac-dev \
+                 libvorbis-dev libogg-dev libjack-dev
 git clone --recurse-submodules <repo_url.git> <repo> && cd <repo>
 cd Builds/LinuxMakefile  # Alternatively, build with CMake
 CONFIG=Release make -j

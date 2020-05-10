@@ -22,7 +22,7 @@ public:
     using LookupTable = std::vector<std::pair<float, std::array<float, T + 1>>>;
 
     explicit BandlimitedOscillator(std::shared_ptr<const LookupTable> t);
-    explicit BandlimitedOscillator(const BandlimitedOscillator &other);
+    BandlimitedOscillator(const BandlimitedOscillator &other);
     ~BandlimitedOscillator() override = default;
 
     [[nodiscard]] float get_next_sample() override;
@@ -32,8 +32,26 @@ public:
     void set_sample_rate(double sr) override;
 
     /**
+     * Alias for a function that can create a single part of
+     * a LookupTable given a top frequency in Hz and the sample rate.
+     *
+     * Note that the returned array is of size (T+1) - this is because
+     * we want to always be able to look at "the next element"
+     * when interpolating between samples, so when making one of these you
+     * typically just do 'arr[T] = arr[0]' before returning the array.
+     */
+    typedef std::array<float, BandlimitedOscillator::T + 1> (*make_table_func)(double, double);
+
+    /**
      * Creates a sample lookup table, specifically a progressively band-limited
-     * table from a full-bandwidth, single-cycle waveform.
+     * table, from a function that can compute a single part of that table
+     * given a top frequency.
+     */
+    static LookupTable from_function(make_table_func table_func, double sample_rate);
+
+    /**
+     * Creates a sample lookup table, specifically a progressively band-limited
+     * table, from a full-bandwidth, single-cycle waveform.
      *
      * This function allows you to create a large lookup table (ideally once, at startup) and
      * then share the table across many different oscillator implementations without having to
@@ -72,7 +90,7 @@ private:
 };
 
 BandlimitedOscillator::LookupTable make_sine();
-BandlimitedOscillator::LookupTable make_triangle(double top_freq, double sample_rate);
-BandlimitedOscillator::LookupTable make_square(double top_freq, double sample_rate);
-BandlimitedOscillator::LookupTable make_engineers_sawtooth(double top_freq, double sample_rate);
-BandlimitedOscillator::LookupTable make_musicians_sawtooth(double top_freq, double sample_rate);
+std::array<float, BandlimitedOscillator::T + 1> make_triangle(double top_freq, double sample_rate);
+std::array<float, BandlimitedOscillator::T + 1> make_square(double top_freq, double sample_rate);
+std::array<float, BandlimitedOscillator::T + 1>
+make_engineers_sawtooth(double top_freq, double sample_rate);
