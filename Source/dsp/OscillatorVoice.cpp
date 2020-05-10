@@ -20,12 +20,16 @@ bool OscillatorSound::appliesToChannel(int midi_channel)
 
 OscillatorVoice::OscillatorVoice(
     std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
-    std::atomic<float> *pan, std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
+    std::atomic<float> *detune_semitones, std::atomic<float> *detune_cents, std::atomic<float> *pan,
+    std::atomic<float> *gain_attack, std::atomic<float> *gain_decay,
     std::atomic<float> *gain_sustain, std::atomic<float> *gain_release, Identifier filter_type_id,
     std::atomic<float> *filter_enabled, std::atomic<float> *filter_cutoff,
     std::atomic<float> *filter_q) :
     osc(std::move(oscillator)),
     state(apvts),
+
+    detune_semitones(detune_semitones),
+    detune_cents(detune_cents),
 
     pan(pan),
 
@@ -52,7 +56,8 @@ void OscillatorVoice::startNote(
     ignoreUnused(sound);
 
     level = velocity * 0.3f;
-    osc->set_freq(calc_freq(midi_note_number, pitch_wheel_pos));
+    osc->set_freq(calc_freq(
+        midi_note_number, pitch_wheel_pos, (int)((*detune_semitones * 100.0) + *detune_cents)));
 
     ADSR::Parameters osc_one_gain_params = {
         *gain_attack, *gain_decay, *gain_sustain, *gain_release};
@@ -73,7 +78,9 @@ void OscillatorVoice::stopNote(float velocity, bool allow_tail_off)
 
 void OscillatorVoice::pitchWheelMoved(int pitch_wheel_pos)
 {
-    osc->set_freq(calc_freq(getCurrentlyPlayingNote(), pitch_wheel_pos));
+    osc->set_freq(calc_freq(
+        getCurrentlyPlayingNote(), pitch_wheel_pos,
+        (int)((*detune_semitones * 100.0) + *detune_cents)));
 }
 
 void OscillatorVoice::controllerMoved(int, int) {}
@@ -117,23 +124,19 @@ void OscillatorVoice::setCurrentPlaybackSampleRate(double new_rate)
     gain_envelope.setSampleRate(new_rate);
 }
 
-double OscillatorVoice::calc_freq(int nn, int wheel_pos)
+/**
+ * Calculates the effective frequency in Hz given a base MIDI note number,
+ * the pitch wheel position, and the detune in cents.
+ */
+double OscillatorVoice::calc_freq(int nn, int wheel_pos, int cents_detune)
 {
     // TODO: BEND_RANGE can be a user-changeable parameter
-    static constexpr int BEND_RANGE = 4;  // semitones of pitch bend
-
-    jassert(wheel_pos >= 0);
-    if (nn < 0) {
-        return 0.0;
-    }
+    static constexpr int BEND_RANGE = 4;  // semitones of pitch wheel bend
 
     // 0 = pitch down; 8192 = neutral; 16383 = pitch up
-    double pitch_ratio = (wheel_pos - 8192) / (double)16383;
-    int sign = (pitch_ratio == 0.0) ? 0 : (pitch_ratio < 0 ? -1 : 1);
+    double pitch_wheel_ratio = (wheel_pos - 8192) / (double)16383;
+    double actual_nn = nn + (cents_detune / 100.0) + (pitch_wheel_ratio * BEND_RANGE);
 
-    double curr_freq = MidiMessage::getMidiNoteInHertz(nn);
-    double bent_freq = MidiMessage::getMidiNoteInHertz(nn + (BEND_RANGE * sign));
-
-    // Linearly interpolate between curr/bent freq, up or down
-    return ((1.0 - (sign * pitch_ratio)) * curr_freq) + (sign * pitch_ratio * bent_freq);
+    // TODO: This algorithm locks us into equal-temperament, assuming A4 = 440Hz
+    return pow(2, (actual_nn - 69) / 12.0) * 440.0;
 }

@@ -13,6 +13,9 @@ struct DatabaseIdentifiers {
 
     static const Identifier OSC_ONE_WAVEFORM;
 
+    static const Identifier OSC_ONE_DETUNE_SEMITONES;
+    static const Identifier OSC_ONE_DETUNE_CENTS;
+
     static const Identifier OSC_ONE_PAN;
 
     static const Identifier OSC_ONE_GAIN;
@@ -31,6 +34,9 @@ struct DatabaseIdentifiers {
     static const Identifier OSC_TWO_GROUP;
 
     static const Identifier OSC_TWO_WAVEFORM;
+
+    static const Identifier OSC_TWO_DETUNE_SEMITONES;
+    static const Identifier OSC_TWO_DETUNE_CENTS;
 
     static const Identifier OSC_TWO_PAN;
 

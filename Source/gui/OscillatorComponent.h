@@ -7,7 +7,8 @@
 class OscillatorComponent : public Component {
 public:
     OscillatorComponent(
-        AudioProcessorValueTreeState &state, const Identifier &waveform_id, const String &pan_id,
+        AudioProcessorValueTreeState &state, const Identifier &waveform_id,
+        const String &detune_semitones_id, const String &detune_cents_id, const String &pan_id,
         const String &gain_attack_id, const String &gain_decay_id, const String &gain_sustain_id,
         const String &gain_release_id, const String &filter_type_id,
         const String &filter_enabled_id, const String &filter_cutoff_id, const String &filter_q_id);
@@ -21,6 +22,11 @@ private:
     // TODO: Perhaps this should be done with a TreeView?
     std::unique_ptr<WaveformSelectorListBoxModel> waveform_selector_model;
     ListBox waveform_selector;
+
+    Slider detune_semitones_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
+    Slider detune_cents_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
+    APVTS::SliderAttachment detune_semitones_slider_attachment;
+    APVTS::SliderAttachment detune_cents_slider_attachment;
 
     Slider pan_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
     APVTS::SliderAttachment pan_slider_attachment;

@@ -10,6 +10,9 @@ const Identifier DatabaseIdentifiers::OSC_ONE_GROUP {"OscOneGroup"};
 
 const Identifier DatabaseIdentifiers::OSC_ONE_WAVEFORM {"OscOneWaveform"};
 
+const Identifier DatabaseIdentifiers::OSC_ONE_DETUNE_SEMITONES {"OscOneDetuneSemitones"};
+const Identifier DatabaseIdentifiers::OSC_ONE_DETUNE_CENTS {"OscOneDetuneCents"};
+
 const Identifier DatabaseIdentifiers::OSC_ONE_PAN {"OscOnePan"};
 
 const Identifier DatabaseIdentifiers::OSC_ONE_GAIN {"OscOneGain"};
@@ -28,6 +31,9 @@ const Identifier DatabaseIdentifiers::OSC_ONE_FILTER_Q {"OscOneFilterQ"};
 const Identifier DatabaseIdentifiers::OSC_TWO_GROUP {"OscTwoGroup"};
 
 const Identifier DatabaseIdentifiers::OSC_TWO_WAVEFORM {"OscTwoWaveform"};
+
+const Identifier DatabaseIdentifiers::OSC_TWO_DETUNE_SEMITONES {"OscTwoDetuneSemitones"};
+const Identifier DatabaseIdentifiers::OSC_TWO_DETUNE_CENTS {"OscTwoDetuneCents"};
 
 const Identifier DatabaseIdentifiers::OSC_TWO_PAN {"OscTwoPan"};
 

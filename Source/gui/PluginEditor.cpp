@@ -15,6 +15,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
 
         DatabaseIdentifiers::OSC_ONE_WAVEFORM,
 
+        DatabaseIdentifiers::OSC_ONE_DETUNE_SEMITONES.toString(),
+        DatabaseIdentifiers::OSC_ONE_DETUNE_CENTS.toString(),
+
         DatabaseIdentifiers::OSC_ONE_PAN.toString(),
 
         DatabaseIdentifiers::OSC_ONE_GAIN_ATTACK.toString(),
@@ -31,6 +34,9 @@ NaepenAudioProcessorEditor::NaepenAudioProcessorEditor(NaepenAudioProcessor &pro
         naepenProcessor.state,
 
         DatabaseIdentifiers::OSC_TWO_WAVEFORM,
+
+        DatabaseIdentifiers::OSC_TWO_DETUNE_SEMITONES.toString(),
+        DatabaseIdentifiers::OSC_TWO_DETUNE_CENTS.toString(),
 
         DatabaseIdentifiers::OSC_TWO_PAN.toString(),
 
