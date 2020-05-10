@@ -53,12 +53,13 @@ void OscillatorAudioProcessor::prepareToPlay(double sample_rate, int samples_per
 
     triangle_osc = std::make_shared<BandlimitedOscillator>(
         std::make_shared<const BandlimitedOscillator::LookupTable>(
-            make_triangle(20.0, sample_rate)));
+            BandlimitedOscillator::from_function(make_triangle, sample_rate)));
     square_osc = std::make_shared<BandlimitedOscillator>(
-        std::make_shared<const BandlimitedOscillator::LookupTable>(make_square(20.0, sample_rate)));
+        std::make_shared<const BandlimitedOscillator::LookupTable>(
+            BandlimitedOscillator::from_function(make_square, sample_rate)));
     engineers_sawtooth_osc = std::make_shared<BandlimitedOscillator>(
         std::make_shared<const BandlimitedOscillator::LookupTable>(
-            make_engineers_sawtooth(20.0, sample_rate)));
+            BandlimitedOscillator::from_function(make_engineers_sawtooth, sample_rate)));
 
     update_current_oscillator();
 }

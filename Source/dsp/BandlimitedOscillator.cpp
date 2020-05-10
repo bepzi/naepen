@@ -61,6 +61,35 @@ void BandlimitedOscillator::set_sample_rate(double sr)
     sample_rate = sr;
 }
 
+BandlimitedOscillator::LookupTable BandlimitedOscillator::from_function(
+    BandlimitedOscillator::make_table_func table_func, double sample_rate)
+{
+    assert(sample_rate > 0.0);
+
+    LookupTable table;
+    table.reserve(MAX_TABLES);
+
+    double freq_hz = 18.0;
+    while (freq_hz < (sample_rate / 2) && table.size() < MAX_TABLES) {
+        // Each table has a "top frequency" at which it can be safely used without aliasing.
+        // When saving the tables, we tell each table that it can play at a top frequency
+        // slightly greater than is actually true, because we want the tables to
+        // overlap a little bit to enable smooth switching between tables during playback.
+        // This is especially important for things like automated detune and pitch wheel bending.
+        // This comes at a cost of a negligible amount of aliasing.
+
+        // In this case, allow each table to overlap the next one by 1/8th
+        // (determined by qualitative analysis)
+        double overlap_freq_hz = freq_hz + (((freq_hz * 2) - freq_hz) / 8);
+
+        table.push_back(
+            std::make_pair<>(overlap_freq_hz / sample_rate, table_func(freq_hz, sample_rate)));
+        freq_hz *= 2;
+    }
+
+    return table;
+}
+
 BandlimitedOscillator::LookupTable
 BandlimitedOscillator::from_full_bandwidth(std::array<double, T> waveform)
 {
@@ -190,12 +219,12 @@ BandlimitedOscillator::LookupTable make_sine()
     return out;
 }
 
-BandlimitedOscillator::LookupTable make_triangle(double top_freq, double sample_rate)
+std::array<float, BandlimitedOscillator::T + 1> make_triangle(double top_freq, double sample_rate)
 {
     assert(top_freq > 0.0);
     assert(sample_rate > 0.0);
 
-    std::array<double, BandlimitedOscillator::T> samples = {};
+    std::array<float, BandlimitedOscillator::T + 1> samples = {};
 
     double phase = 0.0;
     double phase_delta = (2 * M_PI) / (double)(BandlimitedOscillator::T);
@@ -210,15 +239,16 @@ BandlimitedOscillator::LookupTable make_triangle(double top_freq, double sample_
         phase += phase_delta;
     }
 
-    return BandlimitedOscillator::from_full_bandwidth(samples);
+    samples[BandlimitedOscillator::T] = samples[0];
+    return samples;
 }
 
-BandlimitedOscillator::LookupTable make_square(double top_freq, double sample_rate)
+std::array<float, BandlimitedOscillator::T + 1> make_square(double top_freq, double sample_rate)
 {
     assert(top_freq > 0.0);
     assert(sample_rate > 0.0);
 
-    std::array<double, BandlimitedOscillator::T> samples = {};
+    std::array<float, BandlimitedOscillator::T + 1> samples = {};
 
     double phase = 0.0;
     double phase_delta = (2 * M_PI) / (double)(BandlimitedOscillator::T);
@@ -233,15 +263,17 @@ BandlimitedOscillator::LookupTable make_square(double top_freq, double sample_ra
         phase += phase_delta;
     }
 
-    return BandlimitedOscillator::from_full_bandwidth(samples);
+    samples[BandlimitedOscillator::T] = samples[0];
+    return samples;
 }
 
-BandlimitedOscillator::LookupTable make_engineers_sawtooth(double top_freq, double sample_rate)
+std::array<float, BandlimitedOscillator::T + 1>
+make_engineers_sawtooth(double top_freq, double sample_rate)
 {
     assert(top_freq > 0.0);
     assert(sample_rate > 0.0);
 
-    std::array<double, BandlimitedOscillator::T> samples = {};
+    std::array<float, BandlimitedOscillator::T + 1> samples = {};
 
     double phase = 0.0;
     double phase_delta = (2 * M_PI) / (double)(BandlimitedOscillator::T);
@@ -259,5 +291,6 @@ BandlimitedOscillator::LookupTable make_engineers_sawtooth(double top_freq, doub
         phase += phase_delta;
     }
 
-    return BandlimitedOscillator::from_full_bandwidth(samples);
+    samples[BandlimitedOscillator::T] = samples[0];
+    return samples;
 }
