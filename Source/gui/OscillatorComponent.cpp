@@ -90,7 +90,7 @@ void OscillatorComponent::resized()
     auto waveform_controls = area.reduced(0, 8);
 
     waveform_selector.setBounds(waveform_controls.removeFromLeft(col_width * 2)
-                                    .reduced(0, waveform_controls.getHeight() / 2));
+                                    .reduced(0, waveform_controls.getHeight() / 4));
 
     auto detune_controls = waveform_controls.removeFromLeft(col_width);
     detune_semitones_slider.setBounds(
