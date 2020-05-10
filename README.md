@@ -9,7 +9,7 @@ A polyphonic synthesizer.
 On Arch Linux:
 
 ```bash
-sudo pacman -S juce fftw
+sudo pacman -S fftw
 git clone --recurse-submodules <repo_url.git> <repo> && cd <repo>
 cd Builds/LinuxMakefile  # Alternatively, build with CMake
 CONFIG=Release make -j
