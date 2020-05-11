@@ -10,8 +10,14 @@ public:
             window_background_argb, widget_background_argb, menu_background_argb, outline_argb,
             default_text_argb, default_fill_argb, highlighted_text_argb, highlighted_fill_argb,
             menu_text_argb);
-
         setColourScheme(scheme);
+
+        auto font_typeface = Typeface::createSystemTypefaceFor(
+            BinaryData::TruenoRg_otf, BinaryData::TruenoRg_otfSize);
+        jassert(font_typeface->getName().isNotEmpty());
+        setDefaultSansSerifTypeface(font_typeface);
+
+        setDefaultLookAndFeel(this);
     }
 
     void drawLabel(Graphics &g, Label &label) override

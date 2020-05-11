@@ -36,6 +36,7 @@ add_executable (STANDALONE_PLUGIN
 set_source_files_properties ("../../juce/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp" PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library (SHARED_CODE STATIC
+    "../../Assets/TruenoRg.otf"
     "../../Source/processors/OscillatorAudioProcessor.cpp"
     "../../Source/processors/OscillatorAudioProcessor.h"
     "../../Source/processors/ProcessorBase.h"
@@ -1600,6 +1601,8 @@ add_library (SHARED_CODE STATIC
     "../../juce/modules/juce_opengl/juce_opengl.mm"
     "../../juce/modules/juce_opengl/juce_opengl.h"
     "../../JuceLibraryCode/AppConfig.h"
+    "../../JuceLibraryCode/BinaryData.cpp"
+    "../../JuceLibraryCode/BinaryData.h"
     "../../JuceLibraryCode/include_juce_audio_basics.cpp"
     "../../JuceLibraryCode/include_juce_audio_devices.cpp"
     "../../JuceLibraryCode/include_juce_audio_formats.cpp"
@@ -1619,6 +1622,7 @@ add_library (SHARED_CODE STATIC
     "../../JuceLibraryCode/JucePluginDefines.h"
 )
 
+set_source_files_properties ("../../Assets/TruenoRg.otf" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/processors/OscillatorAudioProcessor.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/processors/ProcessorBase.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../Source/dsp/NoiseOscillator.h" PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -3171,6 +3175,7 @@ set_source_files_properties ("../../juce/modules/juce_opengl/juce_opengl.cpp" PR
 set_source_files_properties ("../../juce/modules/juce_opengl/juce_opengl.mm" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../juce/modules/juce_opengl/juce_opengl.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../JuceLibraryCode/AppConfig.h" PROPERTIES HEADER_FILE_ONLY TRUE)
+set_source_files_properties ("../../JuceLibraryCode/BinaryData.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../JuceLibraryCode/JuceHeader.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 set_source_files_properties ("../../JuceLibraryCode/JucePluginDefines.h" PROPERTIES HEADER_FILE_ONLY TRUE)
 

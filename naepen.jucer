@@ -6,9 +6,12 @@
               pluginName="Naepen" pluginManufacturer="Benjamin Zinn" aaxIdentifier="com.github.bepzi.naepen"
               version="0.1.0" projectLineFeed="&#10;" displaySplashScreen="0"
               reportAppUsage="0" splashScreenColour="Dark" bundleIdentifier="com.github.bepzi.naepen"
-              pluginDesc="A polyphonic synthesizer" includeBinaryInJuceHeader="0"
+              pluginDesc="A polyphonic synthesizer" includeBinaryInJuceHeader="1"
               headerPath="../../Source">
   <MAINGROUP id="ysGfdO" name="naepen">
+    <GROUP id="{9032A88A-711A-C343-BABB-F5F18F6583F3}" name="Assets">
+      <FILE id="cfQrMb" name="TruenoRg.otf" compile="0" resource="1" file="Assets/TruenoRg.otf"/>
+    </GROUP>
     <GROUP id="{DF682C7B-3045-DC10-66DE-B8D64A35269A}" name="Source">
       <GROUP id="{41B85368-F388-4262-FE4C-BD6AC376C775}" name="processors">
         <FILE id="LBiEBT" name="OscillatorAudioProcessor.cpp" compile="1" resource="0"
