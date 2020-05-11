@@ -35,7 +35,23 @@ OscillatorComponent::OscillatorComponent(
     addAndMakeVisible(oscillator_name_label);
 
     waveform_selector.updateContent();
-    waveform_selector.selectRow(0);
+
+    // Properly select the correct waveform on startup
+    int selected_waveform_idx = 0;
+    const String &selected_waveform_id =
+        state.state.getProperty(waveform_id, waveform_selector_model->waveforms[0].first)
+            .toString();
+    for (; selected_waveform_idx < (int)waveform_selector_model->waveforms.size();
+         ++selected_waveform_idx) {
+        if (waveform_selector_model->waveforms[selected_waveform_idx].first ==
+            selected_waveform_id) {
+            break;
+        }
+
+        jassert(selected_waveform_idx != (int)waveform_selector_model->waveforms.size() - 1);
+    }
+    waveform_selector.selectRow(selected_waveform_idx);
+
     addAndMakeVisible(waveform_selector);
 
     addAndMakeVisible(detune_semitones_slider);
