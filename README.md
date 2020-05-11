@@ -2,7 +2,11 @@
 
 ![](https://github.com/bepzi/naepen/workflows/CI/badge.svg) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A polyphonic synthesizer.
+A toy polyphonic synthesizer. Not ready for production!
+
+<p align="center">
+    <img src="screenshots/naepen-2020-05-10.png?raw=true" alt="Naepen (2020-05-10)"/>
+</p>
 
 ### Building
 
