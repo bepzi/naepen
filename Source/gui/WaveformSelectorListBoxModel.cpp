@@ -4,14 +4,14 @@
 
 WaveformSelectorListBoxModel::WaveformSelectorListBoxModel(
     AudioProcessorValueTreeState &apvts, Identifier waveform_id) :
-    state(apvts),
-    waveform_id(std::move(waveform_id)),
     waveforms(
         {{"Sine", "Sine"},
          {"Triangle", "Triangle"},
          {"Square", "Square"},
          {"EngineersSawtooth", "Engineer's Sawtooth"},
-         {"WhiteNoise", "White Noise"}})
+         {"WhiteNoise", "White Noise"}}),
+    state(apvts),
+    waveform_id(std::move(waveform_id))
 {
 }
 

@@ -15,11 +15,11 @@ public:
 
     void selectedRowsChanged(int row) override;
 
+    // list of (database name, human-readable name)
+    const std::vector<std::pair<String, String>> waveforms;
+
 private:
     AudioProcessorValueTreeState &state;
 
     Identifier waveform_id;
-
-    // list of (human-readable name, database-name)
-    std::vector<std::pair<String, String>> waveforms;
 };

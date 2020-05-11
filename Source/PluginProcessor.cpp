@@ -110,18 +110,6 @@ AudioProcessorEditor *NaepenAudioProcessor::createEditor()
 }
 
 //==============================================================================
-#ifdef DEBUG
-// Don't save/load patch state when compiling in debug mode, for development purposes
-void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
-{
-    ignoreUnused(dest_data);
-}
-
-void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_bytes)
-{
-    ignoreUnused(data, size_in_bytes);
-}
-#else
 void NaepenAudioProcessor::getStateInformation(MemoryBlock &dest_data)
 {
     auto copied_state = state.copyState();
@@ -136,7 +124,6 @@ void NaepenAudioProcessor::setStateInformation(const void *data, int size_in_byt
         state.replaceState(ValueTree::fromXml(*xml));
     }
 }
-#endif
 
 void NaepenAudioProcessor::initialize_graph()
 {
