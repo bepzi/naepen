@@ -30,10 +30,10 @@ void WaveformSelectorListBoxModel::paintListBoxItem(
     Rectangle<int> area = {0, 0, width, height};
     area.reduce(2, 0);
     if (rowIsSelected) {
-        g.fillAll(Colours::darkgrey);
-        g.setColour(Colours::white);
+        g.fillAll(Colour(NaepenLookAndFeel::highlighted_fill_argb));
+        g.setColour(Colour(NaepenLookAndFeel::highlighted_text_argb));
     } else {
-        g.setColour(Colours::lightgrey);
+        g.setColour(Colour(NaepenLookAndFeel::default_text_argb));
     }
 
     g.drawText(waveforms[rowNumber].second, area, Justification::centredLeft);

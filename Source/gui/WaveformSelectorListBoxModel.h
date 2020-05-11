@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NaepenLookAndFeel.h"
 #include "dsp/BandlimitedOscillator.h"
 
 #include <JuceHeader.h>

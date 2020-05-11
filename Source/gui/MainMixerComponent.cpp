@@ -1,6 +1,9 @@
 #include "MainMixerComponent.h"
 
 #include "DatabaseIdentifiers.h"
+#include "NaepenLookAndFeel.h"
+
+static const int TEXT_HEIGHT = 24;
 
 MainMixerComponent::MainMixerComponent(AudioProcessorValueTreeState &state) :
     master_gain_slider_attachment(
@@ -11,28 +14,24 @@ MainMixerComponent::MainMixerComponent(AudioProcessorValueTreeState &state) :
         state, DatabaseIdentifiers::OSC_TWO_GAIN.toString(), osc_two_gain_slider)
 {
     addAndMakeVisible(master_gain_slider);
+    master_gain_label.setJustificationType(Justification::centred);
+    addAndMakeVisible(master_gain_label);
 
     addAndMakeVisible(osc_one_gain_slider);
-    addAndMakeVisible(osc_two_gain_slider);
-}
+    osc_one_gain_label.setJustificationType(Justification::centred);
+    addAndMakeVisible(osc_one_gain_label);
 
-/**
- * Stupid helper function because there's no native way in JUCE
- * to convert from Rectangle<int> to Rectangle<float>
- */
-static Rectangle<float> from_rect_int(Rectangle<int> int_rect)
-{
-    return {
-        (float)int_rect.getX(), (float)int_rect.getY(), (float)int_rect.getWidth(),
-        (float)int_rect.getHeight()};
+    addAndMakeVisible(osc_two_gain_slider);
+    osc_two_gain_label.setJustificationType(Justification::centred);
+    addAndMakeVisible(osc_two_gain_label);
 }
 
 void MainMixerComponent::paint(Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour(Colours::lightgrey);
-    g.drawRoundedRectangle(from_rect_int(getLocalBounds()), 8, 2);
+    g.setColour(Colour(NaepenLookAndFeel::outline_argb));
+    g.drawRoundedRectangle(getLocalBounds().toFloat(), 8, 3);
 }
 
 void MainMixerComponent::resized()
@@ -42,9 +41,17 @@ void MainMixerComponent::resized()
 
     auto width = area.getWidth() / 4;
 
-    master_gain_slider.setBounds(area.removeFromLeft(width));
+    auto region = area.removeFromLeft(width);
+    master_gain_label.setBounds(region.removeFromBottom(TEXT_HEIGHT));
+    master_gain_slider.setBounds(region);
+
     area.removeFromLeft(width);
 
-    osc_one_gain_slider.setBounds(area.removeFromLeft(width));
-    osc_two_gain_slider.setBounds(area);
+    region = area.removeFromLeft(width);
+    osc_one_gain_label.setBounds(region.removeFromBottom(TEXT_HEIGHT));
+    osc_one_gain_slider.setBounds(region);
+
+    region = area.removeFromLeft(width);
+    osc_two_gain_label.setBounds(region.removeFromBottom(TEXT_HEIGHT));
+    osc_two_gain_slider.setBounds(region);
 }
