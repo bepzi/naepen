@@ -11,7 +11,7 @@ public:
     bool appliesToChannel(int /* midi_channel */) override;
 };
 
-class OscillatorVoice : public SynthesiserVoice {
+class OscillatorVoice : public SynthesiserVoice, public ValueTree::Listener {
 public:
     OscillatorVoice(
         std::unique_ptr<Oscillator> oscillator, AudioProcessorValueTreeState &apvts,
@@ -20,6 +20,7 @@ public:
         std::atomic<float> *gain_sustain, std::atomic<float> *gain_release,
         Identifier filter_type_id, std::atomic<float> *filter_enabled,
         std::atomic<float> *filter_cutoff, std::atomic<float> *filter_q);
+    ~OscillatorVoice() override;
 
     bool canPlaySound(SynthesiserSound *sound) override;
 
@@ -42,6 +43,10 @@ public:
      * and the position of the pitch wheel.
      */
     static double calc_freq(int midi_nn, int pitch_wheel_pos, int cents_detune);
+
+    // =======================================================================
+    void valueTreePropertyChanged(
+        ValueTree &treeWhosePropertyHasChanged, const Identifier &property) override;
 
 private:
     std::unique_ptr<Oscillator> osc;

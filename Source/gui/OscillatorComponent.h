@@ -4,7 +4,7 @@
 
 #include <JuceHeader.h>
 
-class OscillatorComponent : public Component {
+class OscillatorComponent : public Component, public ComboBox::Listener {
 public:
     OscillatorComponent(
         const String &oscillator_name, AudioProcessorValueTreeState &state,
@@ -16,11 +16,15 @@ public:
 
     void paint(Graphics &) override;
     void resized() override;
+    void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 
 private:
     using APVTS = juce::AudioProcessorValueTreeState;
 
     Label oscillator_name_label;
+
+    APVTS &state;
+    String filter_type_id;
 
     // TODO: Perhaps this should be done with a TreeView?
     std::unique_ptr<WaveformSelectorListBoxModel> waveform_selector_model;
@@ -51,7 +55,7 @@ private:
     Label gain_release_label {"", "R"};
 
     ComboBox filter_type_combo_box;
-    APVTS::ComboBoxAttachment filter_type_combo_box_attachment;
+
     ToggleButton filter_enabled_button {"Filter Enabled"};
     Slider filter_cutoff_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};
     Slider filter_q_slider {Slider::RotaryHorizontalVerticalDrag, Slider::TextBoxBelow};

@@ -14,6 +14,9 @@ OscillatorComponent::OscillatorComponent(
     const String &filter_cutoff_id, const String &filter_q_id) :
     oscillator_name_label("", oscillator_name),
 
+    state(state),
+    filter_type_id(filter_type_id),
+
     waveform_selector_model(std::make_unique<WaveformSelectorListBoxModel>(state, waveform_id)),
     waveform_selector("", waveform_selector_model.get()),
 
@@ -27,7 +30,6 @@ OscillatorComponent::OscillatorComponent(
     gain_sustain_slider_attachment(state, gain_sustain_id, gain_sustain_slider),
     gain_release_slider_attachment(state, gain_release_id, gain_release_slider),
 
-    filter_type_combo_box_attachment(state, filter_type_id, filter_type_combo_box),
     filter_enabled_button_attachment(state, filter_enabled_id, filter_enabled_button),
     filter_cutoff_slider_attachment(state, filter_cutoff_id, filter_cutoff_slider),
     filter_q_slider_attachment(state, filter_q_id, filter_q_slider)
@@ -78,14 +80,12 @@ OscillatorComponent::OscillatorComponent(
     addAndMakeVisible(gain_sustain_label);
     addAndMakeVisible(gain_release_label);
 
-    // Gross! APVTS attachments don't take the specific kind of parameter
-    // into account, so even though our parameter is a ParameterChoice the attachment won't populate
-    // the ComboBox with its variants. We have to do duplicate some code and do it ourselves...
-    // TODO: Maybe some kind of wrapper/intermediate class to handle this weirdness?
-    filter_type_combo_box.addItemList({"Lowpass", "Highpass", "Bandpass"}, 1);
-    auto filter_type = static_cast<int>(
-        reinterpret_cast<AudioParameterChoice *>(state.getParameter(filter_type_id))->getIndex());
-    filter_type_combo_box.setSelectedItemIndex(filter_type, dontSendNotification);
+    // TODO: Writing out the filter variants here is a bit hackish, redo this
+    filter_type_combo_box.addItemList(
+        {"Lowpass", "Highpass", "Bandpass"}, (int)SvfFilter::Type::LOWPASS);
+    int selected_filter_id = state.state.getProperty(filter_type_id, (int)SvfFilter::Type::LOWPASS);
+    filter_type_combo_box.setSelectedId(selected_filter_id, dontSendNotification);
+    filter_type_combo_box.addListener(this);
 
     addAndMakeVisible(filter_type_combo_box);
     addAndMakeVisible(filter_enabled_button);
@@ -171,4 +171,16 @@ void OscillatorComponent::resized()
         gain_release_label.setBounds(region.removeFromBottom(TEXT_HEIGHT));
         gain_release_slider.setBounds(region);
     }
+}
+
+void OscillatorComponent::comboBoxChanged(ComboBox *comboBoxThatHasChanged)
+{
+    if (comboBoxThatHasChanged != &filter_type_combo_box) {
+        return;
+    }
+
+    int selected_filter_type = filter_type_combo_box.getSelectedId();
+    jassert(selected_filter_type > 0);
+
+    state.state.setProperty(filter_type_id, selected_filter_type, nullptr);
 }

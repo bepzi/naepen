@@ -43,6 +43,12 @@ OscillatorVoice::OscillatorVoice(
     filter_cutoff(filter_cutoff),
     filter_q(filter_q)
 {
+    state.state.addListener(this);
+}
+
+OscillatorVoice::~OscillatorVoice()
+{
+    state.state.removeListener(this);
 }
 
 bool OscillatorVoice::canPlaySound(SynthesiserSound *sound)
@@ -90,12 +96,6 @@ void OscillatorVoice::renderNextBlock(
 {
     jassert(output_buffer.getNumChannels() == 2);
 
-    auto filter_type = static_cast<SvfFilter::Type>(
-        reinterpret_cast<AudioParameterChoice *>(state.getParameter(filter_type_id))->getIndex());
-    if (filter_type != filter.get_type()) {
-        filter.set_type(filter_type);
-    }
-
     for (int i = start_sample; i < start_sample + num_samples; ++i) {
         if (!gain_envelope.isActive()) {
             clearCurrentNote();
@@ -139,4 +139,19 @@ double OscillatorVoice::calc_freq(int nn, int wheel_pos, int cents_detune)
 
     // TODO: This algorithm locks us into equal-temperament, assuming A4 = 440Hz
     return pow(2, (actual_nn - 69) / 12.0) * 440.0;
+}
+
+// ====================================================
+void OscillatorVoice::valueTreePropertyChanged(
+    ValueTree &treeWhosePropertyHasChanged, const Identifier &property)
+{
+    ignoreUnused(treeWhosePropertyHasChanged);
+
+    if (property != filter_type_id) {
+        return;
+    }
+
+    auto filter_type = (SvfFilter::Type)(int)state.state.getProperty(
+        filter_type_id, (int)SvfFilter::Type::LOWPASS);
+    filter.set_type(filter_type);
 }

@@ -194,12 +194,10 @@ void NaepenAudioProcessor::initialize_graph()
     // to the graph to handle. I think.
 }
 
-// TODO: Add static methods to each automatable component to generate their own parameters
+// TODO: Add static methods to each automatable component to generate their own parameters?
 APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
 {
     NormalisableRange<float> gain_range = {0.0f, 1.0f, 0.001f};
-
-    const StringArray filter_type_choices = {"Lowpass", "Highpass", "Bandpass"};
 
     NormalisableRange<float> adr_range = {0.0f, 5.0f, 0.001f};
     adr_range.setSkewForCentre(0.75f);
@@ -252,9 +250,6 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             std::move(osc_one_gain_decay), std::move(osc_one_gain_sustain),
             std::move(osc_one_gain_release));
 
-        auto osc_one_filter_type = std::make_unique<AudioParameterChoice>(
-            DatabaseIdentifiers::OSC_ONE_FILTER_TYPE.toString(), "Osc 1 Filter Type",
-            filter_type_choices, 0);
         auto osc_one_filter_enabled = std::make_unique<AudioParameterBool>(
             DatabaseIdentifiers::OSC_ONE_FILTER_ENABLED.toString(), "Osc 1 Filter Enabled", false);
 
@@ -269,8 +264,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             DatabaseIdentifiers::OSC_ONE_FILTER_Q.toString(), "Osc 1 Filter Q", q_range, 0.5f);
 
         osc_one_group->addChild(
-            std::move(osc_one_filter_type), std::move(osc_one_filter_enabled),
-            std::move(osc_one_filter_cutoff), std::move(osc_one_filter_q));
+            std::move(osc_one_filter_enabled), std::move(osc_one_filter_cutoff),
+            std::move(osc_one_filter_q));
     }
 
     // Parameters for Oscillator 2
@@ -309,9 +304,6 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             std::move(osc_two_gain_decay), std::move(osc_two_gain_sustain),
             std::move(osc_two_gain_release));
 
-        auto osc_two_filter_type = std::make_unique<AudioParameterChoice>(
-            DatabaseIdentifiers::OSC_TWO_FILTER_TYPE.toString(), "Osc 2 Filter Type",
-            filter_type_choices, 0);
         auto osc_two_filter_enabled = std::make_unique<AudioParameterBool>(
             DatabaseIdentifiers::OSC_TWO_FILTER_ENABLED.toString(), "Osc 2 Filter Enabled", false);
 
@@ -326,8 +318,8 @@ APVTS::ParameterLayout NaepenAudioProcessor::create_parameter_layout()
             DatabaseIdentifiers::OSC_TWO_FILTER_Q.toString(), "Osc 2 Filter Q", q_range, 0.5f);
 
         osc_two_group->addChild(
-            std::move(osc_two_filter_type), std::move(osc_two_filter_enabled),
-            std::move(osc_two_filter_cutoff), std::move(osc_two_filter_q));
+            std::move(osc_two_filter_enabled), std::move(osc_two_filter_cutoff),
+            std::move(osc_two_filter_q));
     }
 
     return {std::move(master_gain_param), std::move(osc_one_group), std::move(osc_two_group)};
