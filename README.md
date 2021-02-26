@@ -4,6 +4,12 @@
 
 A toy polyphonic synthesizer. Not ready for production!
 
+This was my final project for Prof. Taube's
+[MUS205](http://cmp.music.illinois.edu/courses/taube/mus205/) at the
+University of Illinois. If you are a future MUS205 student, you are
+welcome to take inspiration from this code, provided you give proper
+attribution.
+
 <p align="center">
     <img src="screenshots/naepen-2020-05-10.png?raw=true" alt="Naepen (2020-05-10)"/>
 </p>
