@@ -1,8 +1,6 @@
 <h1 align="center">Naepen</h1>
 
-![](https://github.com/bepzi/naepen/workflows/CI/badge.svg) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-
-A toy polyphonic synthesizer. Not ready for production!
+![](https://github.com/bepzi/naepen/workflows/CI/badge.svg) [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 
 This was my final project for Prof. Taube's
 [MUS205](http://cmp.music.illinois.edu/courses/taube/mus205/) at the
